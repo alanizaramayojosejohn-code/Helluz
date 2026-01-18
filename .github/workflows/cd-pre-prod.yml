@@ -1,0 +1,64 @@
+# name: CD - Angular Firebase Staging
+
+# on:
+#   push:
+#     branches:
+#       - staging
+#   pull_request:
+#     branches:
+#       - staging
+
+# jobs:
+#   ci:
+#     name: CI Angular (staging)
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout repositorio
+#         uses: actions/checkout@v4
+
+#       - name: Instalar Bun
+#         uses: oven-sh/setup-bun@v1
+#         with:
+#           bun-version: latest
+
+#       - name: Instalar dependencias
+#         run: bun install --frozen-lockfile
+
+#       - name: Lint Angular
+#         run: bun run lint
+
+#       - name: Build Angular
+#         run: bun run build --configuration production
+
+#   cd:
+#     name: Deploy Firebase Staging
+#     runs-on: ubuntu-latest
+#     needs: ci
+
+#     steps:
+#       - name: Checkout repositorio
+#         uses: actions/checkout@v4
+
+#       - name: Instalar Bun
+#         uses: oven-sh/setup-bun@v1
+#         with:
+#           bun-version: latest
+
+#       - name: Instalar dependencias
+#         run: bun install --frozen-lockfile
+
+#       - name: Build Angular producción
+#         run: bun run build --configuration production
+
+#       - name: Instalar Firebase CLI
+#         run: bun add -g firebase-tools
+
+#       - name: Deploy Firebase Pre-Prod
+#         env:
+#           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN_PREPROD }}
+#         run: |
+#           firebase deploy \
+#             --only hosting,dataconnect \
+#             --project cafe-pre-prod \
+#             --non-interactive

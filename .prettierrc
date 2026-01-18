@@ -1,0 +1,23 @@
+{
+  "tabWidth": 3,
+  "semi": false,
+  "arrowParens": "always",
+  "printWidth": 120,
+  "trailingComma": "es5",
+  "singleQuote": true,
+  "bracketSpacing": true,
+  "htmlWhitespaceSensitivity": "strict",
+  "insertPragma": false,
+  "proseWrap": "always",
+  "quoteProps": "consistent",
+  "requirePragma": false,
+  "useTabs": false,
+  "overrides": [
+    {
+      "files": "*.html",
+      "options": {
+        "parser": "angular"
+      }
+    }
+  ]
+}
