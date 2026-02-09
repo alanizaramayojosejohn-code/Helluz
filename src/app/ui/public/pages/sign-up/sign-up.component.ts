@@ -15,7 +15,7 @@ import { MatButtonModule } from '@angular/material/button'
 import { MatIconModule } from '@angular/material/icon'
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { MatDividerModule } from '@angular/material/divider'
-import { AuthService } from '../../../services/auth.service'
+import { AuthService } from '../../../../services/auth.service'
 
 @Component({
    selector: 'app-sign-up',
@@ -34,7 +34,7 @@ import { AuthService } from '../../../services/auth.service'
    templateUrl: './sign-up.component.html',
    // styleUrls: ['./sign-up.component.css']
 })
-export class SignUpComponent {
+export default class SignUpComponent {
    registerForm: FormGroup
    loading = signal(false)
    errorMessage = signal('')

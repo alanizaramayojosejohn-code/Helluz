@@ -1,0 +1,168 @@
+<div class="min-h-screen bg-white text-white p-6">
+   <div class="max-w-3xl mx-auto">
+      <div class="mb-8">
+         <h1 class="text-4xl font-bold text-red-600 mb-2">
+            {{ isEditMode() ? 'Editar Horario' : 'Registrar Horario' }}
+         </h1>
+         <p class="text-gray-400">Completa la información del horario</p>
+      </div>
+
+      <form [formGroup]="scheduleForm" (ngSubmit)="onSubmit()" class="space-y-6">
+         <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-6 space-y-6">
+            <!-- Sucursal -->
+            <mat-form-field appearance="outline" class="w-full">
+               <mat-label>Sucursal</mat-label>
+               <mat-select formControlName="branchId" required>
+                  @for (branch of branches$ | async; track branch.id) {
+                     <mat-option [value]="branch.id">{{ branch.name }}</mat-option>
+                  }
+               </mat-select>
+               @if (hasFieldError('branchId')) {
+                  <mat-error>{{ getFieldError('branchId') }}</mat-error>
+               }
+            </mat-form-field>
+
+            <!-- Día y Disciplina -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Día de la semana</mat-label>
+                  <mat-select formControlName="day" required>
+                     @for (day of days$ | async; track day.id) {
+                        <mat-option [value]="day.name">{{ day.name }}</mat-option>
+                     }
+                  </mat-select>
+                  @if (hasFieldError('day')) {
+                     <mat-error>{{ getFieldError('day') }}</mat-error>
+                  }
+               </mat-form-field>
+
+               <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Disciplina</mat-label>
+                  <mat-select formControlName="discipline" required>
+                     @for (discipline of disciplines$ | async; track discipline.id) {
+                        <mat-option [value]="discipline.name">
+                           {{ discipline.name }}
+                        </mat-option>
+                     }
+                  </mat-select>
+                  @if (hasFieldError('discipline')) {
+                     <mat-error>{{ getFieldError('discipline') }}</mat-error>
+                  }
+               </mat-form-field>
+            </div>
+
+            <!-- Horarios -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Hora de inicio</mat-label>
+                  <input matInput type="time" formControlName="startTime" required autocomplete="off" />
+                  @if (hasFieldError('startTime')) {
+                     <mat-error>{{ getFieldError('startTime') }}</mat-error>
+                  }
+               </mat-form-field>
+
+               <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Hora de fin</mat-label>
+                  <input matInput type="time" formControlName="endTime" required autocomplete="off" />
+                  @if (hasFieldError('endTime')) {
+                     <mat-error>{{ getFieldError('endTime') }}</mat-error>
+                  }
+               </mat-form-field>
+            </div>
+
+            <!-- Instructor -->
+            @if (instructors$) {
+               <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Instructor (Opcional)</mat-label>
+                  <mat-select formControlName="instructorId">
+                     <mat-option value="">Sin instructor asignado</mat-option>
+                     @for (instructor of instructors$ | async; track instructor.id) {
+                        <mat-option [value]="instructor.id">
+                           {{ getInstructorFullName(instructor) }}
+                        </mat-option>
+                     }
+                  </mat-select>
+               </mat-form-field>
+            }
+         </div>
+
+         <!-- Error de validación cruzada -->
+         @if (scheduleForm.hasError('invalidTimeRange') && scheduleForm.touched) {
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+               <div class="flex items-center gap-3">
+                  <svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                     <path
+                        fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clip-rule="evenodd"
+                     />
+                  </svg>
+                  <p class="text-sm text-red-800">La hora de fin debe ser posterior a la hora de inicio</p>
+               </div>
+            </div>
+         }
+
+         <!-- Error Message -->
+         @if (errorMessage()) {
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+               <div class="flex items-center gap-3">
+                  <svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                     <path
+                        fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clip-rule="evenodd"
+                     />
+                  </svg>
+                  <p class="text-sm text-red-800">{{ errorMessage() }}</p>
+               </div>
+            </div>
+         }
+
+         <!-- Botones -->
+         <div class="flex gap-4">
+            <button
+               type="button"
+               (click)="onCancel()"
+               [disabled]="isSubmitting()"
+               class="flex-1 bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+               Cancelar
+            </button>
+
+            <button
+               type="submit"
+               [disabled]="!canSubmit()"
+               class="flex-1 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+               @if (isSubmitting()) {
+                  <span class="flex items-center justify-center gap-2">
+                     <svg
+                        class="animate-spin h-5 w-5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                     >
+                        <circle
+                           class="opacity-25"
+                           cx="12"
+                           cy="12"
+                           r="10"
+                           stroke="currentColor"
+                           stroke-width="4"
+                        ></circle>
+                        <path
+                           class="opacity-75"
+                           fill="currentColor"
+                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                     </svg>
+                     Guardando...
+                  </span>
+               } @else {
+                  {{ submitButtonText() }}
+               }
+            </button>
+         </div>
+      </form>
+   </div>
+</div>

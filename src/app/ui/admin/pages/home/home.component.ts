@@ -24,7 +24,7 @@ import { MatMenuModule } from '@angular/material/menu'
    templateUrl: './home.component.html',
    // styleUrls: ['./home.component.css']
 })
-export class Home implements OnInit {
+export default class Home implements OnInit {
    user = signal<User | null>(null)
 
    constructor(public authService: AuthService) {}

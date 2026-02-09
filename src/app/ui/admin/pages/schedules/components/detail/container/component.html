@@ -1,0 +1,118 @@
+<!-- <div class="min-h-screen bg-white p-6">
+  <div class="max-w-4xl mx-auto">
+    <div class="flex items-center gap-4 mb-8">
+      <button
+        (click)="onBack()"
+        class="text-gray-600 hover:text-gray-800 transition">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <h1 class="text-4xl font-bold text-red-600">Detalle del Horario</h1>
+    </div>
+
+    @if (isLoading()) {
+      <div class="flex justify-center items-center py-12">
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>
+    }
+
+    @if (errorMessage() && !isLoading()) {
+      <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+        <div class="flex items-center gap-3">
+          <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+          </svg>
+          <p class="text-sm text-red-800">{{ errorMessage() }}</p>
+        </div>
+      </div>
+    }
+
+    @if (schedule() && !isLoading()) {
+      <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg overflow-hidden">
+        <div class="bg-red-600 text-white p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-bold mb-2">{{ getDayLabel(schedule()!.day) }}</h2>
+              <p class="text-red-100">{{ getTimeRange(schedule()!) }}</p>
+            </div>
+            <mat-chip [class]="getDisciplineColor(schedule()!.discipline) + ' text-white text-lg px-4 py-2'">
+              {{ getDisciplineLabel(schedule()!.discipline) }}
+            </mat-chip>
+          </div>
+        </div>
+
+        <div class="p-6 space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-semibold text-gray-600 mb-2">Sucursal</label>
+              <p class="text-lg text-gray-800">{{ schedule()!.branchName }}</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-600 mb-2">Disciplina</label>
+              <p class="text-lg text-gray-800">{{ getDisciplineLabel(schedule()!.discipline) }}</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-600 mb-2">Día</label>
+              <p class="text-lg text-gray-800">{{ getDayLabel(schedule()!.day) }}</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-600 mb-2">Horario</label>
+              <p class="text-lg text-gray-800">{{ getTimeRange(schedule()!) }}</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-600 mb-2">Instructor</label>
+              @if (schedule()!.instructorName) {
+                <p class="text-lg text-gray-800">{{ schedule()!.instructorName }}</p>
+              } @else {
+                <p class="text-lg text-gray-400">Sin instructor asignado</p>
+              }
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-600 mb-2">Estado</label>
+              @if (schedule.status) {
+                <mat-chip class="bg-green-100 text-green-800">Activo</mat-chip>
+              } @else {
+                <mat-chip class="bg-red-100 text-red-800">Inactivo</mat-chip>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-200 p-6 flex gap-4">
+          <button
+            (click)="onEdit()"
+            class="flex-1 bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            </svg>
+            Editar
+          </button>
+
+          <button
+            (click)="onDelete()"
+            [disabled]="isDeleting()"
+            class="flex-1 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+            @if (isDeleting()) {
+              <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Eliminando...
+            } @else {
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+              Eliminar
+            }
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div> -->

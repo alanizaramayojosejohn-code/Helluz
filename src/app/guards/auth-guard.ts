@@ -34,7 +34,7 @@ export const noAuthGuard: CanActivateFn = (route, state) => {
          if (!user) {
             return true
          } else {
-            router.navigate(['/home'])
+            router.navigate(['/admin/home'])
             return false
          }
       })

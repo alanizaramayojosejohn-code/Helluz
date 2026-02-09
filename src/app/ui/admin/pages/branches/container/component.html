@@ -1,0 +1,18 @@
+<div class="min-h-screen">
+   @switch (currentView()) {
+      @case ('list') {
+         <x-list (createBranch)="showForm()" (editBranch)="showForm($event)" (viewDetail)="showDetail($event)" />
+      }
+      @case ('form') {
+         <x-form
+            [branchId]="selectedBranchId()"
+            [isEditMode]="isEditMode()"
+            (cancel)="showList()"
+            (saved)="showList()"
+         />
+      }
+      @case ('detail') {
+         <x-detail [branchId]="selectedBranchId()!" (edit)="showForm($event)" (back)="showList()" />
+      }
+   }
+</div>

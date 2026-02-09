@@ -1,0 +1,71 @@
+<div class="min-h-screen">
+   <div class="max-w-7xl mx-auto">
+      <h1 class="sucursal text-3xl font-sans text-red-700">Sucursales</h1>
+
+      <div class="flex justify-between items-center mb-8">
+         <h1 class="text-4xl font-bold text-gray-600">Productos</h1>
+         <button
+            (click)="onCreateBranch()"
+            class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition"
+         >
+            + Nuevo Producto
+         </button>
+      </div>
+
+      @if (branches$ | async; as branches) {
+         @if (branches.length > 0) {
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+               @for (branch of branches; track branch.id) {
+                  <div
+                     class="bg-gray-100 shadow-sm shadow-black rounded-lg overflow-hidden hover:border-gray-600 transition"
+                  >
+                     <div class="p-4">
+                        <div class="flex justify-between items-start mb-2">
+                           <h3 class="text-xl font-bold text-gray-900">{{ branch.name }}</h3>
+                           <span
+                              [class.bg-green-600]="branch.status === 'activo'"
+                              [class.bg-gray-600]="branch.status === 'inactivo'"
+                              class="text-xs px-2 py-1 rounded"
+                           >
+                              {{ branch.status }}
+                           </span>
+                        </div>
+
+                        <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ branch.city }}</p>
+
+                        <div class="flex justify-between items-center mb-4">
+                           <span class="text-lg text-black"> {{ branch.ip }}</span>
+                        </div>
+
+                        <div>
+                           <span class="text-lg py-1 rounded"> {{ branch.mask }}</span>
+                        </div>
+
+                        <div class="flex gap-2 mt-4">
+                           <button
+                              (click)="onEditBranch(branch.id!)"
+                              class="flex-1 bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded transition"
+                           >
+                              Editar
+                           </button>
+                           <button
+                              (click)="onViewDetail(branch.id!)"
+                              class="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded transition"
+                           >
+                              Ver
+                           </button>
+                           <button
+                              (click)="deleteBranch(branch)"
+                              class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition"
+                           >
+                              Eliminar
+                           </button>
+                        </div>
+                     </div>
+                  </div>
+               }
+            </div>
+         }
+      }
+   </div>
+</div>

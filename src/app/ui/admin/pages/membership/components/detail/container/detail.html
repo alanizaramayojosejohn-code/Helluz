@@ -1,0 +1,91 @@
+<!-- components/detail/container/component.html -->
+<div class="p-6 max-w-3xl mx-auto">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">Detalle de Membresía</h1>
+    <button mat-icon-button (click)="onClose()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex justify-center p-8">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (membership(); as membership) {
+    <mat-card class="mb-4">
+      <mat-card-header>
+        <mat-card-title class="text-xl">{{ membership.name }}</mat-card-title>
+        <mat-card-subtitle>
+          <mat-chip
+            [class]="membership.status === 'activo' ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'"
+            (click)="onToggleStatus()"
+            class="cursor-pointer"
+          >
+            {{ membership.status }}
+          </mat-chip>
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content class="mt-4">
+        <div class="grid grid-cols-2 gap-4">
+          <!-- Duración -->
+          <div class="border-l-4 border-blue-500 pl-4">
+            <p class="text-sm text-gray-600">Duración</p>
+            <p class="text-lg font-semibold">{{ membership.durationDays }} días</p>
+          </div>
+
+          <!-- Sesiones -->
+          <div class="border-l-4 border-purple-500 pl-4">
+            <p class="text-sm text-gray-600">Total de Sesiones</p>
+            <p class="text-lg font-semibold">{{ membership.totalSessions }} sesiones</p>
+          </div>
+
+          <!-- Costo -->
+          <div class="border-l-4 border-green-500 pl-4">
+            <p class="text-sm text-gray-600">Costo</p>
+            <p class="text-lg font-semibold">${{ membership.cost }}</p>
+          </div>
+
+          <!-- Días permitidos -->
+          <div class="border-l-4 border-orange-500 pl-4">
+            <p class="text-sm text-gray-600">Días Permitidos</p>
+            <p class="text-lg font-semibold">{{ getDaysLabel(membership.allowedDays) }}</p>
+          </div>
+        </div>
+
+        <mat-divider class="my-6"></mat-divider>
+
+        <!-- Fechas -->
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <p class="text-gray-600">Creado</p>
+            <p class="font-medium">{{ getCreatedAtDate() | date: 'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+          <div>
+            <p class="text-gray-600">Última actualización</p>
+            <p class="font-medium">{{ getUpdatedAtDate() | date: 'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions class="flex gap-2 justify-end p-4">
+        <button mat-stroked-button color="warn" (click)="onDelete()">
+          <mat-icon>delete</mat-icon>
+          Eliminar
+        </button>
+        <button mat-raised-button color="primary" (click)="onEdit()">
+          <mat-icon>edit</mat-icon>
+          Editar
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  }
+</div>

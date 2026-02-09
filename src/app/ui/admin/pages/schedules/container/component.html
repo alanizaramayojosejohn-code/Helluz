@@ -1,0 +1,26 @@
+<div class="min-h-screen">
+  @switch (currentView()) {
+    @case ('list') {
+      <x-schedule-list
+        (createSchedule)="showForm()"
+        (editSchedule)="showForm($event)"
+        (viewDetail)="showDetail($event)"
+      />
+     }
+    @case ('form') {
+      <x-schedule-form
+        [scheduleId]="selectedScheduleId()"
+        [isEditMode]="isEditMode()"
+        (cancel)="showList()"
+        (saved)="showList()"
+      />
+    }
+    @case ('detail') {
+      <x-schedule-detail
+        [scheduleId]="selectedScheduleId()!"
+        (edit)="showForm($event)"
+        (back)="showList()"
+      />
+    }
+  }
+</div>
