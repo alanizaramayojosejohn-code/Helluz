@@ -16,5 +16,9 @@ export class NavbarOptionsComponent {
       { label: 'Inicio', icon: 'home', route: '/home' },
       { label: 'Asistencias', icon: 'person-cart', route: '/products' },
       { label: 'Perfil', icon: 'person', route: '/profile' },
+      { label: 'Sucursales', icon: 'person', route: '/admin/sucursales' },
+      { label: 'Horarios', icon: 'person', route: '/admin/horarios' },
+      { label: 'Instructores', icon: 'person', route: '/admin/instructores' },
+      { label: 'Membresías', icon: 'person', route: '/admin/membresias' },
    ]
 }

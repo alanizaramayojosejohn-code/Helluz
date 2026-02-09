@@ -1,76 +1,125 @@
-import { Injectable, inject } from '@angular/core';
-import { Firestore, getDocs, collection, serverTimestamp } from '@angular/fire/firestore';
-import { from, Observable } from 'rxjs';
-import { QueryService } from './query.service';
-import { Student, StudentCreate } from '../../models/student.model';
-import { v7 as uuidv7 } from 'uuid';
+// services/student/student.service.ts
+import { inject, Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Student, CreateStudentDto, UpdateStudentDto } from '../../models/student.model';
+import { StudentQueryService } from './student-query.service';
 
 @Injectable()
 export class StudentService {
+  private readonly query = inject(StudentQueryService);
 
-  private query = inject(QueryService)
-
-  getall(): Observable<Student[]>{
-    return this.query.getall()
+  getStudents(): Observable<Student[]> {
+    return this.query.getAll();
   }
 
-  getStudentById(id: string): Observable <Student | undefined> {
-    return this.query.getById(id)
+  getActiveStudents(): Observable<Student[]> {
+    return this.query.getActive();
   }
 
-  existStudent( ci: string, excludeId?: string): Observable <boolean> {
-    return from(this.query.existByCi(ci, excludeId))
+  getStudentById(id: string): Observable<Student | undefined> {
+    return this.query.getById(id);
   }
 
-  async addStudent( student: StudentCreate): Promise<string> {
-    try{
-      const id = uuidv7()
-      const normalizedName= student.name.trim().toLowerCase()
-      const ci= student.ci
-
-      const exist= await this.query.existByCi(ci)
-      if(exist){
-        throw new Error('El alumno ya existe')
+  async createStudent(student: CreateStudentDto): Promise<string> {
+    try {
+      // Validar CI único
+      const ciExists = await this.query.checkCiExists(student.ci);
+      if (ciExists) {
+        throw new Error('Ya existe un estudiante con ese CI');
       }
 
-      await this.query.create(id,
-         {...student,
-           name: normalizedName,
-            ci: ci})
+      // Validar nombre
+      if (student.name.trim().length < 2) {
+        throw new Error('El nombre debe tener al menos 2 caracteres');
+      }
 
-            return id
-    }catch(error){
-         console.error('Error al crear la sucursal', error)
-         throw error
+      // Validar apellido
+      if (student.lastname.trim().length < 2) {
+        throw new Error('El apellido debe tener al menos 2 caracteres');
+      }
+
+      // Validar CI
+      if (student.ci.trim().length < 5) {
+        throw new Error('El CI debe tener al menos 5 caracteres');
+      }
+
+      // Validar celular
+      if (student.cellphone.trim().length < 8) {
+        throw new Error('El celular debe tener al menos 8 dígitos');
+      }
+
+      // Validar email si se proporciona
+      if (student.email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(student.email)) {
+          throw new Error('El email no es válido');
+        }
+      }
+
+      const id = await this.query.create(student);
+      return id;
+    } catch (error) {
+      console.error('Error al crear el estudiante', error);
+      throw error;
     }
   }
 
-  // async updateStudent (id: string, student: Partial<Student>): Promise<string> {
-  //   try {
+  async updateStudent(id: string, student: UpdateStudentDto): Promise<void> {
+    try {
+      // Validar CI único si se está actualizando
+      if (student.ci) {
+        const ciExists = await this.query.checkCiExists(student.ci, id);
+        if (ciExists) {
+          throw new Error('Ya existe un estudiante con ese CI');
+        }
+      }
 
-  //     const normalizedName= student.name?.trim().toLowerCase()
-  //     const ciStudent= student.ci?
-  //     const exit = await this.query.existByCi(ciStudent, id)
-  //     if(exit){
-  //       throw new Error ('El del alumno ya está registrado')
-  //     }
+      // Validar nombre si se proporciona
+      if (student.name !== undefined && student.name.trim().length < 2) {
+        throw new Error('El nombre debe tener al menos 2 caracteres');
+      }
 
-  //     await this.query.update(id, {
-  //       ...student,
-  //     name: normalizedName,
-  //     ci: ciStudent,
-  //   updatedAt: serverTimestamp,})
+      // Validar apellido si se proporciona
+      if (student.lastname !== undefined && student.lastname.trim().length < 2) {
+        throw new Error('El apellido debe tener al menos 2 caracteres');
+      }
 
-  //     return id
+      // Validar CI si se proporciona
+      if (student.ci !== undefined && student.ci.trim().length < 5) {
+        throw new Error('El CI debe tener al menos 5 caracteres');
+      }
 
-  //   } catch (error) {
+      // Validar celular si se proporciona
+      if (student.cellphone !== undefined && student.cellphone.trim().length < 8) {
+        throw new Error('El celular debe tener al menos 8 dígitos');
+      }
 
-  //   }
+      // Validar email si se proporciona
+      if (student.email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(student.email)) {
+          throw new Error('El email no es válido');
+        }
+      }
 
-  // }
+      await this.query.update(id, student);
+    } catch (error) {
+      console.error('Error al actualizar el estudiante', error);
+      throw error;
+    }
+  }
 
+  async deleteStudent(id: string): Promise<void> {
+    try {
+      await this.query.delete(id);
+    } catch (error) {
+      console.error('Error al eliminar el estudiante', error);
+      throw error;
+    }
+  }
 
-  constructor() { }
-
+  async toggleStatus(id: string, currentStatus: 'activo' | 'inactivo'): Promise<void> {
+    const newStatus = currentStatus === 'activo' ? 'inactivo' : 'activo';
+    await this.query.update(id, { status: newStatus });
+  }
 }
-

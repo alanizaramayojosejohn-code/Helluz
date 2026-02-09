@@ -1,0 +1,120 @@
+<!-- components/form/container/component.html -->
+<div class="p-6 max-w-2xl mx-auto">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">{{ getFormTitle() }}</h1>
+    <button
+      class="text-gray-500 hover:text-gray-700"
+      (click)="onCancel()"
+      mat-icon-button
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex justify-center p-8">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <div class="bg-white rounded-lg shadow p-6">
+    <form [formGroup]="membershipForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      <!-- Nombre -->
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Nombre de la Membresía</mat-label>
+        <input matInput formControlName="name" placeholder="Ej: Mensual Premium" />
+        @if (hasError('name')) {
+          <mat-error>{{ getErrorMessage('name') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Duración en días -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Duración (días)</mat-label>
+          <input matInput type="number" formControlName="durationDays" placeholder="30" />
+          <mat-hint>Días de vigencia</mat-hint>
+          @if (hasError('durationDays')) {
+            <mat-error>{{ getErrorMessage('durationDays') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Total de sesiones -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Total de Sesiones</mat-label>
+          <input matInput type="number" formControlName="totalSessions" placeholder="12" />
+          <mat-hint>Sesiones incluidas</mat-hint>
+          @if (hasError('totalSessions')) {
+            <mat-error>{{ getErrorMessage('totalSessions') }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- Días permitidos -->
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Días Permitidos</mat-label>
+        <mat-select formControlName="allowedDays" multiple>
+          @for (day of daysOptions; track day.value) {
+            <mat-option [value]="day.value">{{ day.label }}</mat-option>
+          }
+        </mat-select>
+        <mat-hint>Días de uso permitido</mat-hint>
+        @if (hasError('allowedDays')) {
+          <mat-error>{{ getErrorMessage('allowedDays') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Costo -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Costo</mat-label>
+          <input matInput type="number" formControlName="cost" placeholder="0.00" />
+          <span matTextPrefix>$&nbsp;</span>
+          @if (hasError('cost')) {
+            <mat-error>{{ getErrorMessage('cost') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Estado -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Estado</mat-label>
+          <mat-select formControlName="status">
+            <mat-option value="activo">Activo</mat-option>
+            <mat-option value="inactivo">Inactivo</mat-option>
+          </mat-select>
+          @if (hasError('status')) {
+            <mat-error>{{ getErrorMessage('status') }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- Botones -->
+      <div class="flex gap-3 justify-end pt-4 border-t">
+        <button
+          type="button"
+          class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+          (click)="onCancel()"
+          [disabled]="isSubmitting()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+          [disabled]="isSubmitting()"
+        >
+          @if (isSubmitting()) {
+            <mat-spinner diameter="20" class="inline-block"></mat-spinner>
+          }
+          {{ isEditMode() ? 'Actualizar' : 'Crear' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

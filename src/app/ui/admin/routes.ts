@@ -25,4 +25,8 @@ export const AdminRoutes: Routes = [
       path: 'horarios',
       loadComponent: async () => await import('./pages/schedules/container/component'),
    },
+   {
+      path: 'membresias',
+      loadComponent: async () => await import('./pages/membership/container/component'),
+   },
 ]

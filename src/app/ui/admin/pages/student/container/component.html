@@ -1,0 +1,25 @@
+<!-- pages/students/container/component.html -->
+@switch (currentView()) {
+  @case ('list') {
+    <x-student-list
+      (createStudent)="showForm()"
+      (editStudent)="showForm($event)"
+      (viewDetail)="showDetail($event)"
+    />
+  }
+  @case ('form') {
+    <x-student-form
+      [studentId]="selectedStudentId()"
+      [isEditMode]="isEditMode()"
+      (saved)="showList()"
+      (cancelled)="showList()"
+    />
+  }
+  @case ('detail') {
+    <x-student-detail
+      [studentId]="selectedStudentId()!"
+      (edit)="showForm($event)"
+      (close)="showList()"
+    />
+  }
+}

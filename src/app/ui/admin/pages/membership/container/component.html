@@ -1,26 +1,22 @@
 <div class="min-h-screen">
-  @switch (currentView()) {
-    @case ('list') {
-      <x-schedule-list
-        (createSchedule)="showForm()"
-        (editSchedule)="showForm($event)"
-        (viewDetail)="showDetail($event)"
-      />
-     }
-    @case ('form') {
-      <x-schedule-form
-        [scheduleId]="selectedScheduleId()"
-        [isEditMode]="isEditMode()"
-        (cancel)="showList()"
-        (saved)="showList()"
-      />
-    }
-    @case ('detail') {
-      <x-schedule-detail
-        [scheduleId]="selectedScheduleId()!"
-        (edit)="showForm($event)"
-        (back)="showList()"
-      />
-    }
-  }
+   @switch (currentView()) {
+      @case ('list') {
+         <x-membership-list
+            (createMembership)="showForm()"
+            (editMembership)="showForm($event)"
+            (viewDetail)="showDetail($event)"
+         />
+      }
+      @case ('form') {
+         <x-membership-form
+            [membershipId]="selectedMembershipId()"
+            [isEditMode]="isEditMode()"
+            (cancel)="showList()"
+            (saved)="showList()"
+         />
+      }
+      @case ('detail') {
+         <x-membership-detail [membershipId]="selectedMembershipId()!" (edit)="showForm($event)" (back)="showList()" />
+      }
+   }
 </div>

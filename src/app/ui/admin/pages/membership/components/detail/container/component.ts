@@ -8,8 +8,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
 import { DatePipe } from '@angular/common';
-import { Membership } from '../../../../../models/membership.model';
-import { MembershipService } from '../../../../../services/membership/membership.service';
+import { MembershipService } from '../../../../../../../services/membership/membership.service';
+import { Membership } from '../../../../../../../models/membership.model';
 
 @Component({
   selector: 'x-membership-detail',

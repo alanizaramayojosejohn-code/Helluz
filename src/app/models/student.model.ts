@@ -1,24 +1,19 @@
-import { User } from '@angular/fire/auth';
-import { FieldValue, Timestamp } from 'firebase/firestore';
-
-export type  Studentstatus= 'activo' | 'inactivo'
+// models/student.model.ts
+import { Timestamp } from '@angular/fire/firestore';
 
 export interface Student {
-  id: 'uuidv7',
-  name : string,
-  ci: string,
-  celphone: number,
-  age:  Timestamp,
-  status: Studentstatus,
-  idSucursal: string,
-  createdAt: Timestamp,
-  updatedAt: Timestamp,
-  createdBy: User;
+  id?: string;
+  name: string;
+  lastname: string;
+  ci: string;
+  cellphone: string;
+  email?: string;
+  emergencyContact?: string;
+  emergencyPhone?: string;
+  status: 'activo' | 'inactivo';
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
 }
 
-export interface StudentCreate extends Omit <Student, 'id' | 'CreatedAt' | 'UpdatedAt'>{
-}
-
-export interface StudentUpdate extends Partial<Omit<Student, 'id' | 'createdAt' | 'updatedAt'>>{
- updatedAt?: FieldValue
-}
+export type CreateStudentDto = Omit<Student, 'id' | 'createdAt' | 'updatedAt'>;
+export type UpdateStudentDto = Partial<Omit<Student, 'id' | 'createdAt' | 'updatedAt'>>;
