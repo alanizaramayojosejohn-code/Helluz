@@ -1,0 +1,34 @@
+/* Animación para el éxito */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Hacer inputs más grandes y legibles */
+::ng-deep .mat-mdc-form-field {
+  font-size: 1.5rem !important;
+}
+
+::ng-deep .mat-mdc-form-field input {
+  font-size: 1.5rem !important;
+  padding: 1rem !important;
+}
+
+::ng-deep .mat-mdc-select {
+  font-size: 1.25rem !important;
+}
+
+/* Hacer que el input de CI sea más prominente */
+#studentCI {
+  text-align: center;
+  letter-spacing: 2px;
+  font-weight: 600;
+}

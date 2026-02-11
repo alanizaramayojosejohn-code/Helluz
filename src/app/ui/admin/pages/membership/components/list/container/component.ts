@@ -32,6 +32,7 @@ export class MembershipList implements OnInit {
    readonly createMembership = output<void>()
    readonly editMembership = output<string>()
    readonly viewDetail = output<string>()
+   
 
    memberships$!: Observable<Membership[]>
 

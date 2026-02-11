@@ -19,6 +19,8 @@ export class NavbarOptionsComponent {
       { label: 'Sucursales', icon: 'person', route: '/admin/sucursales' },
       { label: 'Horarios', icon: 'person', route: '/admin/horarios' },
       { label: 'Instructores', icon: 'person', route: '/admin/instructores' },
+      { label: 'Alumnos', icon: 'person', route: '/admin/alumnos' },
       { label: 'Membresías', icon: 'person', route: '/admin/membresias' },
+      { label: 'Inscripciones', icon: 'person', route: '/admin/inscripciones' },
    ]
 }

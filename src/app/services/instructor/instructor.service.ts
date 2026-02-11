@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { from, Observable, catchError, throwError } from 'rxjs';
+import { from, Observable, catchError, throwError, map } from 'rxjs';
 import { Instructor, CreateInstructorDto, UpdateInstructorDto } from '../../models/instructor.model';
 import { InstructorQueryService } from './instructor-query.service';
 import { v7 as uuidv7 } from 'uuid';
@@ -92,4 +92,12 @@ export class InstructorService {
   getInstructorFullName(instructor: Instructor): string {
     return `${instructor.name} ${instructor.lastname}`;
   }
+
+  // Agregar este método
+getInstructorByCI(ci: string): Observable<Instructor | undefined> {
+  return this.query.getByCI(ci).pipe(
+    map(instructors => instructors[0] as Instructor | undefined)
+  );
+}
+
 }

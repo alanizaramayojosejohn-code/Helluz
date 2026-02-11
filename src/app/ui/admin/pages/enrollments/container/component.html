@@ -1,0 +1,22 @@
+<div class="min-h-screen">
+   @switch (currentView()) {
+      @case ('list') {
+         <x-enrollment-list
+            (createEnrollment)="showForm()"
+            (editEnrollment)="showForm($event)"
+            (viewDetail)="showDetail($event)"
+         />
+      }
+      @case ('form') {
+         <x-enrollment-form
+            [enrollmentId]="selectedEnrollmentId()"
+            [isEditMode]="isEditMode()"
+            (cancel)="showList()"
+            (saved)="showList()"
+         />
+      }
+      @case ('detail') {
+         <x-enrollment-detail [enrollmentId]="selectedEnrollmentId()!" (edit)="showForm($event)" (back)="showList()" />
+      }
+   }
+</div>

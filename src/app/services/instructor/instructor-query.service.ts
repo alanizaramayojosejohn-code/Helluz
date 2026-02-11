@@ -114,5 +114,17 @@ export class InstructorQueryService {
   getDocumentReference(id: string): DocumentReference {
     return doc(this.firestore, 'instructors', id);
   }
+
+  // Agregar este método
+getByCI(ci: string): Observable<Instructor[]> {
+  const q = query(
+    this.instructorsCollection,
+    where('ci', '==', ci.trim()),
+    where('status', '==', 'activo')
+  );
+
+  return collectionData(q, { idField: 'id' }) as Observable<Instructor[]>;
+}
+
 }
 

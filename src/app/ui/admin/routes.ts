@@ -29,4 +29,13 @@ export const AdminRoutes: Routes = [
       path: 'membresias',
       loadComponent: async () => await import('./pages/membership/container/component'),
    },
+   {
+    path: 'alumnos',
+    loadComponent: async () => await import('./pages/student/container/component'),
+   },
+   {
+    path: 'inscripciones',
+    loadComponent: async () => await import('./pages/enrollments/container/component'),
+   },
+
 ]

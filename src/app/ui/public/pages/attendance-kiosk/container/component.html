@@ -1,0 +1,107 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-red-900 to-gray-900 flex items-center justify-center p-4">
+   <div class="max-w-2xl">
+      <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+         <div class="bg-red-600 text-white p-4 text-center">
+            <h1 class="text2xl font-bold">Registro de Asistencia</h1>
+            <p class="text-xl text-red-100">Academia de MMA</p>
+         </div>
+
+         <form [formGroup]="attendanceForm" (ngSubmit)="onSubmit()" class="p-3 space-y-6">
+
+          <mat-form-field appearance="outline" class="w-full">
+               <mat-label class="text-sm">Cédula de Identidad</mat-label>
+               <input
+                  matInput
+                  id="studentCI"
+                  formControlName="studentCI"
+                  placeholder="Ingresa tu CI..."
+                  autocomplete="off"
+                  class="text-sm py-1"
+                  autofocus
+               />
+               <mat-icon matPrefix class="text-gray-500">badge</mat-icon>
+               @if (hasFieldError('studentCI')) {
+                  <mat-error class="text-lg">{{ getFieldError('studentCI') }}</mat-error>
+               }
+            </mat-form-field>
+
+            @if (schedules().length > 0) {
+               <mat-form-field appearance="outline" class="w-full">
+                  <mat-label class="text-xl">Clase</mat-label>
+                  <mat-select formControlName="scheduleId" required>
+                     @for (schedule of schedules(); track schedule.id) {
+                        <mat-option [value]="schedule.id" class="text-xl py-4">
+                           {{ getDisciplineName(schedule.discipline) }} - {{ getScheduleTime(schedule) }}
+                           @if (schedule.instructorName) {
+                              <span class="text-gray-500"> - {{ schedule.instructorName }}</span>
+                           }
+                        </mat-option>
+                     }
+                  </mat-select>
+                  @if (hasFieldError('scheduleId')) {
+                     <mat-error class="text-lg">{{ getFieldError('scheduleId') }}</mat-error>
+                  }
+               </mat-form-field>
+            } @else if (attendanceForm.get('branchId')?.value) {
+               <div class="text-center py-8 text-gray-500">
+                  <mat-icon class="text-6xl mb-4">event_busy</mat-icon>
+                  <p class="text-xl">No hay clases disponibles en este momento</p>
+               </div>
+            }
+
+            @if (hasSuccess()) {
+               <div class="bg-green-50 border-2 border-green-500 rounded-lg p-6 animate-pulse">
+                  <div class="flex items-center gap-4">
+                     <mat-icon class="text-green-600 text-5xl">check_circle</mat-icon>
+                     <div>
+                        <p class="text-2xl font-bold text-green-800">¡Éxito!</p>
+                        <p class="text-xl text-green-700">{{ successMessage() }}</p>
+                     </div>
+                  </div>
+               </div>
+            }
+
+            @if (hasError()) {
+               <div class="bg-red-50 border-2 border-red-500 rounded-lg p-6">
+                  <div class="flex items-center gap-4">
+                     <mat-icon class="text-red-600 text-5xl">error</mat-icon>
+                     <div>
+                        <p class="text-2xl font-bold text-red-800">Error</p>
+                        <p class="text-xl text-red-700">{{ errorMessage() }}</p>
+                     </div>
+                  </div>
+               </div>
+            }
+
+            <button
+               type="submit"
+               [disabled]="isSubmitting() || attendanceForm.invalid"
+               class="w-full bg-red-600 hover:bg-red-700 text-white px-2 py-2 rounded-lg font-bold text-sm transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+            >
+               @if (isSubmitting()) {
+                  <span class="flex items-center justify-center gap-3">
+                     <mat-spinner diameter="30" class="inline-block"></mat-spinner>
+                     Registrando...
+                  </span>
+               } @else {
+                  <span class="flex items-center justify-center gap-3">
+                     <mat-icon class="text-sm">check</mat-icon>
+                     REGISTRAR ASISTENCIA
+                  </span>
+               }
+            </button>
+         </form>
+
+         <div class="bg-gray-100 p-6 text-center text-gray-600">
+            <p class="text-lg">
+               <mat-icon class="align-middle mr-2">info</mat-icon>
+               Escanea tu carnet o ingresa tu CI manualmente
+            </p>
+         </div>
+      </div>
+
+      <div class="mt-6 text-center text-white text-sm">
+         <p>¿Problemas para registrar? Contacta a recepción</p>
+      </div>
+   </div>
+</div>

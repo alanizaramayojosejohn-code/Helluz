@@ -8,7 +8,7 @@ export interface Schedule {
   startTime: string;
   endTime: string;
   discipline: string;
-  instructorId?: string; // OPCIONAL - Asignar instructor
+  instructorId?: string;
   instructorName?: string;
   status: 'activo' | 'inactivo';
   createdAt?: Timestamp;
