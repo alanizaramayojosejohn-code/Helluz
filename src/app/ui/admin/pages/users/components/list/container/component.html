@@ -1,0 +1,157 @@
+<!-- components/list/container/component.html -->
+<div class="min-h-screen bg-white p-6">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+      <div>
+        <h1 class="text-4xl font-bold text-red-600 mb-2">Gestión de Usuarios</h1>
+        <p class="text-gray-600">Administra los usuarios del sistema</p>
+      </div>
+      <button
+        (click)="onCreateUser()"
+        class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center gap-2"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Nuevo Usuario
+      </button>
+    </div>
+
+    <!-- Instrucciones -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+      <div class="flex items-start gap-3">
+        <svg class="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <div>
+          <p class="font-semibold text-blue-900 mb-1">Instrucciones para crear usuarios:</p>
+          <ol class="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+            <li>Ir a <strong>Firebase Console → Authentication → Users → Add User</strong></li>
+            <li>Crear usuario con email y contraseña</li>
+            <li>Copiar el <strong>UID</strong> del usuario creado</li>
+            <li>Hacer clic en "Nuevo Usuario" y completar los datos con el UID</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-4 mb-6">
+      <mat-form-field appearance="outline" class="w-full md:w-64">
+        <mat-label>Filtrar por Rol</mat-label>
+        <mat-select [value]="roleFilter()" (selectionChange)="onRoleFilterChange($event.value)">
+          <mat-option value="all">Todos</mat-option>
+          <mat-option value="admin">Administradores</mat-option>
+          <mat-option value="instructor">Instructores</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    @if (isLoading()) {
+      <div class="flex justify-center p-8">
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    @if (users$ | async; as users) {
+      <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Usuario
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Email
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Rol
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Estado
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Acciones
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            @for (user of filterUsers(users); track user.id) {
+              <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900">{{ getFullName(user) }}</div>
+                  <div class="text-xs text-gray-500">UID: {{ user.id }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                  {{ user.email }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span
+                    [class]="getRoleBadgeClass(user.role)"
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                  >
+                    {{ user.role }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span
+                    [class]="user.status === 'activo'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-gray-100 text-gray-800'"
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full cursor-pointer"
+                    (click)="onToggleStatus(user)"
+                  >
+                    {{ user.status }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2">
+                  <button
+                    class="text-blue-600 hover:text-blue-900 inline-flex items-center"
+                    (click)="onViewDetail(user)"
+                    matTooltip="Ver detalle"
+                  >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                  </button>
+                  <button
+                    class="text-indigo-600 hover:text-indigo-900 inline-flex items-center"
+                    (click)="onEditUser(user)"
+                    matTooltip="Editar"
+                  >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                  </button>
+                  <button
+                    class="text-orange-600 hover:text-orange-900 inline-flex items-center"
+                    (click)="onResetPassword(user)"
+                    matTooltip="Restablecer contraseña"
+                  >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                  No hay usuarios registrados
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

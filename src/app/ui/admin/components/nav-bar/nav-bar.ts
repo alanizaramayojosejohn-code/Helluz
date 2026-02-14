@@ -4,23 +4,22 @@ import { RouterLink } from '@angular/router'
 import { MatToolbarModule } from '@angular/material/toolbar'
 import { MatButtonModule } from '@angular/material/button'
 import { MatIconModule } from '@angular/material/icon'
-import { AuthService } from '../../../../services/auth.service'
 import { NavbarOptionsComponent } from '../navbar-options/navbar-options'
-import { User } from '@angular/fire/auth'
+import { AuthService } from '../../../../services/auth/auth.service'
+import { AuthUser } from '../../../../models/user.model'
 
 @Component({
    selector: 'app-navbar',
    imports: [CommonModule, RouterLink, MatToolbarModule, MatButtonModule, MatIconModule, NavbarOptionsComponent],
    templateUrl: './nav-bar.html',
    styleUrls: ['./nav-bar.css'],
-})
-export class NavbarComponent implements OnInit {
-   user = signal<User | null>(null)
+})export class NavbarComponent implements OnInit {
+   user = signal<AuthUser | null>(null)
 
    constructor(public authService: AuthService) {}
 
    ngOnInit() {
-      this.authService.user$.subscribe((user) => {
+      this.authService.currentUser$.subscribe((user) => {
          this.user.set(user)
       })
    }
@@ -31,8 +30,8 @@ export class NavbarComponent implements OnInit {
 
    getUserDisplayName(): string {
       const currentUser = this.user()
-      if (currentUser?.displayName) {
-         return currentUser.displayName
+      if (currentUser?.name) {
+         return `${currentUser.name} ${currentUser.lastname}`
       }
       if (currentUser?.email) {
          return currentUser.email.split('@')[0]
@@ -45,6 +44,11 @@ export class NavbarComponent implements OnInit {
    }
 
    getPhotoURL(): string {
-      return this.user()?.photoURL || 'https://ui-avatars.com/api/?name=' + this.getUserDisplayName()
+      return 'https://ui-avatars.com/api/?name=' + encodeURIComponent(this.getUserDisplayName())
+   }
+
+   getUserRole(): string {
+      const currentUser = this.user()
+      return currentUser?.role === 'admin' ? 'Administrador' : 'Instructor'
    }
 }

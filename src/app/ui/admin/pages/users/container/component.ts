@@ -1,36 +1,39 @@
-import { AsyncPipe } from '@angular/common'
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
-import { User } from '@angular/fire/auth'
-import { FormsModule } from '@angular/forms'
-import { UserService } from '../../../../../services/user/user.service'
-import { Observable } from 'rxjs'
-import { AppUser, UserRole } from '../../../../../models/user.model'
+// pages/users/container/component.ts
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { UserList } from '../components/list/container/component';
+import { UserForm } from '../components/form/container/component';
+import { UserDetail } from '../components/detail/container/component';
+import { UserService } from '../../../../../services/user/user.service';
+import { UserQueryService } from '../../../../../services/user/user-query.service';
+
+type View = 'list' | 'form' | 'detail';
 
 @Component({
-   selector: 'x-admin-users',
-   imports: [AsyncPipe, FormsModule],
-   providers: [UserService],
-   templateUrl: './component.html',
-   changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'x-users-container',
+  imports: [UserList, UserForm, UserDetail],
+  providers: [UserService, UserQueryService],
+  templateUrl: './component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export default class AdminUsersComponent {
-   private userService = inject(UserService)
-   users$: Observable<AppUser[]> = this.userService.getUsers()
+export default class UsersComponent {
+  currentView = signal<View>('list');
+  selectedUserId = signal<string | null>(null);
+  isEditMode = signal<boolean>(false);
 
-   async updateRole(uid: string, role: UserRole) {
-      try {
-         await this.userService.updateUserRole(uid, role)
-         alert('Rol actualizado')
-      } catch (error) {
-         alert('Error al actualizar rol')
-      }
-   }
+  showList(): void {
+    this.currentView.set('list');
+    this.selectedUserId.set(null);
+    this.isEditMode.set(false);
+  }
 
-   async toggleStatus(uid: string, isActive: boolean) {
-      try {
-         await this.userService.toggleUserStatus(uid, isActive)
-      } catch (error) {
-         alert('Error al cambiar estado')
-      }
-   }
+  showForm(userId: string | null = null): void {
+    this.currentView.set('form');
+    this.selectedUserId.set(userId);
+    this.isEditMode.set(!!userId);
+  }
+
+  showDetail(userId: string): void {
+    this.currentView.set('detail');
+    this.selectedUserId.set(userId);
+  }
 }

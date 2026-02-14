@@ -1,0 +1,32 @@
+<!-- <div class="p-6 bg-gym-dark min-h-screen">
+  <h2 class="text-white text-2xl font-bold mb-6 border-b border-gym-red pb-2 uppercase tracking-tighter">
+    Asistencias de Hoy: <span class="text-gym-red">Alumnos</span>
+  </h2>
+
+  <div class="overflow-x-auto rounded-lg border border-zinc-800">
+    <table class="w-full text-left text-zinc-300">
+      <thead class="bg-zinc-900 text-gym-red uppercase text-xs">
+        <tr>
+          <th class="p-4">Hora</th>
+          <th class="p-4">Alumno</th>
+          <th class="p-4">Disciplina</th>
+          <th class="p-4">Sesiones Restantes</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-zinc-800">
+        @for (item of studentAttendances(); track item.id) {
+          <tr class="hover:bg-zinc-900 transition-colors">
+            <td class="p-4 font-mono text-zinc-500">{{ item.date.toDate() | date:'HH:mm' }}</td>
+            <td class="p-4 font-bold text-white">{{ item.studentName }}</td>
+            <td class="p-4 uppercase text-xs">{{ item.disciplineName }}</td>
+            <td class="p-4">
+              <span [class]="item.sessionsAfter <= 2 ? 'text-gym-red animate-pulse' : 'text-green-500'">
+                {{ item.sessionsAfter }}
+              </span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div> -->

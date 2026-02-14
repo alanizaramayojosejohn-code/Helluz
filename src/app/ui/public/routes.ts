@@ -6,11 +6,11 @@ export const PublicRoutes: Routes = [
       loadComponent: async () => await import('./pages/log-in/log-in.component'),
    },
    {
-      path: 'asistencia',
-      loadComponent: async () => await import('./pages/attendance-kiosk/container/component'),
-   },
-   {
       path: '',
-      loadComponent: async () => await import('./pages/sign-up/sign-up.component'),
+      loadComponent: async () => await import('./pages/log-in/log-in.component'),
    },
+   //  {
+   //   path: 'asistenciae',
+   //   loadComponent: async () => await import('./../admin/pages/studentAttendance/components/mark/container/component')
+   //  }
 ]

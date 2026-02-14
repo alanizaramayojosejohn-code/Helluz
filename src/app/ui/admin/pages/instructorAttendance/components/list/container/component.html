@@ -1,0 +1,296 @@
+<div class="min-h-screen bg-gray-50 p-6">
+  <div class="max-w-7xl mx-auto">
+
+    <!-- Header -->
+    <div class="mb-6 flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">
+          Asistencias de Instructores
+        </h1>
+        <p class="text-gray-600">Control de puntualidad y horas trabajadas</p>
+      </div>
+      <button
+        (click)="onBack()"
+        class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Volver a registro
+      </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Branch Filter -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Sucursal</mat-label>
+          <mat-select (selectionChange)="onBranchChange($event.value)">
+            @for (branch of branches$ | async; track branch.id) {
+              <mat-option [value]="branch.id">{{ branch.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Date Filter -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Fecha</mat-label>
+          <input
+            matInput
+            [matDatepicker]="picker"
+            (dateChange)="onDateChange($event)"
+          />
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+
+        <!-- Status Filter -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Estado</mat-label>
+          <mat-select (selectionChange)="onStatusChange($event.value)">
+            <mat-option [value]="undefined">Todos</mat-option>
+            <mat-option value="presente">Presente</mat-option>
+            <mat-option value="retrasado">Retrasado</mat-option>
+            <mat-option value="falta">Falta</mat-option>
+            <mat-option value="permiso">Permiso</mat-option>
+            <mat-option value="salida-anticipada">Salida Anticipada</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    @if (stats$ | async; as stats) {
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+        <div class="bg-white rounded-lg p-4 border border-gray-200">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600">Total</p>
+              <p class="text-2xl font-bold text-gray-900">{{ stats.total }}</p>
+            </div>
+            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg p-4 border border-gray-200">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600">A tiempo</p>
+              <p class="text-2xl font-bold text-green-600">{{ stats.presente }}</p>
+            </div>
+            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg p-4 border border-gray-200">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600">Retrasados</p>
+              <p class="text-2xl font-bold text-yellow-600">{{ stats.retrasado }}</p>
+            </div>
+            <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg p-4 border border-gray-200">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600">Puntualidad</p>
+              <p class="text-2xl font-bold text-indigo-600">{{ stats.punctualityRate }}%</p>
+            </div>
+            <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg p-4 border border-gray-200">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600">Horas Total</p>
+              <p class="text-2xl font-bold text-purple-600">{{ stats.totalHours }}h</p>
+            </div>
+            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Table -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      @if (filteredAttendances$ | async; as attendances) {
+        @if (attendances.length > 0) {
+          <div class="overflow-x-auto">
+            <table mat-table [dataSource]="attendances" class="w-full">
+
+              <!-- Date/Time Column -->
+              <ng-container matColumnDef="createdAt">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold text-gray-700">Fecha/Hora</th>
+                <td mat-cell *matCellDef="let attendance" class="text-sm">
+                  <div class="font-medium text-gray-900">{{ formatDateTime(attendance.createdAt) }}</div>
+                </td>
+              </ng-container>
+
+              <!-- Instructor Name Column -->
+              <ng-container matColumnDef="instructorName">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold text-gray-700">Instructor</th>
+                <td mat-cell *matCellDef="let attendance" class="text-sm">
+                  <div class="font-medium text-gray-900">{{ attendance.instructorName }}</div>
+                </td>
+              </ng-container>
+
+              <!-- Schedule Column -->
+              <ng-container matColumnDef="schedule">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold text-gray-700">Horario</th>
+                <td mat-cell *matCellDef="let attendance" class="text-sm">
+                  <div class="text-gray-900">
+                    {{ attendance.expectedStartTime }} - {{ attendance.expectedEndTime }}
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Punctuality Column -->
+              <ng-container matColumnDef="punctuality">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold text-gray-700">Puntualidad</th>
+                <td mat-cell *matCellDef="let attendance" class="text-sm">
+                  <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs text-gray-500">Llegada:</span>
+                      <span class="font-medium text-gray-900">{{ attendance.actualArrivalTime }}</span>
+                    </div>
+                    @if (attendance.isLate) {
+                      <div class="flex items-center gap-1 text-yellow-600">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="text-xs font-medium">+{{ attendance.minutesLate }} min</span>
+                      </div>
+                    } @else {
+                      <div class="flex items-center gap-1 text-green-600">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="text-xs font-medium">A tiempo</span>
+                      </div>
+                    }
+                    @if (attendance.actualDepartureTime) {
+                      <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-500">Salida:</span>
+                        <span class="font-medium text-gray-900">{{ attendance.actualDepartureTime }}</span>
+                      </div>
+                    }
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Hours Column -->
+              <ng-container matColumnDef="hours">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold text-gray-700">Horas</th>
+                <td mat-cell *matCellDef="let attendance" class="text-sm">
+                  <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs text-gray-500">Programadas:</span>
+                      <span class="font-medium text-gray-900">{{ attendance.scheduledHours }}h</span>
+                    </div>
+                    @if (attendance.actualHours) {
+                      <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-500">Trabajadas:</span>
+                        <span class="font-medium"
+                              [class.text-green-600]="attendance.actualHours >= attendance.scheduledHours"
+                              [class.text-orange-600]="attendance.actualHours < attendance.scheduledHours">
+                          {{ attendance.actualHours }}h
+                        </span>
+                      </div>
+                    } @else {
+                      <span class="text-xs text-gray-500 italic">En clase...</span>
+                    }
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Status Column -->
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold text-gray-700">Estado</th>
+                <td mat-cell *matCellDef="let attendance">
+                  <span
+                    class="px-3 py-1 rounded-full text-xs font-medium"
+                    [ngClass]="getStatusClass(attendance.status)"
+                  >
+                    @if (attendance.status === 'salida-anticipada') {
+                      Salida anticipada
+                    } @else {
+                      {{ attendance.status | titlecase }}
+                    }
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Actions Column -->
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold text-gray-700">Acciones</th>
+                <td mat-cell *matCellDef="let attendance">
+                  <div class="flex items-center gap-2">
+                    @if (!attendance.actualDepartureTime) {
+                      <button
+                        mat-icon-button
+                        (click)="markDeparture(attendance)"
+                        class="text-green-600 hover:text-green-800"
+                      >
+                        <mat-icon>logout</mat-icon>
+                      </button>
+                    }
+                    <button
+                      mat-icon-button
+                      (click)="openEditDialog(attendance)"
+                      class="text-blue-600 hover:text-blue-800"
+                    >
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      (click)="deleteAttendance(attendance)"
+                      class="text-red-600 hover:text-red-800"
+                    >
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50"></tr>
+            </table>
+          </div>
+        } @else {
+          <div class="p-12 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No hay asistencias</h3>
+            <p class="mt-1 text-sm text-gray-500">No se encontraron registros para los filtros seleccionados.</p>
+          </div>
+        }
+      }
+    </div>
+
+  </div>
+</div>

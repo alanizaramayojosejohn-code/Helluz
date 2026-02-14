@@ -1,37 +1,17 @@
-<div class="p-6">
-   <h2 class="text-2xl font-bold mb-6">Gestión de Usuarios</h2>
-
-   <div class="grid gap-4">
-      @for (user of users$ | async; track user.id) {
-         <div class="bg-white p-4 rounded-lg shadow">
-            <div class="flex justify-between items-center">
-               <div>
-                  <h3 class="font-semibold">{{ user.displayName }}</h3>
-                  <p class="text-sm text-gray-600">{{ user.email }}</p>
-               </div>
-
-               <div class="flex gap-2 items-center">
-                  <select
-                     [value]="user.role"
-                     (change)="updateRole(user.id, $any($event.target).value)"
-                     class="px-3 py-2 border rounded"
-                  >
-                     <option value="admin">Admin</option>
-                     <option value="cajero">Cajero</option>
-                     <option value="cocinero">Cocinero</option>
-                  </select>
-
-                  <button
-                     (click)="toggleStatus(user.id, !user.isActive)"
-                     [class.bg-green-500]="user.isActive"
-                     [class.bg-red-500]="!user.isActive"
-                     class="px-4 py-2 text-white rounded"
-                  >
-                     {{ user.isActive ? 'Activo' : 'Inactivo' }}
-                  </button>
-               </div>
-            </div>
-         </div>
-      }
-   </div>
-</div>
+<!-- pages/users/container/component.html -->
+@switch (currentView()) {
+   @case ('list') {
+      <x-user-list (createUser)="showForm()" (editUser)="showForm($event)" (viewDetail)="showDetail($event)" />
+   }
+   @case ('form') {
+      <x-user-form
+         [userId]="selectedUserId()"
+         [isEditMode]="isEditMode()"
+         (saved)="showList()"
+         (cancelled)="showList()"
+      />
+   }
+   @case ('detail') {
+      <x-user-detail [userId]="selectedUserId()!" (edit)="showForm($event)" (close)="showList()" />
+   }
+}

@@ -1,0 +1,213 @@
+<div class="min-h-screen bg-gray-50 p-6">
+  <div class="max-w-7xl mx-auto">
+
+    <!-- Header -->
+    <div class="mb-6 flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">
+          Asistencias de Estudiantes
+        </h1>
+        <p class="text-gray-600">Registro diario de asistencias</p>
+      </div>
+      <button
+        (click)="onBack()"
+        class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Volver a registro
+      </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Branch Filter -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Sucursal</mat-label>
+          <mat-select (selectionChange)="onBranchChange($event.value)">
+            @for (branch of branches$ | async; track branch.id) {
+              <mat-option [value]="branch.id">{{ branch.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Date Filter -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Fecha</mat-label>
+          <input
+            matInput
+            [matDatepicker]="picker"
+            (dateChange)="onDateChange($event)"
+          />
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+
+        <!-- Status Filter -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Estado</mat-label>
+          <mat-select (selectionChange)="onStatusChange($event.value)">
+            <mat-option [value]="undefined">Todos</mat-option>
+            <mat-option value="presente">Presente</mat-option>
+            <mat-option value="falta">Falta</mat-option>
+            <mat-option value="permiso">Permiso</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    @if (stats$ | async; as stats) {
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded-lg p-4 border border-gray-200">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600">Total</p>
+              <p class="text-2xl font-bold text-gray-900">{{ stats.total }}</p>
+            </div>
+            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg p-4 border border-gray-200">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600">Presentes</p>
+              <p class="text-2xl font-bold text-green-600">{{ stats.presente }}</p>
+            </div>
+            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg p-4 border border-gray-200">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600">Faltas</p>
+              <p class="text-2xl font-bold text-red-600">{{ stats.falta }}</p>
+            </div>
+            <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg p-4 border border-gray-200">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600">Permisos</p>
+              <p class="text-2xl font-bold text-yellow-600">{{ stats.permiso }}</p>
+            </div>
+            <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Table -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      @if (filteredAttendances$ | async; as attendances) {
+        @if (attendances.length > 0) {
+          <div class="overflow-x-auto">
+            <table mat-table [dataSource]="attendances" class="w-full">
+
+              <!-- Date/Time Column -->
+              <ng-container matColumnDef="createdAt">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold text-gray-700">Fecha/Hora</th>
+                <td mat-cell *matCellDef="let attendance" class="text-sm">
+                  <div class="font-medium text-gray-900">{{ formatDateTime(attendance.createdAt) }}</div>
+                </td>
+              </ng-container>
+
+              <!-- Student Name Column -->
+              <ng-container matColumnDef="studentName">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold text-gray-700">Estudiante</th>
+                <td mat-cell *matCellDef="let attendance" class="text-sm">
+                  <div class="font-medium text-gray-900">{{ attendance.studentName }}</div>
+                </td>
+              </ng-container>
+
+              <!-- Session Info Column -->
+              <ng-container matColumnDef="sessionInfo">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold text-gray-700">Sesiones</th>
+                <td mat-cell *matCellDef="let attendance" class="text-sm">
+                  <div class="flex items-center gap-2">
+                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">
+                      #{{ attendance.sessionNumber }}
+                    </span>
+                    <span class="text-xs text-gray-600">
+                      {{ attendance.remainingSessionsAfter }} restantes
+                    </span>
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Status Column -->
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold text-gray-700">Estado</th>
+                <td mat-cell *matCellDef="let attendance">
+                  <span
+                    class="px-3 py-1 rounded-full text-xs font-medium"
+                    [ngClass]="getStatusClass(attendance.status)"
+                  >
+                    {{ attendance.status | titlecase }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Actions Column -->
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold text-gray-700">Acciones</th>
+                <td mat-cell *matCellDef="let attendance">
+                  <div class="flex items-center gap-2">
+                    <button
+                      mat-icon-button
+                      (click)="openEditDialog(attendance)"
+                      class="text-blue-600 hover:text-blue-800"
+                    >
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      (click)="deleteAttendance(attendance)"
+                      class="text-red-600 hover:text-red-800"
+                    >
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50"></tr>
+            </table>
+          </div>
+        } @else {
+          <div class="p-12 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No hay asistencias</h3>
+            <p class="mt-1 text-sm text-gray-500">No se encontraron registros para los filtros seleccionados.</p>
+          </div>
+        }
+      }
+    </div>
+
+  </div>
+</div>

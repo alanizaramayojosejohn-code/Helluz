@@ -2,10 +2,13 @@ import { inject, Injectable } from '@angular/core'
 import { from, Observable, catchError, throwError } from 'rxjs'
 import { Schedule, CreateScheduleDto, UpdateScheduleDto } from '../../models/schedule.model'
 import { ScheduleQueryService } from './schedule-query.service'
+import { collection, Firestore, getDocs, limit, query, where } from '@angular/fire/firestore'
 
 @Injectable()
 export class ScheduleService {
+
    private query = inject(ScheduleQueryService)
+   private firestore = inject(Firestore)
 
    getSchedules(): Observable<Schedule[]> {
       return this.query.getAll()
@@ -21,6 +24,9 @@ export class ScheduleService {
 
    getSchedulesByDay(branchId: string, day: string): Observable<Schedule[]> {
       return this.query.getByDay(branchId, day)
+   }
+   getActiveSchedules(): Observable<Schedule[]>{
+    return this.query.getActive()
    }
 
    checkTimeConflict$(
@@ -115,4 +121,30 @@ export class ScheduleService {
 
       return endMinutes > startMinutes
    }
+
+   async getInstructorScheduleForToday(instructorId: string, dayName: string): Promise<Schedule | null> {
+  try {
+    const col = collection(this.firestore, 'schedules');
+    const q = query(
+      col,
+      where('instructorId', '==', instructorId),
+      where('day', '==', dayName),
+      where('status', '==', 'activo'),
+      limit(1)
+    );
+
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      return null;
+    }
+
+    const doc = snapshot.docs[0];
+    return { id: doc.id, ...doc.data() } as Schedule;
+
+  } catch (error) {
+    console.error('Error al buscar horario del instructor:', error);
+    return null;
+  }
+}
 }

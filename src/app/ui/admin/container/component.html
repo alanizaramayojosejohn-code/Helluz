@@ -1,4 +1,11 @@
-<app-navbar></app-navbar>
-<h1>admin</h1>
-
-<router-outlet />
+<div class="app-container">
+      <app-header></app-header>
+      <app-sidebar></app-sidebar>
+      <main
+        [class.content-expanded]="!sidebarService.isOpen()"
+        [class.content-collapsed]="sidebarService.isOpen()"
+        class="main-content"
+      >
+        <router-outlet></router-outlet>
+      </main>
+    </div>

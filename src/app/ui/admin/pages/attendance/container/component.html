@@ -1,0 +1,26 @@
+<!-- <div class="min-h-screen">
+  @switch (currentView()) {
+    @case ('list') {
+      <x-instructor-list
+        (createInstructor)="showForm()"
+        (editInstructor)="showForm($event)"
+        (viewDetail)="showDetail($event)"
+      />
+    }
+    @case ('form') {
+      <x-instructor-form
+        [instructorId]="selectedInstructorId()"
+        [isEditMode]="isEditMode()"
+        (cancel)="showList()"
+        (saved)="showList()"
+      />
+    }
+    @case ('detail') {
+      <x-instructor-detail
+        [instructorId]="selectedInstructorId()!"
+        (edit)="showForm($event)"
+        (back)="showList()"
+      />
+    }
+  }
+</div> -->

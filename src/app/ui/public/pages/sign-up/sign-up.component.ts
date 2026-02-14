@@ -15,7 +15,7 @@ import { MatButtonModule } from '@angular/material/button'
 import { MatIconModule } from '@angular/material/icon'
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { MatDividerModule } from '@angular/material/divider'
-import { AuthService } from '../../../../services/auth.service'
+import { AuthService } from '../../../../services/auth/auth.service'
 
 @Component({
    selector: 'app-sign-up',
@@ -103,7 +103,7 @@ export default class SignUpComponent {
          const { email, password } = this.registerForm.value
 
          try {
-            await this.authService.registerWithEmail(email, password)
+            await this.authService.loginWithEmail(email, password)
             this.successMessage.set('¡Registro exitoso! Redirigiendo...')
             setTimeout(() => {
                this.router.navigate(['/home'])

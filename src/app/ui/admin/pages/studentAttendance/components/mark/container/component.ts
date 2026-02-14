@@ -1,0 +1,78 @@
+import { Component, inject, signal, output } from '@angular/core'
+import { CommonModule } from '@angular/common'
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
+import { MatFormFieldModule } from '@angular/material/form-field'
+import { MatInputModule } from '@angular/material/input'
+import { MatButtonModule } from '@angular/material/button'
+import { MatIconModule } from '@angular/material/icon'
+import { StudentAttendanceService } from '../../../../../../../services/studentAttendance/student-attendance.service'
+
+@Component({
+   selector: 'x-student-attendance-mark',
+   standalone: true,
+   imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule],
+   providers: [StudentAttendanceService],
+   templateUrl: './component.html',
+})
+export class StudentAttendanceMarkComponent {
+   private readonly fb = inject(FormBuilder)
+   private readonly attendanceService = inject(StudentAttendanceService)
+
+   viewList = output<void>()
+
+   attendanceForm: FormGroup
+   isSubmitting = signal(false)
+   successMessage = signal<string | null>(null)
+   errorMessage = signal<string | null>(null)
+
+   constructor() {
+      this.attendanceForm = this.fb.group({
+         ci: ['', [Validators.required, Validators.minLength(5)]],
+      })
+   }
+
+   async onSubmit(): Promise<void> {
+      if (this.attendanceForm.invalid || this.isSubmitting()) return
+
+      this.isSubmitting.set(true)
+      this.errorMessage.set(null)
+      this.successMessage.set(null)
+
+      try {
+         const result = await this.attendanceService.markAttendance(this.attendanceForm.value)
+
+         this.successMessage.set(
+            `✅ ${result.message}\n\n` +
+               `Estudiante: ${result.studentName}\n` +
+               `Sesión: ${result.sessionNumber}\n` +
+               `Sesiones restantes: ${result.remainingSessions}`
+         )
+
+         this.attendanceForm.reset()
+      } catch (error: any) {
+         this.errorMessage.set(error.message || 'Error al registrar asistencia')
+      } finally {
+         this.isSubmitting.set(false)
+      }
+   }
+
+   hasFieldError(field: string): boolean {
+      const control = this.attendanceForm.get(field)
+      return !!(control && control.invalid && (control.dirty || control.touched))
+   }
+
+   getFieldError(field: string): string {
+      const control = this.attendanceForm.get(field)
+      if (control?.hasError('required')) return 'Este campo es obligatorio'
+      if (control?.hasError('minlength')) return 'CI debe tener al menos 5 caracteres'
+      return ''
+   }
+
+   canSubmit(): boolean {
+      return this.attendanceForm.valid && !this.isSubmitting()
+   }
+
+   onViewList(): void {
+      this.viewList.emit()
+   }
+}

@@ -13,7 +13,7 @@ import { MatMenuModule } from '@angular/material/menu'
 })
 export class NavbarOptionsComponent {
    menuItems = [
-      { label: 'Inicio', icon: 'home', route: '/home' },
+      { label: 'Inicio', icon: 'home', route: '/admin/home' },
       { label: 'Asistencias', icon: 'person-cart', route: '/products' },
       { label: 'Perfil', icon: 'person', route: '/profile' },
       { label: 'Sucursales', icon: 'person', route: '/admin/sucursales' },
@@ -22,5 +22,6 @@ export class NavbarOptionsComponent {
       { label: 'Alumnos', icon: 'person', route: '/admin/alumnos' },
       { label: 'Membresías', icon: 'person', route: '/admin/membresias' },
       { label: 'Inscripciones', icon: 'person', route: '/admin/inscripciones' },
+      { label: 'Usuarios', icon: 'person', route: '/admin/usuarios' },
    ]
 }

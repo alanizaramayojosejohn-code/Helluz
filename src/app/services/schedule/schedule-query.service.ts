@@ -50,6 +50,10 @@ export class ScheduleQueryService {
          map((schedules) => [...schedules].sort((a: any, b: any) => a.startTime.localeCompare(b.startTime)))
       ) as Observable<Schedule[]>
    }
+   getActive(): Observable<Schedule[]>{
+    const q= query(this.schedulesCollection, where('status', '==', 'activo'))
+    return collectionData(q, {idField: 'id'}) as Observable<Schedule[]>
+   }
 
    async checkTimeConflict(
       branchId: string,

@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core'
-import { from, Observable, catchError, throwError, map, combineLatest } from 'rxjs'
+import { from, Observable, catchError, throwError, map, combineLatest, firstValueFrom } from 'rxjs'
 import { Enrollment, CreateEnrollmentDto, UpdateEnrollmentDto } from '../../models/enrollment.model'
 import { EnrollmentQueryService } from './enrollment-query.service'
 import { v7 as uuidv7 } from 'uuid'
@@ -138,5 +138,26 @@ export class EnrollmentService {
             error: (error) => reject(error),
          })
       })
+   }
+
+   async decrementUsedSessions(enrollmentId: string): Promise<void> {
+      try {
+         const enrollment = await firstValueFrom(this.getEnrollmentById(enrollmentId))
+
+         if (!enrollment) {
+            throw new Error('Inscripción no encontrada')
+         }
+
+         const newUsedSessions = Math.max(0, enrollment.usedSessions - 1)
+         const newRemainingSessions = enrollment.totalSessions - newUsedSessions
+
+         await this.query.update(enrollmentId, {
+            usedSessions: newUsedSessions,
+            remainingSessions: newRemainingSessions,
+         })
+      } catch (error) {
+         console.error('Error al decrementar sesiones usadas:', error)
+         throw error
+      }
    }
 }
