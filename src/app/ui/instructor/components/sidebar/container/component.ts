@@ -9,13 +9,13 @@ import { AuthService } from '../../../../../services/auth/auth.service'
 import { MenuItem } from '../../../../../models/interface.config'
 
 @Component({
-   selector: 'app-sidebar',
+   selector: 'i-sidebar',
    standalone: true,
    imports: [CommonModule, RouterLink, RouterLinkActive, MatIconModule, MatTooltipModule],
    templateUrl: './component.html',
    styleUrls: ['./component.css'],
 })
-export class SidebarComponent implements OnInit {
+export class InstructorSidebarComponent implements OnInit {
    readonly sidebarService = inject(SidebarService)
    private readonly authService = inject(AuthService)
 
@@ -23,18 +23,22 @@ export class SidebarComponent implements OnInit {
 
    // Menú de navegación
    menuItems: MenuItem[] = [
-      { label: 'Dashboard', icon: 'dashboard', route: '/admin/home', roles: ['admin', 'instructor'] },
-      { label: 'Alumnos', icon: 'school', route: '/admin/alumnos', roles: ['admin', 'instructor'] },
-      { label: 'Inscripciones', icon: 'assignment', route: '/admin/inscripciones', roles: ['admin', 'instructor'] },
-      { label: 'Horarios', icon: 'schedule', route: '/admin/horarios', roles: ['admin', 'instructor'] },
-      { label: 'Membresías', icon: 'card_membership', route: '/admin/membresias', roles: ['admin'] },
-      { label: 'Instructores', icon: 'fitness_center', route: '/admin/instructores', roles: ['admin'] },
-      { label: 'Usuarios', icon: 'people', route: '/admin/usuarios', roles: ['admin'] },
-      { label: 'Sucursales', icon: 'business', route: '/admin/sucursales', roles: ['admin'] },
-      { label: 'Asistencias Alumnos', icon: 'list_alt', route: '/admin/asistenciasa', roles: ['admin'] },
-      { label: 'Asistencias Instructores', icon: 'list_alt', route: '/admin/asistenciasi', roles: ['admin'] },
+      { label: 'Dashboard', icon: 'dashboard', route: '/instructor/home', roles: ['admin', 'instructor'] },
+      { label: 'Alumnos', icon: 'school', route: '/instructor/alumnos', roles: ['admin', 'instructor'] },
+      {
+         label: 'Inscripciones',
+         icon: 'assignment',
+         route: '/instructor/inscripciones',
+         roles: ['admin', 'instructor'],
+      },
+      {
+         label: 'Asistencias Alumnos',
+         icon: 'list_alt',
+         route: '/instructor/asistenciasa',
+         roles: ['admin', 'instructor'],
+      },
    ]
-  //  done_all
+   //  done_all
 
    ngOnInit(): void {
       this.checkScreenSize()

@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router'
+import { authGuard } from '../../guards/auth-guard'
+import { SharedRoutes } from '../../routes/shared.routes'
 
 export const AdminRoutes: Routes = [
    {
@@ -25,22 +27,23 @@ export const AdminRoutes: Routes = [
       path: 'membresias',
       loadComponent: async () => await import('./pages/membership/container/component'),
    },
-   {
-      path: 'alumnos',
-      loadComponent: async () => await import('./pages/student/container/component'),
-   },
-   {
-      path: 'inscripciones',
-      loadComponent: async () => await import('./pages/enrollments/container/component'),
-   },
+  //  {
+  //     path: 'alumnos',
+  //     canActivate: [authGuard],
+  //     loadComponent: async () => await import('./pages/student/container/component'),
+  //  },
+  //  {
+  //     path: 'inscripciones',
+  //     loadComponent: async () => await import('./pages/enrollments/container/component'),
+  //  },
    {
       path: 'usuarios',
       loadComponent: async () => await import('./pages/users/container/component'),
    },
-   {
-      path: 'asistenciasa',
-      loadComponent: async () => await import('./pages/studentAttendance/container/component'),
-   },
+  //  {
+  //     path: 'asistenciasa',
+  //     loadComponent: async () => await import('./pages/studentAttendance/container/component'),
+  //  },
    {
       path: 'asistenciasi',
       loadComponent: async () => await import('./pages/instructorAttendance/container/component'),
@@ -50,4 +53,5 @@ export const AdminRoutes: Routes = [
       redirectTo: 'home',
       pathMatch: 'full',
    },
+   ...SharedRoutes,
 ]

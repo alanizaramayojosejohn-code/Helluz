@@ -1,0 +1,14 @@
+<aside [class.sidebar-open]="sidebarService.isOpen()" [class.sidebar-closed]="!sidebarService.isOpen()" class="sidebar">
+  <nav class="sidebar-nav">
+    @for (item of getFilteredMenuItems(); track item.route) {
+      <a [routerLink]="item.route" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: item.route === '/admin/home' }" (click)="closeSidebarOnMobile()" class="sidebar-item" [matTooltip]="!sidebarService.isOpen() ? item.label : ''" matTooltipPosition="right">
+        <mat-icon class="sidebar-icon">{{ item.icon }}</mat-icon>
+        <span class="sidebar-label">{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+</aside>
+
+@if (sidebarService.isOpen() && sidebarService.isMobile()) {
+  <div class="sidebar-overlay" (click)="sidebarService.close()"></div>
+}

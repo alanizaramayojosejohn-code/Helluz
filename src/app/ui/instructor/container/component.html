@@ -1,2 +1,11 @@
-<i-navbar></i-navbar>
-<router-outlet></router-outlet>
+<div class="app-container">
+   <i-header></i-header>
+   <i-sidebar></i-sidebar>
+   <main
+      [class.content-expanded]="!sidebarService.isOpen()"
+      [class.content-collapsed]="sidebarService.isOpen()"
+      class="main-content pt-16"
+   >
+      <router-outlet></router-outlet>
+   </main>
+</div>

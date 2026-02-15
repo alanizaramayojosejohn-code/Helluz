@@ -1,11 +1,11 @@
 <div class="app-container">
-      <app-header></app-header>
-      <app-sidebar></app-sidebar>
-      <main
-        [class.content-expanded]="!sidebarService.isOpen()"
-        [class.content-collapsed]="sidebarService.isOpen()"
-        class="main-content"
-      >
-        <router-outlet></router-outlet>
-      </main>
-    </div>
+   <app-header class=""></app-header>
+   <app-sidebar></app-sidebar>
+   <main
+      [class.content-expanded]="!sidebarService.isOpen()"
+      [class.content-collapsed]="sidebarService.isOpen()"
+      class="main-content pt-16"
+   >
+      <router-outlet></router-outlet>
+   </main>
+</div>

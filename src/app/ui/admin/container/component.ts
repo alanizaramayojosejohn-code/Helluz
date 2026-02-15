@@ -2,42 +2,44 @@ import { ChangeDetectionStrategy, Component } from '@angular/core'
 import { RouterOutlet } from '@angular/router'
 import { NavbarComponent } from '../components/nav-bar/nav-bar'
 import { SidebarService } from '../../../services/sidebar/sidebar.service'
-import { HeaderComponent } from "../components/header/container/component";
-import { SidebarComponent } from "../components/sidebar/container/component";
+import { HeaderComponent } from '../components/header/container/component'
+import { SidebarComponent } from '../components/sidebar/container/component'
 
 @Component({
    selector: 'x-admin',
    templateUrl: './component.html',
    imports: [RouterOutlet, NavbarComponent, HeaderComponent, SidebarComponent],
-   styles: [`
-    .app-container {
-      min-height: 100vh;
-      background: #f9fafb;
-    }
+   styles: [
+      `
+         .app-container {
+            min-height: 100vh;
+            background: #f9fafb;
+         }
 
-    .main-content {
-      padding: 2rem;
-      transition: margin-left 0.3s ease;
-      margin-top: 64px; /* Altura del header */
-    }
+         .main-content {
+            padding: 2rem;
+            transition: margin-left 0.3s ease;
+            margin-top: 2rem; /* Altura del header */
+         }
 
-    .content-collapsed {
-      margin-left: 256px;
-    }
+         .content-collapsed {
+            margin-left: 256px;
+         }
 
-    .content-expanded {
-      margin-left: 72px;
-    }
+         .content-expanded {
+            margin-left: 72px;
+         }
 
-    @media (max-width: 768px) {
-      .content-collapsed,
-      .content-expanded {
-        margin-left: 0;
-      }
-    }
-  `],
+         @media (max-width: 768px) {
+            .content-collapsed,
+            .content-expanded {
+               margin-left: 0;
+            }
+         }
+      `,
+   ],
    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class AdminComponent {
-  constructor(readonly sidebarService: SidebarService) {}
+   constructor(readonly sidebarService: SidebarService) {}
 }

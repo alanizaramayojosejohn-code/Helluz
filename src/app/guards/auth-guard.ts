@@ -90,3 +90,20 @@ export const instructorGuard: CanActivateFn = (route, state) => {
       })
    )
 }
+// guards/auth.guard.ts
+export const adminOrInstructorGuard: CanActivateFn = (route, state) => {
+   const authService = inject(AuthService)
+   const router = inject(Router)
+
+   return authService.currentUser$.pipe(
+      take(1),
+      map((user: AuthUser | null) => {
+         if (user && user.status === 'activo' && (user.role === 'admin' || user.role === 'instructor')) {
+            return true
+         } else {
+            router.navigate(['/log-in'])
+            return false
+         }
+      })
+   )
+}
