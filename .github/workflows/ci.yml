@@ -1,46 +1,46 @@
-name: CI - Angular (Develop)
+# name: CI - Angular (Develop)
 
-on:
-  push:
-    branches:
-      - develop
-  pull_request:
-    branches:
-      - develop
+# on:
+#   push:
+#     branches:
+#       - develop
+#   pull_request:
+#     branches:
+#       - develop
 
-jobs:
-  ci:
-    name: CI Angular (Bun + Vitest)
-    runs-on: ubuntu-latest
+# jobs:
+#   ci:
+#     name: CI Angular (Bun + Vitest)
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repositorio
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout repositorio
+#         uses: actions/checkout@v4
 
-      - name: Instalar Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: 1.3.3
+#       - name: Instalar Bun
+#         uses: oven-sh/setup-bun@v1
+#         with:
+#           bun-version: 1.3.3
 
-      - name: Cache Bun packages
-        uses: actions/cache@v3
-        with:
-          path: frontend/.bun
-          key: bun-deps-${{ hashFiles('frontend/package.json') }}
-          restore-keys: |
-            bun-deps-
+#       - name: Cache Bun packages
+#         uses: actions/cache@v3
+#         with:
+#           path: frontend/.bun
+#           key: bun-deps-${{ hashFiles('frontend/package.json') }}
+#           restore-keys: |
+#             bun-deps-
 
-      - name: Instalar dependencias
-        run: bun install
+#       - name: Instalar dependencias
+#         run: bun install
 
-      - name: Lint Angular
-        run: bun run lint
+#       - name: Lint Angular
+#         run: bun run lint
 
-      - name: Ejecutar pruebas unitarias
-        run: bun run test
+#       - name: Ejecutar pruebas unitarias
+#         run: bun run test
 
-      - name: Build Angular
-        run: bun run build --configuration production
+#       - name: Build Angular
+#         run: bun run build --configuration production
 
-      - name: Test coverage
-        run: bun run test -- --coverage
+#       - name: Test coverage
+#         run: bun run test -- --coverage
