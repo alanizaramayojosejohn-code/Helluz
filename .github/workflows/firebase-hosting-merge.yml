@@ -19,7 +19,7 @@ jobs:
          - run: bun install
 
          # 👇 build angular
-         - run: bun run build
+         - run: bun run build -- --configuration production --project=frontend
 
          # 👇 deploy
          - uses: FirebaseExtended/action-hosting-deploy@v0
