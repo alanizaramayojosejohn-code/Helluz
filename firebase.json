@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist/cafe-app/browser",
+    "public": "dist/frontend",
     "ignore": [
       "firebase.json",
       "**/.*",

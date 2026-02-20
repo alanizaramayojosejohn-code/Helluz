@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "cafe-app-6f070"
-  }
+    "default": "helluz",
+    "helluz": "helluz"
+  },
+  "targets": {},
+  "etags": {}
 }
