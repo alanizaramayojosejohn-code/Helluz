@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core'
 import { RouterOutlet } from '@angular/router'
-import { NavbarComponent } from '../components/nav-bar/nav-bar'
 import { SidebarService } from '../../../services/sidebar/sidebar.service'
 import { HeaderComponent } from '../components/header/container/component'
 import { SidebarComponent } from '../components/sidebar/container/component'
@@ -8,7 +7,7 @@ import { SidebarComponent } from '../components/sidebar/container/component'
 @Component({
    selector: 'x-admin',
    templateUrl: './component.html',
-   imports: [RouterOutlet, NavbarComponent, HeaderComponent, SidebarComponent],
+   imports: [RouterOutlet, HeaderComponent, SidebarComponent],
    styles: [
       `
          .app-container {

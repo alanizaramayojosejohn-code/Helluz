@@ -1,6 +1,6 @@
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
   <div class="max-w-2xl mx-auto">
-    <!-- Header -->
+
     <div class="mb-8 text-center">
       <div class="inline-flex items-center justify-center w-20 h-20 bg-indigo-100 rounded-full mb-4">
         <svg class="w-10 h-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -13,7 +13,6 @@
       <p class="text-gray-600">Instructores</p>
     </div>
 
-    <!-- Success Message -->
     @if (successMessage()) {
       <div class="rounded-lg p-6 mb-6 animate-fade-in"
            [class.bg-green-50]="!successMessage()?.includes('⚠️')"
@@ -42,7 +41,6 @@
       </div>
     }
 
-    <!-- Error Message -->
     @if (errorMessage()) {
       <div class="bg-red-50 border-l-4 border-red-500 rounded-lg p-6 mb-6 animate-fade-in">
         <div class="flex items-start gap-4">
@@ -56,12 +54,10 @@
       </div>
     }
 
-    <!-- Form Card -->
     <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
       <div class="p-8">
         <form [formGroup]="attendanceForm" (ngSubmit)="onSubmit()" class="space-y-6">
 
-          <!-- CI Input -->
           <div class="space-y-2">
             <label class="block text-sm font-medium text-gray-700">
               Cédula de Identidad
@@ -81,7 +77,6 @@
             }
           </div>
 
-          <!-- Submit Button -->
           <button
             type="submit"
             [disabled]="!canSubmit()"
@@ -108,22 +103,8 @@
         </form>
       </div>
 
-      <!-- Footer -->
-      <div class="bg-gray-50 px-8 py-4 border-t border-gray-200">
-        <button
-          type="button"
-          (click)="onViewList()"
-          class="text-gray-600 hover:text-indigo-600 font-medium text-sm flex items-center gap-2 transition-colors"
-        >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-          </svg>
-          Ver lista de asistencias
-        </button>
-      </div>
     </div>
 
-    <!-- Info Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
       <div class="bg-white rounded-lg p-4 border border-gray-200">
         <div class="flex items-center gap-3">

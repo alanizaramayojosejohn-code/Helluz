@@ -1,4 +1,3 @@
-// components/list/container/component.ts
 import { Component, DestroyRef, inject, OnInit, output, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AsyncPipe } from '@angular/common'
@@ -32,7 +31,7 @@ export class MembershipList implements OnInit {
    readonly createMembership = output<void>()
    readonly editMembership = output<string>()
    readonly viewDetail = output<string>()
-   
+
 
    memberships$!: Observable<Membership[]>
 

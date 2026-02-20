@@ -3,10 +3,11 @@ import { BranchService } from '../../../../../../services/branch/branch.service'
 import { Observable } from 'rxjs'
 import { Branch } from '../../../../../../models/branch.model'
 import { CommonModule } from '@angular/common'
+import { MatIcon } from "@angular/material/icon";
 
 @Component({
    selector: 'x-list',
-   imports: [CommonModule],
+   imports: [CommonModule, MatIcon],
    templateUrl: './list.html',
    styleUrl: './list.css',
 })

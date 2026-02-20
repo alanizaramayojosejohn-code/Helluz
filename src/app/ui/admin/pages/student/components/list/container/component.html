@@ -1,7 +1,6 @@
-<!-- components/list/container/component.html -->
 <div class="min-h-screen bg-white p-6">
   <div class="max-w-7xl mx-auto">
-    <!-- Header -->
+
     <div class="flex justify-between items-center mb-8">
       <div>
         <h1 class="text-4xl font-bold text-red-600 mb-2">Gestión de Estudiantes</h1>
@@ -18,7 +17,6 @@
       </button>
     </div>
 
-    <!-- Filtros -->
     <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-4 mb-6">
       <mat-form-field appearance="outline" class="w-full md:w-64">
         <mat-label>Filtrar por Estado</mat-label>
@@ -43,7 +41,7 @@
     }
 
     @if (students$ | async; as students) {
-      <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg overflow-hidden">
+      <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>

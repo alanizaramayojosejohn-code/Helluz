@@ -1,10 +1,9 @@
-// models/user.model.ts
 import { Timestamp } from '@angular/fire/firestore'
 
 export type UserRole = 'admin' | 'instructor'
 
 export interface User {
-   id?: string // uid de Firebase Auth
+   id?: string
    email: string
    name: string
    lastname: string
@@ -12,7 +11,7 @@ export interface User {
    status: 'activo' | 'inactivo'
    createdAt?: Timestamp
    updatedAt?: Timestamp
-   createdBy?: string // uid del admin que lo creó
+   createdBy?: string
 }
 
 export type CreateUserDto = Omit<User, 'id' | 'createdAt' | 'updatedAt'> & {

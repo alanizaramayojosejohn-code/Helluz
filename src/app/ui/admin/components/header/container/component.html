@@ -1,45 +1,40 @@
-<!-- components/header/component.html -->
-<header class="bg-white border-b border-gray-200 z-40 shadow-sm fixed top-0 w-full left-0">
+<header class="bg-gray-950 border-b border-gray-200 z-40 shadow-sm fixed top-0 w-full left-0">
    <div class="flex items-center justify-between h-16 px-4">
-      <!-- Left: Menu toggle + Logo -->
       <div class="flex items-center gap-4">
-         <!-- Botón hamburguesa -->
-         <button (click)="toggleSidebar()" class="p-2 rounded-lg hover:bg-gray-100 transition-colors" matTooltip="Menu">
+         <button
+            (click)="toggleSidebar()"
+            class="p-2 rounded-lg bg-black border-none hover:bg-gray-900 transition-colors"
+            matTooltip="Menu"
+         >
             <mat-icon class="text-gray-600">menu</mat-icon>
          </button>
 
-         <!-- Logo -->
          <div class="flex items-center gap-3">
             <img src="images/Logo.webp" alt="Logo" class="w-10 h-10 rounded-full" />
             <span class="text-xl font-bold text-red-600 hidden md:block">Helluz</span>
          </div>
       </div>
 
-      <!-- Right: User info + Logout -->
       <div class="flex items-center gap-4">
-         <!-- User info (desktop) -->
          <div class="hidden md:flex flex-col items-end">
-            <span class="text-sm font-semibold text-gray-800">{{ getUserDisplayName() }}</span>
-            <span class="text-xs text-gray-500">{{ getUserRole() }}</span>
+            <span class="text-sm font-semibold text-gray-400">{{ getUserDisplayName() }}</span>
+            <span class="text-xs text-gray-300">{{ getUserRole() }}</span>
          </div>
 
-         <!-- Avatar + Menu -->
          <button
             [matMenuTriggerFor]="userMenu"
-            class="flex items-center justify-center w-10 h-10 rounded-full bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors"
+            class="flex items-center justify-center w-10 h-10 rounded-full border-none bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors"
          >
             {{ getUserInitials() }}
          </button>
 
          <mat-menu #userMenu="matMenu">
-            <!-- User info (mobile) -->
             <div class="px-4 py-3 border-b md:hidden">
                <p class="text-sm font-semibold text-gray-800">{{ getUserDisplayName() }}</p>
                <p class="text-xs text-gray-500">{{ getUserEmail() }}</p>
                <p class="text-xs text-gray-500 mt-1">{{ getUserRole() }}</p>
             </div>
 
-            <!-- Logout -->
             <button mat-menu-item (click)="logout()">
                <mat-icon class="text-red-600">logout</mat-icon>
                <span class="text-gray-700">Cerrar sesión</span>

@@ -5,16 +5,23 @@ import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatInputModule } from '@angular/material/input'
 import { MatButtonModule } from '@angular/material/button'
 import { MatIconModule } from '@angular/material/icon'
-import { StudentAttendanceService } from '../../../../../../../services/studentAttendance/student-attendance.service'
+import { StudentAttendanceService } from '../../../../../services/studentAttendance/student-attendance.service'
+import { StudentQueryService } from '../../../../../services/student/student-query.service'
+import { StudentService } from '../../../../../services/student/student.service'
+import { ScheduleService } from '../../../../../services/schedule/schedule.service'
+import { ScheduleQueryService } from '../../../../../services/schedule/schedule-query.service'
+import { StudentAttendanceQueryService } from '../../../../../services/studentAttendance/student-attendance-query.service'
+import { EnrollmentQueryService } from '../../../../../services/enrollment/enrollment-query.service'
+import { EnrollmentService } from '../../../../../services/enrollment/enrollment.service'
 
 @Component({
    selector: 'x-student-attendance-mark',
    standalone: true,
    imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule],
-   providers: [StudentAttendanceService],
+     providers: [StudentQueryService, StudentService, ScheduleService, ScheduleQueryService, StudentAttendanceQueryService, StudentAttendanceService, EnrollmentQueryService, EnrollmentService,  ],
    templateUrl: './component.html',
 })
-export class StudentAttendanceMarkComponent {
+export default class StudentAttendanceMarkComponent {
    private readonly fb = inject(FormBuilder)
    private readonly attendanceService = inject(StudentAttendanceService)
 

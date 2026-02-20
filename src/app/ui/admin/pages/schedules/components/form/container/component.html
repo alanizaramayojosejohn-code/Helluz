@@ -9,12 +9,15 @@
 
       <form [formGroup]="scheduleForm" (ngSubmit)="onSubmit()" class="space-y-6">
          <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-6 space-y-6">
-            <!-- Sucursal -->
             <mat-form-field appearance="outline" class="w-full">
                <mat-label>Sucursal</mat-label>
                <mat-select formControlName="branchId" required>
                   @for (branch of branches$ | async; track branch.id) {
-                     <mat-option [value]="branch.id">{{ branch.name }}</mat-option>
+                     <mat-option
+                     
+                     [value]="branch.id">{{
+                        branch.name
+                     }}</mat-option>
                   }
                </mat-select>
                @if (hasFieldError('branchId')) {
@@ -22,7 +25,6 @@
                }
             </mat-form-field>
 
-            <!-- Día y Disciplina -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                <mat-form-field appearance="outline" class="w-full">
                   <mat-label>Día de la semana</mat-label>
@@ -51,7 +53,6 @@
                </mat-form-field>
             </div>
 
-            <!-- Horarios -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                <mat-form-field appearance="outline" class="w-full">
                   <mat-label>Hora de inicio</mat-label>
@@ -70,7 +71,6 @@
                </mat-form-field>
             </div>
 
-            <!-- Instructor -->
             @if (instructors$) {
                <mat-form-field appearance="outline" class="w-full">
                   <mat-label>Instructor (Opcional)</mat-label>
@@ -86,7 +86,6 @@
             }
          </div>
 
-         <!-- Error de validación cruzada -->
          @if (scheduleForm.hasError('invalidTimeRange') && scheduleForm.touched) {
             <div class="bg-red-50 border border-red-200 rounded-lg p-4">
                <div class="flex items-center gap-3">
@@ -102,7 +101,6 @@
             </div>
          }
 
-         <!-- Error Message -->
          @if (errorMessage()) {
             <div class="bg-red-50 border border-red-200 rounded-lg p-4">
                <div class="flex items-center gap-3">
@@ -118,7 +116,6 @@
             </div>
          }
 
-         <!-- Botones -->
          <div class="flex gap-4">
             <button
                type="button"

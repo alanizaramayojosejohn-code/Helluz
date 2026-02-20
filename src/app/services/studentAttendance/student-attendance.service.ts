@@ -20,7 +20,6 @@ export class StudentAttendanceService {
   private readonly scheduleService = inject(ScheduleService);
   private readonly studentService = inject(StudentService);
 
-  // ==================== QUERIES CON FILTROS ====================
 
   getAttendancesByBranchAndDate(
     branchId: string,
@@ -30,7 +29,6 @@ export class StudentAttendanceService {
     return this.query.getByBranchAndDate(branchId, date, status);
   }
 
-  // ==================== ESTADÍSTICAS ====================
 
   getAttendanceStats(
     branchId: string,
@@ -47,7 +45,6 @@ export class StudentAttendanceService {
     );
   }
 
-  // ==================== MARCAR ASISTENCIA ====================
 async markAttendance(request: StudentAttendanceMarkRequest): Promise<{
   success: boolean;
   message: string;
@@ -58,16 +55,14 @@ async markAttendance(request: StudentAttendanceMarkRequest): Promise<{
   try {
     const today = new Date();
 
-    // 1. Buscar estudiante por CI
     const student = await firstValueFrom(this.studentService.getStudentByCi(request.ci));
 
-    if (!student) {
+    if (!student || !student.id) { // ✅ Validar que tenga ID
       throw new Error('CI no encontrado. Verifica tu cédula de identidad');
     }
 
-    // 2. Obtener inscripción activa
     const enrollments = await firstValueFrom(
-      this.enrollmentService.getActiveEnrollmentsByStudent(student.id!)
+      this.enrollmentService.getActiveEnrollmentsByStudent(student.id)
     );
 
     if (!enrollments || enrollments.length === 0) {
@@ -76,35 +71,32 @@ async markAttendance(request: StudentAttendanceMarkRequest): Promise<{
 
     const enrollment = enrollments[0];
 
-    // 3. Validar sesiones disponibles
+    if (!enrollment.id) {
+      throw new Error('Error: Inscripción sin identificador');
+    }
+
     if (enrollment.remainingSessions <= 0) {
       throw new Error('No te quedan sesiones disponibles. Renueva tu membresía');
     }
 
-    // 4. Validar que no esté vencida
     const endDate = enrollment.endDate.toDate();
     if (endDate < today) {
+      await this.enrollmentService.updateEnrollmentStatus(enrollment.id, 'vencida');
       throw new Error('Tu membresía ha vencido. Renueva para continuar');
     }
 
-    // 5. Verificar que no haya marcado ya hoy
-    const alreadyMarked = await this.query.checkAlreadyMarkedToday(
-      student.id!,
-      today
-    );
+    const alreadyMarked = await this.query.checkAlreadyMarkedToday(student.id, today);
 
     if (alreadyMarked) {
       throw new Error('Ya marcaste asistencia hoy');
     }
 
-    // 6. Calcular número de sesión
     const sessionNumber = enrollment.usedSessions + 1;
     const remainingSessionsAfter = enrollment.remainingSessions - 1;
 
-    // 7. Crear asistencia
     const id = uuidv7();
     const attendanceData: CreateStudentAttendanceDto = {
-      studentId: student.id!,
+      studentId: student.id,
       studentName: `${student.name} ${student.lastname}`,
       enrollmentId: enrollment.id,
       branchId: enrollment.branchId,
@@ -118,7 +110,6 @@ async markAttendance(request: StudentAttendanceMarkRequest): Promise<{
       id
     } as StudentAttendance);
 
-    // 8. Incrementar sesiones usadas
     await this.enrollmentService.incrementUsedSessions(enrollment.id);
 
     return {
@@ -130,12 +121,10 @@ async markAttendance(request: StudentAttendanceMarkRequest): Promise<{
     };
 
   } catch (error) {
-    console.error('Error al marcar asistencia de estudiante:', error);
+    console.error('❌ Error al marcar asistencia:', error); // ✅ Mejor log
     throw error;
   }
 }
-
-  // ==================== ACTUALIZAR ESTADO ====================
 
   async updateAttendanceStatus(
     id: string,
@@ -149,7 +138,6 @@ async markAttendance(request: StudentAttendanceMarkRequest): Promise<{
     }
   }
 
-  // ==================== ELIMINAR ASISTENCIA ====================
 
   async deleteAttendance(id: string, enrollmentId: string): Promise<void> {
     try {
@@ -161,7 +149,6 @@ async markAttendance(request: StudentAttendanceMarkRequest): Promise<{
     }
   }
 
-  // ==================== UTILIDADES ====================
 
   private getDayNames(days: number[]): string {
     const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];

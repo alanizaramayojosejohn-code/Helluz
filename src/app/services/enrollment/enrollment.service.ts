@@ -79,8 +79,11 @@ export class EnrollmentService {
 
    async incrementUsedSessions(enrollmentId: string): Promise<void> {
       try {
-         // Obtener enrollment actual
-         const enrollment = await this.query.getById(enrollmentId).toPromise()
+         if (!enrollmentId) {
+            throw new Error('ID de inscripción requerido')
+         }
+
+         const enrollment = await firstValueFrom(this.query.getById(enrollmentId))
 
          if (!enrollment) {
             throw new Error('Inscripción no encontrada')
@@ -93,20 +96,19 @@ export class EnrollmentService {
          const newUsedSessions = enrollment.usedSessions + 1
          const newRemainingSessions = enrollment.totalSessions - newUsedSessions
 
-         // Actualizar
          await this.query.update(enrollmentId, {
             usedSessions: newUsedSessions,
             remainingSessions: newRemainingSessions,
             status: newRemainingSessions === 0 ? 'completada' : enrollment.status,
          })
+
+         console.log('✅ Sesiones incrementadas correctamente') // Debug
       } catch (error) {
-         console.error('Error al incrementar sesiones usadas', error)
+         console.error('❌ Error al incrementar sesiones usadas:', error)
          throw error
       }
    }
-
    async checkExpiredEnrollments(): Promise<void> {
-      // Esta función se puede ejecutar diariamente con un Cloud Function
       const allEnrollments = await this.query.getAll().toPromise()
       const today = new Date()
 
@@ -123,14 +125,12 @@ export class EnrollmentService {
       }
    }
 
-   // Helper para calcular fecha fin
    calculateEndDate(startDate: Date, durationDays: number): Date {
       const endDate = new Date(startDate)
       endDate.setDate(endDate.getDate() + durationDays)
       return endDate
    }
 
-   // Helper privado
    private async getActiveEnrollmentsByStudentPromise(studentId: string): Promise<Enrollment[]> {
       return new Promise((resolve, reject) => {
          this.query.getActiveByStudent(studentId).subscribe({
@@ -157,6 +157,19 @@ export class EnrollmentService {
          })
       } catch (error) {
          console.error('Error al decrementar sesiones usadas:', error)
+         throw error
+      }
+   }
+
+   async updateEnrollmentStatus(
+      enrollmentId: string,
+      status: 'activa' | 'completada' | 'cancelada' | 'vencida'
+   ): Promise<void> {
+      try {
+         await this.query.update(enrollmentId, { status })
+         console.log(`✅ Inscripción ${enrollmentId} marcada como ${status}`)
+      } catch (error) {
+         console.error('❌ Error al actualizar status de inscripción:', error)
          throw error
       }
    }

@@ -1,164 +1,124 @@
-<div
-  class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-200 via-slate-300 to-slate-200 p-4"
->
-  <div class="w-full max-w-md">
-    <!-- Card Principal -->
-    <div class="bg-slate-100 rounded-2xl shadow-2xl shadow-black p-8 backdrop-blur-sm">
-      <!-- Header -->
-      <div class="text-center mb-8">
-        <div class="mb-4">
-          <div
-            class="w-16 h-16 bg-gradient-to-br rounded-full mx-auto flex items-center justify-center"
-          >
-            <img
-              src="/images/Logo.webp"
-              alt="Logo"
-              class="w-20 h-20 rounded-full shadow-sm shadow-black"
-            />
-          </div>
-        </div>
-        <h1 class="text-3xl font-bold text-black mb-2">Bienvenido</h1>
-        <p class="text-gray-600">Inicia sesión para continuar</p>
-      </div>
-
-      <!-- Mensaje de Error -->
-      @if (errorMessage()) {
-      <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg animate-shake">
-        <div class="flex items-start gap-3">
-          <mat-icon class="text-red-600 mt-0.5">error_outline</mat-icon>
-          <div>
-            <p class="text-red-800 text-sm font-medium">Error de autenticación</p>
-            <p class="text-red-600 text-sm mt-1">{{ errorMessage() }}</p>
-          </div>
-        </div>
-      </div>
-      }
-
-      <!-- Formulario -->
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
-        <!-- Campo Email -->
-        <div class="relative">
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Correo electrónico</mat-label>
-            <input
-              matInput
-              type="email"
-              formControlName="email"
-              placeholder="tu@email.com"
-              autocomplete="email"
-            />
-            <mat-icon matPrefix class="text-gray-400 mr-2">email</mat-icon>
-            @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
-            <mat-error>{{ getEmailErrorMessage() }}</mat-error>
-            }
-          </mat-form-field>
-        </div>
-
-        <!-- Campo Contraseña -->
-        <div class="relative">
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Contraseña</mat-label>
-            <input
-              matInput
-              [type]="hidePassword() ? 'password' : 'text'"
-              formControlName="password"
-              placeholder="••••••••"
-              autocomplete="current-password"
-            />
-            <mat-icon matPrefix class="text-gray-400 mr-2">lock</mat-icon>
-            <button
-              mat-icon-button
-              matSuffix
-              type="button"
-              (click)="togglePasswordVisibility()"
-              [attr.aria-label]="hidePassword() ? 'Mostrar contraseña' : 'Ocultar contraseña'"
-              class="hover:bg-gray-100 rounded-full"
-            >
-              <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
-            </button>
-            @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
-            <mat-error>{{ getPasswordErrorMessage() }}</mat-error>
-            }
-          </mat-form-field>
-        </div>
-
-        <!-- Link Olvidé mi contraseña -->
-        <div class="text-right -mt-2">
-          <a
-            href="#"
-            class="text-sm text-purple-600 hover:text-purple-700 font-medium transition-colors"
-          >
-            ¿Olvidaste tu contraseña?
-          </a>
-        </div>
-
-        <!-- Botón de Envío -->
-        <button
-          mat-raised-button
-          color="primary"
-          type="submit"
-          class="w-full !h-12 !text-base !font-semibold !rounded-lg !shadow-lg hover:!shadow-xl !transition-all !duration-300"
-          [disabled]="loading()"
-        >
-          @if (loading()) {
-          <div class="flex items-center justify-center gap-2">
-            <mat-spinner diameter="20" class="inline-block"></mat-spinner>
-            <span>Iniciando sesión...</span>
-          </div>
-          } @else {
-          <div class="flex items-center justify-center gap-2">
-            <mat-icon>login</mat-icon>
-            <span>Iniciar Sesión</span>
-          </div>
-          }
-        </button>
-      </form>
-
-      <!-- Divisor -->
-      <div class="relative my-8">
-        <div class="absolute inset-0 flex items-center">
-          <div class="w-full border-t border-gray-300"></div>
-        </div>
-        <div class="relative flex justify-center text-sm">
-          <span class="px-4 bg-white text-gray-500 font-medium">O continúa con</span>
-        </div>
-      </div>
-
-      <!-- Botón de Google -->
+<div class="justify-between bg-gradient-to-r from-black via-slate-300 to-black">
+   <a href="/asistenciaalumnos">
       <button
-        mat-stroked-button
-        type="button"
-        class="w-full !h-12 !text-base !font-medium !border-2 !rounded-lg hover:!bg-gray-50 !transition-all !duration-300"
-        (click)="loginWithGoogle()"
-        [disabled]="loading()"
+         class="w-1/5 m-1 ml-4 text-red-600 border-none shadow-md shadow-black h-7 bg-red-50 hover:bg-red-200 rounded-full text-sm"
+         >Alumnos</button
       >
-        <div class="flex items-center justify-center gap-3">
-          <img
-            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-            alt="Google"
-            class="w-5 h-5"
-          />
-          <span class="text-gray-700">Continuar con Google</span>
-        </div>
-      </button>
+   </a>
+   <a href="/asistenciainstructores">
+      <button
+         class="w-1/5 m-1 ml-4 text-red-600 border-none shadow-md shadow-black h-7 bg-red-50 hover:bg-red-200 rounded-full text-sm"
+         >Instructores</button
+      >
+   </a>
+</div>
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-black via-slate-300 to-black p-4">
+   <div class="w-full max-w-md">
+      <div class="bg-gray-300 rounded-2xl shadow-2xl shadow-black p-8 backdrop-blur-sm">
+         <div class="text-center mb-8">
+            <div class="mb-4">
+               <div class="w-16 h-16 bg-gradient-to-br rounded-full mx-auto flex items-center justify-center">
+                  <img src="/images/Logo.webp" alt="Logo" class="w-20 h-20 rounded-full shadow-sm shadow-black" />
+               </div>
+            </div>
+            <h1 class="text-3xl font-bold text-black mb-2">Bienvenido</h1>
+            <p class="text-gray-600">Inicia sesión para continuar</p>
+         </div>
 
-      <!-- Link a Registro -->
-      <div class="text-center mt-8 pt-6 border-t border-gray-200">
-        <p class="text-sm text-gray-600">
-          ¿No tienes cuenta?
-          <a
-            routerLink="/auth/sign-up"
-            class="text-blue-600 font-semibold hover:text-blue-700 hover:underline transition-all ml-1"
-          >
-            Regístrate gratis
-          </a>
-        </p>
+         @if (errorMessage()) {
+            <div class="mb-6 p-4 bg-gray-200 border-l-4 border-red-500 rounded-xl rounded-r-lg animate-shake">
+               <div class="flex items-start gap-3">
+                  <mat-icon class="text-red-600 mt-0.5">error_outline</mat-icon>
+                  <div>
+                     <p class="text-red-800 text-sm font-medium">Error de autenticación</p>
+                     <p class="text-red-600 text-sm mt-1">{{ errorMessage() }}</p>
+                  </div>
+               </div>
+            </div>
+         }
+
+         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
+            <div class="relative">
+               <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Correo electrónico</mat-label>
+                  <input
+                     matInput
+                     type="email"
+                     formControlName="email"
+                     placeholder="tu@email.com"
+                     autocomplete="email"
+                  />
+                  <mat-icon matPrefix class="text-gray-400 mr-2">email</mat-icon>
+                  @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+                     <mat-error>{{ getEmailErrorMessage() }}</mat-error>
+                  }
+               </mat-form-field>
+            </div>
+
+            <div class="relative">
+               <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Contraseña</mat-label>
+                  <input
+                     matInput
+                     [type]="hidePassword() ? 'password' : 'text'"
+                     formControlName="password"
+                     placeholder="••••••••"
+                     autocomplete="current-password"
+                  />
+                  <mat-icon matPrefix class="text-gray-400 mr-2">lock</mat-icon>
+                  <button
+                     mat-icon-button
+                     matSuffix
+                     type="button"
+                     (click)="togglePasswordVisibility()"
+                     [attr.aria-label]="hidePassword() ? 'Mostrar contraseña' : 'Ocultar contraseña'"
+                     class="hover:bg-gray-100 rounded-full"
+                  >
+                     <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+                  </button>
+                  @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+                     <mat-error>{{ getPasswordErrorMessage() }}</mat-error>
+                  }
+               </mat-form-field>
+            </div>
+
+            <button
+               mat-raised-button
+               color="primary"
+               type="submit"
+               class="w-full !h-12 !text-base !font-semibold !rounded-lg !shadow-lg hover:!shadow-xl !transition-all !duration-300"
+               [disabled]="loading()"
+            >
+               @if (loading()) {
+                  <div class="flex items-center justify-center gap-2">
+                     <mat-spinner diameter="20" class="inline-block"></mat-spinner>
+                     <span>Iniciando sesión...</span>
+                  </div>
+               } @else {
+                  <div class="flex items-center justify-center gap-2">
+                     <mat-icon>login</mat-icon>
+                     <span>Iniciar Sesión</span>
+                  </div>
+               }
+            </button>
+         </form>
+
+         <!-- <button
+            mat-stroked-button
+            type="button"
+            class="w-full !h-12 !text-base !font-medium !border-2 !rounded-lg hover:!bg-gray-50 !transition-all !duration-300"
+            (click)="loginWithGoogle()"
+            [disabled]="loading()"
+         >
+            <div class="flex items-center justify-center gap-3">
+               <img
+                  src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                  alt="Google"
+                  class="w-5 h-5"
+               />
+               <span class="text-gray-700">Continuar con Google</span>
+            </div>
+         </button> -->
       </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="text-center mt-6">
-      <p class="text-white text-sm opacity-90">Protegido con Firebase Authentication</p>
-    </div>
-  </div>
+   </div>
 </div>

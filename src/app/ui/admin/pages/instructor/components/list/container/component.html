@@ -66,7 +66,7 @@
           </button>
         </div>
       } @else {
-        <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg overflow-hidden">
+        <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg overflow-x-auto">
           <table mat-table [dataSource]="filteredInstructors" class="w-full">
 
             <!-- Nombre -->
@@ -74,7 +74,7 @@
               <th mat-header-cell *matHeaderCellDef class="font-semibold">Nombre Completo</th>
               <td mat-cell *matCellDef="let instructor">
                 <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-semibold">
+                  <div class="w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center font-semibold">
                     {{ getInitials(instructor) }}
                   </div>
                   <span class="font-medium text-gray-700">

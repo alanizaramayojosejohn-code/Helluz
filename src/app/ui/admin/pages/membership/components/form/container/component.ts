@@ -76,7 +76,7 @@ export class MembershipForm implements OnInit {
          name: ['', [Validators.required, Validators.minLength(3)]],
          durationDays: [30, [Validators.required, Validators.min(1)]],
          totalSessions: [12, [Validators.required, Validators.min(1)]],
-         allowedDays: [[], [Validators.required]],
+        //  allowedDays: [[], [Validators.required]],
          cost: [0, [Validators.required, Validators.min(0)]],
          status: ['activo', Validators.required],
       })
@@ -96,7 +96,7 @@ export class MembershipForm implements OnInit {
                      name: membership.name,
                      durationDays: membership.durationDays,
                      totalSessions: membership.totalSessions,
-                     allowedDays: membership.allowedDays,
+                    //  allowedDays: membership.allowedDays,
                      cost: membership.cost,
                      status: membership.status,
                   })

@@ -31,13 +31,11 @@ export class ScheduleQueryService {
       const refScheduleDoc = doc(this.firestore, 'schedules', id)
       return docData(refScheduleDoc, { idField: 'id' }) as Observable<Schedule | undefined>
    }
-   // En getByBranch
    getByBranch(branchId: string): Observable<Schedule[]> {
       const q = query(this.schedulesCollection, where('branchId', '==', branchId))
       return collectionData(q, { idField: 'id' }) as Observable<Schedule[]>
    }
 
-   // En getByDay
    getByDay(branchId: string, day: string): Observable<Schedule[]> {
       const q = query(
          this.schedulesCollection,
@@ -50,9 +48,9 @@ export class ScheduleQueryService {
          map((schedules) => [...schedules].sort((a: any, b: any) => a.startTime.localeCompare(b.startTime)))
       ) as Observable<Schedule[]>
    }
-   getActive(): Observable<Schedule[]>{
-    const q= query(this.schedulesCollection, where('status', '==', 'activo'))
-    return collectionData(q, {idField: 'id'}) as Observable<Schedule[]>
+   getActive(): Observable<Schedule[]> {
+      const q = query(this.schedulesCollection, where('status', '==', 'activo'))
+      return collectionData(q, { idField: 'id' }) as Observable<Schedule[]>
    }
 
    async checkTimeConflict(
@@ -107,8 +105,13 @@ export class ScheduleQueryService {
 
    async update(id: string, data: Partial<Schedule>): Promise<void> {
       const scheduleDoc = doc(this.firestore, 'schedules', id)
+
+      const cleanData = Object.fromEntries(
+         Object.entries(data).filter(([_, value]) => value !== undefined)
+      ) as Partial<Schedule>
+
       await updateDoc(scheduleDoc, {
-         ...data,
+         ...cleanData,
          //  instructorId: data.instructorId ?? null,
          updatedAt: serverTimestamp(),
       })

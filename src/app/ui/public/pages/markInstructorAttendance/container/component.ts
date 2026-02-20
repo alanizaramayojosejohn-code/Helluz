@@ -5,7 +5,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { InstructorAttendanceService } from '../../../../../../../services/instructorAttendance/instructor-attendance.service';
+import { InstructorAttendanceService } from '../../../../../services/instructorAttendance/instructor-attendance.service';
+import { InstructorAttendanceQueryService } from '../../../../../services/instructorAttendance/instructor-attendance-query.service';
+import { ScheduleService } from '../../../../../services/schedule/schedule.service';
+import { ScheduleQueryService } from '../../../../../services/schedule/schedule-query.service';
+import { InstructorQueryService } from '../../../../../services/instructor/instructor-query.service';
+import { InstructorService } from '../../../../../services/instructor/instructor.service';
 
 @Component({
   selector: 'x-instructor-attendance-mark',
@@ -18,10 +23,10 @@ import { InstructorAttendanceService } from '../../../../../../../services/instr
     MatButtonModule,
     MatIconModule
   ],
-  providers: [InstructorAttendanceService],
+  providers: [InstructorAttendanceService, InstructorAttendanceQueryService, ScheduleService, ScheduleQueryService, InstructorQueryService, InstructorService],
   templateUrl: './component.html'
 })
-export class InstructorAttendanceMarkComponent {
+export default class InstructorAttendanceMarkComponent {
   private readonly fb = inject(FormBuilder);
   private readonly attendanceService = inject(InstructorAttendanceService);
 
