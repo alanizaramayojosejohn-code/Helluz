@@ -1,7 +1,11 @@
 import { Routes } from '@angular/router'
 
 export const PublicRoutes: Routes = [
-   {
+  {
+    path: 'home',
+    loadComponent: async () => await import('./pages/home/container/component')
+  },
+  {
       path: 'log-in',
       loadComponent: async () => await import('./pages/log-in/log-in.component'),
    },
@@ -15,7 +19,7 @@ export const PublicRoutes: Routes = [
    },
    {
       path: '',
-      loadComponent: async () => await import('./pages/log-in/log-in.component'),
+      loadComponent: async () => await import('./pages/home/container/component'),
    },
    //  {
    //   path: 'asistenciae',

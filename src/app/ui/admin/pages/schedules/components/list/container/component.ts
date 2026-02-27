@@ -9,7 +9,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { MatTooltipModule } from '@angular/material/tooltip'
 import { AsyncPipe } from '@angular/common'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
-import { Observable, BehaviorSubject, switchMap, startWith } from 'rxjs'
+import { Observable, BehaviorSubject, switchMap, map } from 'rxjs'
 import { ScheduleService } from '../../../../../../../services/schedule/schedule.service'
 import { BranchService } from '../../../../../../../services/branch/branch.service'
 import { SeedService } from '../../../../../../../services/seed/seed.service'
@@ -41,17 +41,25 @@ export class ScheduleList implements OnInit {
    readonly editSchedule = output<string>()
    readonly viewDetail = output<string>()
 
-   // Observables
    schedules$!: Observable<Schedule[]>
    branches$!: Observable<Branch[]>
 
-   // Subject para manejar el filtro de sucursal
    private selectedBranchId$ = new BehaviorSubject<string | null>(null)
 
    readonly isLoading = signal(false)
    readonly errorMessage = signal<string | null>(null)
 
    readonly displayedColumns = ['day', 'time', 'discipline', 'instructor', 'branch', 'actions']
+
+   private readonly dayOrder: Record<string, number> = {
+      Lunes: 1,
+      Martes: 2,
+      Miercoles: 3,
+      Jueves: 4,
+      Viernes: 5,
+      Sábado: 6,
+      Domingo: 7,
+   }
 
    ngOnInit(): void {
       this.loadData()
@@ -61,24 +69,20 @@ export class ScheduleList implements OnInit {
       this.isLoading.set(true)
       this.errorMessage.set(null)
 
-      // Cargar sucursales
       this.branches$ = this.branchService.getActiveBranches()
 
-      // Cargar horarios reactivos según la sucursal seleccionada
       this.schedules$ = this.selectedBranchId$.pipe(
          switchMap((branchId) => {
             if (branchId) {
-               // Si hay sucursal seleccionada, filtrar por ella
                return this.scheduleService.getSchedulesByBranch(branchId)
             } else {
-               // Si no hay sucursal, cargar todos
                return this.scheduleService.getSchedules()
             }
          }),
+         map((schedules) => this.sortSchedules(schedules)),
          takeUntilDestroyed(this.destroyRef)
       )
 
-      // Marcar como cargado cuando lleguen los datos
       this.schedules$.subscribe({
          next: () => this.isLoading.set(false),
          error: () => {
@@ -88,9 +92,30 @@ export class ScheduleList implements OnInit {
       })
    }
 
+   private sortSchedules(schedules: Schedule[]): Schedule[] {
+      return [...schedules].sort((a, b) => {
+         const dayOrderA = this.dayOrder[a.day] || 999
+         const dayOrderB = this.dayOrder[b.day] || 999
+
+         if (dayOrderA !== dayOrderB) {
+            return dayOrderA - dayOrderB
+         }
+
+         return this.compareTime(a.startTime, b.startTime)
+      })
+   }
+
+   private compareTime(timeA: string, timeB: string): number {
+      const [hourA, minuteA] = timeA.split(':').map(Number)
+      const [hourB, minuteB] = timeB.split(':').map(Number)
+
+      const totalMinutesA = hourA * 60 + minuteA
+      const totalMinutesB = hourB * 60 + minuteB
+
+      return totalMinutesA - totalMinutesB
+   }
+
    onBranchFilterChange(branchId: string): void {
-      // Emitir nuevo valor al subject
-      // 'all' se convierte a null para cargar todos
       this.selectedBranchId$.next(branchId === 'all' ? null : branchId)
    }
 
@@ -111,8 +136,6 @@ export class ScheduleList implements OnInit {
    }
 
    getDayLabel(dayId: string): string {
-      // Aquí necesitarás el seedService para obtener el label
-      // Por ahora retornamos el ID, luego lo mejoramos
       return dayId
    }
 

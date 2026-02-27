@@ -1,153 +1,187 @@
-import { Component, DestroyRef, inject, OnInit, output, signal } from '@angular/core';
-import { MatTableModule } from '@angular/material/table';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatSelectModule } from '@angular/material/select';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { AsyncPipe, DatePipe } from '@angular/common';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { EnrollmentService } from '../../../../../../../services/enrollment/enrollment.service';
-import { BranchService } from '../../../../../../../services/branch/branch.service';
-import { Enrollment } from '../../../../../../../models/enrollment.model';
-import { Branch } from '../../../../../../../models/branch.model';
-import { Observable, BehaviorSubject, switchMap } from 'rxjs';
+import { Component, DestroyRef, inject, OnInit, output, signal } from '@angular/core'
+import { MatTableModule } from '@angular/material/table'
+import { MatButtonModule } from '@angular/material/button'
+import { MatIconModule } from '@angular/material/icon'
+import { MatChipsModule } from '@angular/material/chips'
+import { MatSelectModule } from '@angular/material/select'
+import { MatFormFieldModule } from '@angular/material/form-field'
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
+import { MatTooltipModule } from '@angular/material/tooltip'
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator'
+import { AsyncPipe, DatePipe } from '@angular/common'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
+import { EnrollmentService } from '../../../../../../../services/enrollment/enrollment.service'
+import { BranchService } from '../../../../../../../services/branch/branch.service'
+import { Enrollment, EnrollmentPage } from '../../../../../../../models/enrollment.model'
+import { Branch } from '../../../../../../../models/branch.model'
+import { DocumentSnapshot } from '@angular/fire/firestore'
+import { Observable } from 'rxjs'
 
 @Component({
-  selector: 'x-enrollment-list',
-  standalone: true,
-  imports: [
-    MatTableModule,
-    MatButtonModule,
-    MatIconModule,
-    MatChipsModule,
-    MatSelectModule,
-    MatFormFieldModule,
-    MatProgressSpinnerModule,
-    MatTooltipModule,
-    AsyncPipe,
-    DatePipe
-  ],
-  templateUrl: './component.html',
+   selector: 'x-enrollment-list',
+   imports: [
+      MatTableModule,
+      MatButtonModule,
+      MatIconModule,
+      MatChipsModule,
+      MatSelectModule,
+      MatFormFieldModule,
+      MatProgressSpinnerModule,
+      MatTooltipModule,
+      MatPaginatorModule,
+      DatePipe,
+      AsyncPipe,
+   ],
+   templateUrl: './component.html',
 })
 export class EnrollmentList implements OnInit {
-  private readonly enrollmentService = inject(EnrollmentService);
-  private readonly branchService = inject(BranchService);
-  private readonly destroyRef = inject(DestroyRef);
+   private readonly enrollmentService = inject(EnrollmentService)
+   private readonly branchService = inject(BranchService)
+   private readonly destroyRef = inject(DestroyRef)
 
-  readonly createEnrollment = output<void>();
-  readonly editEnrollment = output<string>();
-  readonly viewDetail = output<string>();
+   readonly createEnrollment = output<void>()
+   readonly editEnrollment = output<string>()
+   readonly viewDetail = output<string>()
 
-  enrollments$!: Observable<Enrollment[]>;
-  branches$!: Observable<Branch[]>;
+   enrollments = signal<Enrollment[]>([])
+   branches$!: Observable<Branch[]>
 
-  private selectedBranchId$ = new BehaviorSubject<string | null>(null);
-  private selectedStatus$ = new BehaviorSubject<string>('all');
+   readonly pageSize = 20
+   currentPage = signal(0)
+   totalRecords = signal(0)
+   hasMore = signal(true)
 
-  readonly isLoading = signal(false);
-  readonly errorMessage = signal<string | null>(null);
+   private pageHistory: (DocumentSnapshot | null)[] = [null] // Historial de cursores por página
+   private lastDoc: DocumentSnapshot | null = null
 
-  readonly displayedColumns = [
-    'student',
-    'membership',
-    'branch',
-    'dates',
-    'sessions',
-    'payment',
-    'status',
-    'actions'
-  ];
+   private selectedBranchId = signal<string | null>(null)
+   private selectedStatus = signal<string>('all')
 
-  ngOnInit(): void {
-    this.loadData();
-  }
+   readonly isLoading = signal(false)
+   readonly errorMessage = signal<string | null>(null)
 
-  private loadData(): void {
-    this.isLoading.set(true);
-    this.errorMessage.set(null);
+   readonly displayedColumns = ['student', 'membership', 'branch', 'dates', 'sessions', 'payment', 'status', 'actions']
 
-    this.branches$ = this.branchService.getActiveBranches();
+   ngOnInit(): void {
+      this.loadBranches()
+      this.loadPage(0)
+   }
 
-    // Cargar enrollments reactivos según filtros
-    this.enrollments$ = this.selectedBranchId$.pipe(
-      switchMap(branchId => {
-        if (branchId) {
-          return this.enrollmentService.getEnrollmentsByBranch(branchId);
-        } else {
-          return this.enrollmentService.getEnrollments();
-        }
-      }),
-      takeUntilDestroyed(this.destroyRef)
-    );
+   private loadBranches(): void {
+      this.branches$ = this.branchService.getActiveBranches()
+   }
 
-    this.enrollments$.subscribe({
-      next: () => this.isLoading.set(false),
-      error: () => {
-        this.errorMessage.set('Error al cargar inscripciones');
-        this.isLoading.set(false);
+   private async loadPage(pageIndex: number): Promise<void> {
+      this.isLoading.set(true)
+      this.errorMessage.set(null)
+
+      try {
+         // Determinar el cursor basado en la página
+         const cursor = this.pageHistory[pageIndex] || null
+
+         // Obtener los datos
+         const result = await this.enrollmentService.getEnrollmentsPage(
+            this.pageSize,
+            cursor,
+            this.selectedBranchId() || undefined,
+            this.selectedStatus()
+         )
+
+         // Actualizar datos
+         this.enrollments.set(result.enrollments)
+         this.lastDoc = result.lastDoc
+         this.hasMore.set(result.hasMore)
+         this.currentPage.set(pageIndex)
+
+         // Guardar cursor para siguiente página si no existe
+         if (result.hasMore && this.pageHistory.length === pageIndex + 1) {
+            this.pageHistory.push(result.lastDoc)
+         }
+
+         // Contar total (opcional, puede ser costoso)
+         // const total = await this.enrollmentService.countEnrollments(
+         //   this.selectedBranchId() || undefined,
+         //   this.selectedStatus()
+         // );
+         // this.totalRecords.set(total);
+      } catch (error) {
+         console.error('Error al cargar página:', error)
+         this.errorMessage.set('Error al cargar inscripciones')
+      } finally {
+         this.isLoading.set(false)
       }
-    });
-  }
+   }
 
-  onBranchFilterChange(branchId: string): void {
-    this.selectedBranchId$.next(branchId === 'all' ? null : branchId);
-  }
+   onPageChange(event: PageEvent): void {
+      this.loadPage(event.pageIndex)
+   }
 
-  onStatusFilterChange(status: string): void {
-    this.selectedStatus$.next(status);
-  }
+   async onBranchFilterChange(branchId: string): Promise<void> {
+      this.selectedBranchId.set(branchId === 'all' ? null : branchId)
+      this.resetPagination()
+      await this.loadPage(0)
+   }
 
-  onCreateEnrollment(): void {
-    this.createEnrollment.emit();
-  }
+   async onStatusFilterChange(status: string): Promise<void> {
+      this.selectedStatus.set(status)
+      this.resetPagination()
+      await this.loadPage(0)
+   }
 
-  onEditEnrollment(enrollment: Enrollment): void {
-    this.editEnrollment.emit(enrollment.id);
-  }
+   private resetPagination(): void {
+      this.currentPage.set(0)
+      this.pageHistory = [null]
+      this.lastDoc = null
+   }
 
-  onViewDetail(enrollment: Enrollment): void {
-    this.viewDetail.emit(enrollment.id);
-  }
+   onCreateEnrollment(): void {
+      this.createEnrollment.emit()
+   }
 
-  getStatusClass(status: string): string {
-    const classes: Record<string, string> = {
-      'activa': 'bg-green-100 text-green-800',
-      'vencida': 'bg-red-100 text-red-800',
-      'cancelada': 'bg-gray-100 text-gray-800',
-      'completada': 'bg-blue-100 text-blue-800'
-    };
-    return classes[status] || 'bg-gray-100 text-gray-800';
-  }
+   onEditEnrollment(enrollment: Enrollment): void {
+      this.editEnrollment.emit(enrollment.id)
+   }
 
-  getPaymentStatusClass(status: string): string {
-    const classes: Record<string, string> = {
-      'pagado': 'bg-green-100 text-green-800',
-      'pendiente': 'bg-yellow-100 text-yellow-800',
-      'parcial': 'bg-orange-100 text-orange-800'
-    };
-    return classes[status] || 'bg-gray-100 text-gray-800';
-  }
+   onViewDetail(enrollment: Enrollment): void {
+      this.viewDetail.emit(enrollment.id)
+   }
 
-  getSessionsProgress(enrollment: Enrollment): number {
-    return (enrollment.usedSessions / enrollment.totalSessions) * 100;
-  }
+   getStatusClass(status: string): string {
+      const classes: Record<string, string> = {
+         activa: 'bg-green-100 text-green-800',
+         vencida: 'bg-red-100 text-red-800',
+         cancelada: 'bg-gray-100 text-gray-800',
+         completada: 'bg-blue-100 text-blue-800',
+      }
+      return classes[status] || 'bg-gray-100 text-gray-800'
+   }
 
-  isExpiringSoon(enrollment: Enrollment): boolean {
-    if (enrollment.status !== 'activa') return false;
+   getPaymentStatusClass(status: string): string {
+      const classes: Record<string, string> = {
+         pagado: 'bg-green-100 text-green-800',
+         pendiente: 'bg-yellow-100 text-yellow-800',
+         parcial: 'bg-orange-100 text-orange-800',
+      }
+      return classes[status] || 'bg-gray-100 text-gray-800'
+   }
 
-    const today = new Date();
-    const endDate = enrollment.endDate.toDate();
-    const daysLeft = Math.floor((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+   getSessionsProgress(enrollment: Enrollment): number {
+      return (enrollment.usedSessions / enrollment.totalSessions) * 100
+   }
 
-    return daysLeft <= 7 && daysLeft >= 0;
-  }
+   isExpiringSoon(enrollment: Enrollment): boolean {
+      if (enrollment.status !== 'activa') return false
 
-  getDaysLeft(enrollment: Enrollment): number {
-    const today = new Date();
-    const endDate = enrollment.endDate.toDate();
-    return Math.floor((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-  }
+      const today = new Date()
+      const endDate = enrollment.endDate.toDate()
+      const daysLeft = Math.floor((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+
+      return daysLeft <= 7 && daysLeft >= 0
+   }
+
+   getDaysLeft(enrollment: Enrollment): number {
+      const today = new Date()
+      const endDate = enrollment.endDate.toDate()
+      return Math.floor((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+   }
 }

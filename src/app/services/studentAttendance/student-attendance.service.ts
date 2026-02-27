@@ -57,7 +57,7 @@ async markAttendance(request: StudentAttendanceMarkRequest): Promise<{
 
     const student = await firstValueFrom(this.studentService.getStudentByCi(request.ci));
 
-    if (!student || !student.id) { // ✅ Validar que tenga ID
+    if (!student || !student.id) {
       throw new Error('CI no encontrado. Verifica tu cédula de identidad');
     }
 

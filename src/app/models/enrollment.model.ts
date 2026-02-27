@@ -1,4 +1,4 @@
-import { Timestamp } from '@angular/fire/firestore';
+import { DocumentSnapshot, Timestamp } from '@angular/fire/firestore';
 
 export interface Enrollment {
   id: string;
@@ -37,4 +37,12 @@ export interface EnrollmentFormValue {
   branchId: string;
   startDate: Date;
   paymentStatus: 'pendiente' | 'pagado' | 'parcial';
+}
+
+
+export interface EnrollmentPage {
+  enrollments: Enrollment[];
+  lastDoc: DocumentSnapshot | null;
+  hasMore: boolean;
+  total?: number;
 }

@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core'
 import { from, Observable, catchError, throwError, map, combineLatest, firstValueFrom } from 'rxjs'
-import { Enrollment, CreateEnrollmentDto, UpdateEnrollmentDto } from '../../models/enrollment.model'
+import { Enrollment, CreateEnrollmentDto, UpdateEnrollmentDto, EnrollmentPage } from '../../models/enrollment.model'
 import { EnrollmentQueryService } from './enrollment-query.service'
 import { v7 as uuidv7 } from 'uuid'
-import { Timestamp } from '@angular/fire/firestore'
+import { DocumentSnapshot, Timestamp } from '@angular/fire/firestore'
 
 @Injectable()
 export class EnrollmentService {
@@ -173,4 +173,38 @@ export class EnrollmentService {
          throw error
       }
    }
+
+async getEnrollmentsPage(
+      pageSize: number = 20,
+      lastDoc: DocumentSnapshot | null = null,
+      branchId?: string,
+      status?: string
+   ): Promise<EnrollmentPage> {
+      try {
+         const result = await this.query.getEnrollmentsPage(pageSize, lastDoc, branchId, status);
+
+         return {
+            enrollments: result.enrollments,
+            lastDoc: result.lastDoc,
+            hasMore: result.hasMore
+         };
+      } catch (error) {
+         console.error('Error al obtener página de inscripciones:', error);
+         throw error;
+      }
+   }
+
+   /**
+    * Cuenta el total de inscripciones
+    */
+   async countEnrollments(branchId?: string, status?: string): Promise<number> {
+      try {
+         return await this.query.countEnrollments(branchId, status);
+      } catch (error) {
+         console.error('Error al contar inscripciones:', error);
+         return 0;
+      }
+   }
+
+
 }

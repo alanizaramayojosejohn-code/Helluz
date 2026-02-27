@@ -14,7 +14,11 @@ import {
   updateDoc,
   where,
   orderBy,
-  Timestamp as FirestoreTimestamp
+  Timestamp as FirestoreTimestamp,
+  DocumentSnapshot,
+  QueryConstraint,
+  startAfter,
+  limit
 } from '@angular/fire/firestore';
 import { Observable, map } from 'rxjs';
 import { Enrollment } from '../../models/enrollment.model';
@@ -23,6 +27,7 @@ import { Enrollment } from '../../models/enrollment.model';
 export class EnrollmentQueryService {
   private firestore = inject(Firestore);
   private enrollmentsCollection = collection(this.firestore, 'enrollments');
+  private readonly collectionName = 'enrollments';
 
   getAll(): Observable<Enrollment[]> {
     return collectionData(this.enrollmentsCollection, { idField: 'id' }).pipe(
@@ -118,4 +123,101 @@ export class EnrollmentQueryService {
   getDocumentReference(id: string): DocumentReference {
     return doc(this.firestore, 'enrollments', id);
   }
+
+
+  async getEnrollmentsPage(
+    pageSize: number = 20,
+    lastDoc: DocumentSnapshot | null = null,
+    branchId?: string,
+    status?: string
+  ): Promise<{
+    enrollments: Enrollment[];
+    lastDoc: DocumentSnapshot | null;
+    hasMore: boolean;
+  }> {
+    try {
+      const col = collection(this.firestore, this.collectionName);
+      const constraints: QueryConstraint[] = [];
+
+      // Filtros opcionales
+      if (branchId) {
+        constraints.push(where('branchId', '==', branchId));
+      }
+
+      if (status && status !== 'all') {
+        constraints.push(where('status', '==', status));
+      }
+
+      // Ordenamiento
+      constraints.push(orderBy('createdAt', 'desc'));
+
+      // Paginación
+      if (lastDoc) {
+        constraints.push(startAfter(lastDoc));
+      }
+
+      constraints.push(limit(pageSize + 1)); // +1 para saber si hay más
+
+      const q = query(col, ...constraints);
+      const snapshot = await getDocs(q);
+
+      const enrollments: Enrollment[] = [];
+      const docs = snapshot.docs;
+
+      // Verificar si hay más páginas
+      const hasMore = docs.length > pageSize;
+
+      // Tomar solo los registros solicitados
+      const docsToProcess = hasMore ? docs.slice(0, pageSize) : docs;
+
+      docsToProcess.forEach(doc => {
+        enrollments.push({
+          id: doc.id,
+          ...doc.data()
+        } as Enrollment);
+      });
+
+      // Guardar el último documento para la siguiente página
+      const newLastDoc = docsToProcess.length > 0
+        ? docsToProcess[docsToProcess.length - 1]
+        : null;
+
+      return {
+        enrollments,
+        lastDoc: newLastDoc,
+        hasMore
+      };
+
+    } catch (error) {
+      console.error('Error al obtener página de inscripciones:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Cuenta el total de inscripciones (opcional, para mostrar "Página 1 de X")
+   */
+  async countEnrollments(branchId?: string, status?: string): Promise<number> {
+    try {
+      const col = collection(this.firestore, this.collectionName);
+      const constraints: QueryConstraint[] = [];
+
+      if (branchId) {
+        constraints.push(where('branchId', '==', branchId));
+      }
+
+      if (status && status !== 'all') {
+        constraints.push(where('status', '==', status));
+      }
+
+      const q = query(col, ...constraints);
+      const snapshot = await getDocs(q);
+
+      return snapshot.size;
+    } catch (error) {
+      console.error('Error al contar inscripciones:', error);
+      return 0;
+    }
+  }
+
 }
