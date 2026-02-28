@@ -16,6 +16,8 @@ import { AttendanceService } from '../../../../../services/attendance/attendance
 import { AttendanceQueryService } from '../../../../../services/attendance/attendance-query.service'
 import { ScheduleQueryService } from '../../../../../services/schedule/schedule-query.service'
 import { ScheduleService } from '../../../../../services/schedule/schedule.service'
+import { InstructorService } from '../../../../../services/instructor/instructor.service'
+import { InstructorQueryService } from '../../../../../services/instructor/instructor-query.service'
 
 type View = 'list' | 'form' | 'detail'
 
@@ -33,7 +35,10 @@ type View = 'list' | 'form' | 'detail'
       MembershipQueryService,
       AttendanceService,
       AttendanceQueryService,
-      ScheduleQueryService, ScheduleService
+      ScheduleQueryService,
+      ScheduleService,
+      InstructorService,
+      InstructorQueryService,
    ],
    templateUrl: './component.html',
    changeDetection: ChangeDetectionStrategy.OnPush,
