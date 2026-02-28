@@ -2,22 +2,21 @@
    <div class="max-w-3xl mx-auto">
       <div class="mb-8">
          <h1 class="text-4xl font-bold text-red-600 mb-2">
-            {{ isEditMode() ? 'Editar Horario' : 'Registrar Horario' }}
+            {{ isEditMode() ? 'Editar Horario' : 'Registrar Horarios' }}
          </h1>
-         <p class="text-gray-400">Completa la información del horario</p>
+         <p class="text-gray-400">
+            {{ isEditMode() ? 'Modifica la información del horario' : 'Crea horarios para múltiples días' }}
+         </p>
       </div>
 
       <form [formGroup]="scheduleForm" (ngSubmit)="onSubmit()" class="space-y-6">
          <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-6 space-y-6">
+            <!-- Sucursal -->
             <mat-form-field appearance="outline" class="w-full">
                <mat-label>Sucursal</mat-label>
                <mat-select formControlName="branchId" required>
                   @for (branch of branches$ | async; track branch.id) {
-                     <mat-option
-                     
-                     [value]="branch.id">{{
-                        branch.name
-                     }}</mat-option>
+                     <mat-option [value]="branch.id">{{ branch.name }}</mat-option>
                   }
                </mat-select>
                @if (hasFieldError('branchId')) {
@@ -25,34 +24,29 @@
                }
             </mat-form-field>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Día de la semana</mat-label>
-                  <mat-select formControlName="day" required>
-                     @for (day of days$ | async; track day.id) {
-                        <mat-option [value]="day.name">{{ day.name }}</mat-option>
-                     }
-                  </mat-select>
-                  @if (hasFieldError('day')) {
-                     <mat-error>{{ getFieldError('day') }}</mat-error>
+            <!-- ✅ Días - Multi-select -->
+            <mat-form-field appearance="outline" class="w-full">
+               <mat-label>
+                  {{ isEditMode() ? 'Día de la semana' : 'Días de la semana (puedes seleccionar varios)' }}
+               </mat-label>
+               <mat-select formControlName="days" [multiple]="!isEditMode()" required>
+                  @for (day of days$ | async; track day.id) {
+                     <mat-option [value]="day.name">{{ day.name }}</mat-option>
                   }
-               </mat-form-field>
+               </mat-select>
+               <mat-hint>
+                  {{
+                     isEditMode()
+                        ? 'Solo puedes cambiar un día a la vez en edición'
+                        : 'Selecciona todos los días que necesites'
+                  }}
+               </mat-hint>
+               @if (hasFieldError('days')) {
+                  <mat-error>{{ getFieldError('days') }}</mat-error>
+               }
+            </mat-form-field>
 
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Disciplina</mat-label>
-                  <mat-select formControlName="discipline" required>
-                     @for (discipline of disciplines$ | async; track discipline.id) {
-                        <mat-option [value]="discipline.name">
-                           {{ discipline.name }}
-                        </mat-option>
-                     }
-                  </mat-select>
-                  @if (hasFieldError('discipline')) {
-                     <mat-error>{{ getFieldError('discipline') }}</mat-error>
-                  }
-               </mat-form-field>
-            </div>
-
+            <!-- Horarios -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                <mat-form-field appearance="outline" class="w-full">
                   <mat-label>Hora de inicio</mat-label>
@@ -71,6 +65,23 @@
                </mat-form-field>
             </div>
 
+            <!-- ✅ Disciplina fija (informativo) -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+               <div class="flex items-center gap-3">
+                  <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                     <path
+                        fill-rule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                        clip-rule="evenodd"
+                     />
+                  </svg>
+                  <p class="text-sm text-blue-800">
+                     <strong>Disciplina:</strong> Todos los horarios se crearán con disciplina <strong>MMA</strong>
+                  </p>
+               </div>
+            </div>
+
+            <!-- Instructor -->
             @if (instructors$) {
                <mat-form-field appearance="outline" class="w-full">
                   <mat-label>Instructor (Opcional)</mat-label>
@@ -82,10 +93,18 @@
                         </mat-option>
                      }
                   </mat-select>
+                  <mat-hint>
+                     {{
+                        isEditMode()
+                           ? 'Cambia el instructor de este horario'
+                           : 'Se asignará a todos los días seleccionados'
+                     }}
+                  </mat-hint>
                </mat-form-field>
             }
          </div>
 
+         <!-- Validación de tiempo -->
          @if (scheduleForm.hasError('invalidTimeRange') && scheduleForm.touched) {
             <div class="bg-red-50 border border-red-200 rounded-lg p-4">
                <div class="flex items-center gap-3">
@@ -101,6 +120,7 @@
             </div>
          }
 
+         <!-- Mensajes de error -->
          @if (errorMessage()) {
             <div class="bg-red-50 border border-red-200 rounded-lg p-4">
                <div class="flex items-center gap-3">
@@ -116,6 +136,7 @@
             </div>
          }
 
+         <!-- Botones -->
          <div class="flex gap-4">
             <button
                type="button"

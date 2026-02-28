@@ -84,10 +84,9 @@ export class ScheduleForm implements OnInit {
       this.scheduleForm = this.fb.group(
          {
             branchId: ['', Validators.required],
-            day: ['', Validators.required],
+            days: [[], Validators.required],
             startTime: ['', [Validators.required, Validators.pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)]],
             endTime: ['', [Validators.required, Validators.pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)]],
-            discipline: ['', Validators.required],
             instructorId: [''],
             status: ['activo'],
          },
@@ -138,7 +137,7 @@ export class ScheduleForm implements OnInit {
    private loadInstructorsByBranch(branchId: string): void {
       this.instructors$ = this.instructorService
          .getInstructorsByBranch(branchId)
-        //  .pipe(tap((instructors) => (this.instructorsCache = instructors)))
+         .pipe(tap((instructors) => (this.instructorsCache = instructors)))
    }
 
    private loadScheduleIfEditMode(): void {
@@ -147,7 +146,6 @@ export class ScheduleForm implements OnInit {
          this.loadSchedule(scheduleId)
       }
    }
-
    private loadSchedule(id: string): void {
       this.scheduleService
          .getScheduleById(id)
@@ -158,10 +156,9 @@ export class ScheduleForm implements OnInit {
                   this.currentSchedule.set(schedule)
                   this.scheduleForm.patchValue({
                      branchId: schedule.branchId,
-                     day: schedule.day,
+                     days: [schedule.day], // ✅ Array con un solo día en edición
                      startTime: schedule.startTime,
                      endTime: schedule.endTime,
-                     discipline: schedule.discipline,
                      instructorId: schedule.instructorId || '',
                      status: schedule.status,
                   })
@@ -209,13 +206,13 @@ export class ScheduleForm implements OnInit {
    private async saveSchedule(): Promise<void> {
       const formValue = this.scheduleForm.value
 
-      // Obtener nombres desnormalizados del cache
       const branchName = this.branchesCache.find((b) => b.id === formValue.branchId)?.name || ''
       const instructorName = formValue.instructorId ? this.getInstructorName(formValue.instructorId) : undefined
 
       if (this.isEditMode() && this.scheduleId()) {
          const updateData: UpdateScheduleDto = {
             ...formValue,
+            day: this.currentSchedule()?.day,
             branchName,
             instructorId: formValue.instructorId || undefined,
             instructorName,
@@ -223,17 +220,25 @@ export class ScheduleForm implements OnInit {
 
          await this.scheduleService.updateSchedule(this.scheduleId()!, updateData)
       } else {
-         const createData: CreateScheduleDto = {
-            ...formValue,
-            branchName,
-            instructorId: formValue.instructorId || undefined,
-            instructorName,
-         }
+         const selectedDays: string[] = formValue.days
 
-         await this.scheduleService.addSchedule(createData)
+         for (const day of selectedDays) {
+            const createData: CreateScheduleDto = {
+               branchId: formValue.branchId,
+               branchName,
+               day: day,
+               startTime: formValue.startTime,
+               endTime: formValue.endTime,
+               discipline: 'MMA',
+               instructorId: formValue.instructorId || undefined,
+               instructorName,
+               status: formValue.status,
+            }
+
+            await this.scheduleService.addSchedule(createData)
+         }
       }
    }
-
    private getInstructorName(instructorId: string): string {
       const instructor = this.instructorsCache.find((i) => i.id === instructorId)
       return instructor ? this.instructorService.getInstructorFullName(instructor) : ''
@@ -261,7 +266,12 @@ export class ScheduleForm implements OnInit {
       if (!field || !field.errors || !field.touched) return null
 
       const errors = field.errors
-      if (errors['required']) return 'Campo requerido'
+      if (errors['required']) {
+         if (fieldName === 'days') {
+            return 'Selecciona al menos un día'
+         }
+         return 'Campo requerido'
+      }
       if (errors['pattern']) return 'Formato inválido (HH:mm)'
 
       return 'Error de validación'
