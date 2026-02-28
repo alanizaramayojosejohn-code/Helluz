@@ -24,7 +24,7 @@ export class StudentService {
       return this.query.getByCi(ci)
    }
 
-   async createStudent(student: CreateStudentDto): Promise<string> {
+   async createStudent(student: CreateStudentDto, currentUserId: string, currentUserName: string): Promise<string> {
       try {
          // Validar CI único
          const ciExists = await this.query.checkCiExists(student.ci)
@@ -60,7 +60,11 @@ export class StudentService {
             }
          }
 
-         const id = await this.query.create(student)
+         const id = await this.query.create({
+            ...student,
+            createdBy: currentUserId,
+            createdByName: currentUserName,
+         })
          return id
       } catch (error) {
          console.error('Error al crear el estudiante', error)
@@ -68,7 +72,7 @@ export class StudentService {
       }
    }
 
-   async updateStudent(id: string, student: UpdateStudentDto): Promise<void> {
+   async updateStudent(id: string, student: UpdateStudentDto, currentUserId: string, currentUserName: string): Promise<void> {
       try {
          // Validar CI único si se está actualizando
          if (student.ci) {
@@ -106,7 +110,11 @@ export class StudentService {
             }
          }
 
-         await this.query.update(id, student)
+         await this.query.update(id, {
+            ...student,
+            updatedBy: currentUserId,
+            updatedByName: currentUserName,
+         });
       } catch (error) {
          console.error('Error al actualizar el estudiante', error)
          throw error

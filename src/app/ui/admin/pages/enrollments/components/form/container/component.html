@@ -11,12 +11,11 @@
 
       <form [formGroup]="enrollmentForm" (ngSubmit)="onSubmit()" class="space-y-6">
          <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-6 space-y-6">
-
             <!-- Alumno -->
             <mat-form-field appearance="outline" class="w-full">
                <mat-label>Alumno</mat-label>
                <mat-select formControlName="studentId" required>
-                  @for (student of students(); track student.id) {
+                  @for (student of students$ | async; track student.id) {
                      <mat-option [value]="student.id">
                         {{ getStudentFullName(student) }} - CI: {{ student.ci }}
                      </mat-option>
@@ -32,7 +31,7 @@
                <mat-form-field appearance="outline" class="w-full">
                   <mat-label>Sucursal</mat-label>
                   <mat-select formControlName="branchId" required>
-                     @for (branch of branches(); track branch.id) {
+                     @for (branch of branches$ | async; track branch.id) {
                         <mat-option [value]="branch.id">{{ branch.name }}</mat-option>
                      }
                   </mat-select>
@@ -44,7 +43,7 @@
                <mat-form-field appearance="outline" class="w-full">
                   <mat-label>Membresía</mat-label>
                   <mat-select formControlName="membershipId" required>
-                     @for (membership of memberships(); track membership.id) {
+                     @for (membership of memberships$ | async; track membership.id) {
                         <mat-option [value]="membership.id">
                            {{ membership.name }} - Bs. {{ membership.cost }}
                         </mat-option>
@@ -140,14 +139,11 @@
                   <h3 class="font-semibold text-yellow-900 mb-2">⚠️ Información Importante</h3>
                   <div class="text-sm text-yellow-800 space-y-1">
                      <p>
-                        <strong>Sesiones usadas:</strong> {{ currentEnrollment()!.usedSessions }} / {{ currentEnrollment()!.totalSessions }}
+                        <strong>Sesiones usadas:</strong> {{ currentEnrollment()!.usedSessions }} /
+                        {{ currentEnrollment()!.totalSessions }}
                      </p>
-                     <p>
-                        <strong>Sesiones restantes:</strong> {{ currentEnrollment()!.remainingSessions }}
-                     </p>
-                     <p class="mt-2 text-xs">
-                        Al cambiar la membresía, las sesiones usadas se mantendrán.
-                     </p>
+                     <p> <strong>Sesiones restantes:</strong> {{ currentEnrollment()!.remainingSessions }} </p>
+                     <p class="mt-2 text-xs"> Al cambiar la membresía, las sesiones usadas se mantendrán. </p>
                   </div>
                </div>
             }

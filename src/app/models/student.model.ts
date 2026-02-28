@@ -13,7 +13,11 @@ export interface Student {
   status: 'activo' | 'inactivo';
   createdAt?: Timestamp;
   updatedAt?: Timestamp;
+  createdBy?: string;
+  createdByName?: string;
+  updatedBy?: string
+  updatedByName?: string
 }
 
-export type CreateStudentDto = Omit<Student, 'id' | 'createdAt' | 'updatedAt'>;
-export type UpdateStudentDto = Partial<Omit<Student, 'id' | 'createdAt' | 'updatedAt'>>;
+export type CreateStudentDto = Omit<Student, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'>;
+export type UpdateStudentDto = Partial<Omit<Student, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'>>;

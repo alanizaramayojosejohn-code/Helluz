@@ -33,7 +33,7 @@ export class EnrollmentService {
       return this.query.getExpiring(days)
    }
 
-   async addEnrollment(enrollment: CreateEnrollmentDto): Promise<string> {
+   async addEnrollment(enrollment: CreateEnrollmentDto, currentUserId:string, currentUserName: string): Promise<string> {
       try {
          const id = uuidv7()
 
@@ -50,6 +50,8 @@ export class EnrollmentService {
          await this.query.create(id, {
             ...enrollment,
             id,
+            createdBy: currentUserId,
+            createdByName: currentUserName,
          })
 
          return id
@@ -59,9 +61,13 @@ export class EnrollmentService {
       }
    }
 
-   async updateEnrollment(id: string, enrollment: UpdateEnrollmentDto): Promise<void> {
+   async updateEnrollment(id: string, enrollment: UpdateEnrollmentDto, currentUserId:string, currentUserName: string): Promise<void> {
       try {
-         await this.query.update(id, enrollment)
+         await this.query.update(id, {
+            ...enrollment,
+            updatedBy: currentUserId,
+            updatedByName: currentUserName,
+         })
       } catch (error) {
          console.error('Error al actualizar la inscripción', error)
          throw error
@@ -174,23 +180,23 @@ export class EnrollmentService {
       }
    }
 
-async getEnrollmentsPage(
+   async getEnrollmentsPage(
       pageSize: number = 20,
       lastDoc: DocumentSnapshot | null = null,
       branchId?: string,
       status?: string
    ): Promise<EnrollmentPage> {
       try {
-         const result = await this.query.getEnrollmentsPage(pageSize, lastDoc, branchId, status);
+         const result = await this.query.getEnrollmentsPage(pageSize, lastDoc, branchId, status)
 
          return {
             enrollments: result.enrollments,
             lastDoc: result.lastDoc,
-            hasMore: result.hasMore
-         };
+            hasMore: result.hasMore,
+         }
       } catch (error) {
-         console.error('Error al obtener página de inscripciones:', error);
-         throw error;
+         console.error('Error al obtener página de inscripciones:', error)
+         throw error
       }
    }
 
@@ -199,12 +205,10 @@ async getEnrollmentsPage(
     */
    async countEnrollments(branchId?: string, status?: string): Promise<number> {
       try {
-         return await this.query.countEnrollments(branchId, status);
+         return await this.query.countEnrollments(branchId, status)
       } catch (error) {
-         console.error('Error al contar inscripciones:', error);
-         return 0;
+         console.error('Error al contar inscripciones:', error)
+         return 0
       }
    }
-
-
 }

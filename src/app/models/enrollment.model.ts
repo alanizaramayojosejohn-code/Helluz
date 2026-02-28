@@ -19,13 +19,16 @@ export interface Enrollment {
   allowedDays: number[];
 
   cost: number;
-  // paymentStatus: 'pendiente' | 'pagado' | 'parcial';
   paymentMethod: 'Qr' | 'Efectivo';
 
   status: 'activa' | 'vencida' | 'cancelada' | 'completada';
 
   createdAt?: Timestamp;
   updatedAt?: Timestamp;
+  createdBy?: string;
+  createdByName?: string;
+  updatedBy?: string;
+  updatedByName?: string;
 }
 
 export type CreateEnrollmentDto = Omit<Enrollment, 'id' | 'createdAt' | 'updatedAt'>;

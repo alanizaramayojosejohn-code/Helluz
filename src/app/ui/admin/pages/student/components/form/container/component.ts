@@ -1,183 +1,199 @@
 // components/form/container/component.ts
-import { Component, DestroyRef, effect, inject, input, OnInit, output, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { StudentService } from '../../../../../../../services/student/student.service';
-import { CreateStudentDto, UpdateStudentDto } from '../../../../../../../models/student.model';
+import { Component, DestroyRef, effect, inject, input, OnInit, output, signal } from '@angular/core'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
+import { MatFormFieldModule } from '@angular/material/form-field'
+import { MatInputModule } from '@angular/material/input'
+import { MatSelectModule } from '@angular/material/select'
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
+import { StudentService } from '../../../../../../../services/student/student.service'
+import { CreateStudentDto, UpdateStudentDto } from '../../../../../../../models/student.model'
+import { AuthService } from '../../../../../../../services/auth/auth.service'
+import { user } from '@angular/fire/auth'
 
 @Component({
-  selector: 'x-student-form',
-  imports: [
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatProgressSpinnerModule,
-  ],
-  templateUrl: './component.html',
+   selector: 'x-student-form',
+   imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatProgressSpinnerModule],
+   templateUrl: './component.html',
 })
 export class StudentForm implements OnInit {
-  private readonly fb = inject(FormBuilder);
-  private readonly studentService = inject(StudentService);
-  private readonly destroyRef = inject(DestroyRef);
+   private readonly fb = inject(FormBuilder)
+   private readonly studentService = inject(StudentService)
+   private readonly destroyRef = inject(DestroyRef)
 
-  readonly studentId = input<string | null>(null);
-  readonly isEditMode = input<boolean>(false);
+   readonly studentId = input<string | null>(null)
+   readonly isEditMode = input<boolean>(false)
 
-  readonly saved = output<void>();
-  readonly cancelled = output<void>();
+   readonly saved = output<void>()
+   readonly cancelled = output<void>()
 
-  studentForm!: FormGroup;
+   studentForm!: FormGroup
 
-  readonly isSubmitting = signal(false);
-  readonly isLoading = signal(false);
-  readonly errorMessage = signal<string | null>(null);
+   readonly isSubmitting = signal(false)
+   readonly isLoading = signal(false)
+   readonly errorMessage = signal<string | null>(null)
 
-  constructor() {
-    effect(() => {
-      const id = this.studentId();
-      if (id) {
-        this.loadStudent(id);
+   private readonly authService = inject(AuthService)
+   currentUserId = signal<string | null>(null)
+   currentUserName = signal<string | null>(null)
+
+   constructor() {
+      effect(() => {
+         const id = this.studentId()
+         if (id) {
+            this.loadStudent(id)
+         }
+      })
+   }
+
+   ngOnInit(): void {
+      this.initForm()
+      this.loadCurrentUser()
+   }
+
+   loadCurrentUser(): void {
+      this.authService.currentUser$.subscribe((user) => {
+         if (user?.uid) {
+            this.currentUserId.set(user.uid)
+            this.currentUserName.set(`${user.name} ${user.lastname}`)
+         }
+      })
+   }
+
+   private initForm(): void {
+      this.studentForm = this.fb.group({
+         name: ['', [Validators.required, Validators.minLength(2)]],
+         lastname: ['', [Validators.required, Validators.minLength(2)]],
+         ci: ['', [Validators.required, Validators.minLength(5)]],
+         cellphone: ['', [Validators.required, Validators.minLength(8)]],
+         email: ['', [Validators.email]],
+         emergencyContact: [''],
+         emergencyPhone: [''],
+         status: ['activo', Validators.required],
+      })
+   }
+
+   private loadStudent(id: string): void {
+      this.isLoading.set(true)
+      this.errorMessage.set(null)
+
+      this.studentService
+         .getStudentById(id)
+         .pipe(takeUntilDestroyed(this.destroyRef))
+         .subscribe({
+            next: (student) => {
+               if (student) {
+                  this.studentForm.patchValue({
+                     name: student.name,
+                     lastname: student.lastname,
+                     ci: student.ci,
+                     cellphone: student.cellphone,
+                     email: student.email || '',
+                     emergencyContact: student.emergencyContact || '',
+                     emergencyPhone: student.emergencyPhone || '',
+                     status: student.status,
+                  })
+               }
+               this.isLoading.set(false)
+            },
+            error: () => {
+               this.errorMessage.set('Error al cargar el estudiante')
+               this.isLoading.set(false)
+            },
+         })
+   }
+
+   async onSubmit(): Promise<void> {
+      if (!this.validateForm()) {
+         return
       }
-    });
-  }
 
-  ngOnInit(): void {
-    this.initForm();
-  }
+      this.resetErrors()
+      this.isSubmitting.set(true)
 
-  private initForm(): void {
-    this.studentForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
-      lastname: ['', [Validators.required, Validators.minLength(2)]],
-      ci: ['', [Validators.required, Validators.minLength(5)]],
-      cellphone: ['', [Validators.required, Validators.minLength(8)]],
-      email: ['', [Validators.email]],
-      emergencyContact: [''],
-      emergencyPhone: [''],
-      status: ['activo', Validators.required],
-    });
-  }
+      try {
+         await this.saveStudent()
+         this.saved.emit()
+      } catch (error) {
+         this.handleSaveError(error)
+      } finally {
+         this.isSubmitting.set(false)
+      }
+   }
 
-  private loadStudent(id: string): void {
-    this.isLoading.set(true);
-    this.errorMessage.set(null);
+   private validateForm(): boolean {
+      if (this.studentForm.invalid) {
+         this.studentForm.markAllAsTouched()
+         this.errorMessage.set('Por favor, completa todos los campos requeridos')
+         return false
+      }
+      return true
+   }
 
-    this.studentService
-      .getStudentById(id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (student) => {
-          if (student) {
-            this.studentForm.patchValue({
-              name: student.name,
-              lastname: student.lastname,
-              ci: student.ci,
-              cellphone: student.cellphone,
-              email: student.email || '',
-              emergencyContact: student.emergencyContact || '',
-              emergencyPhone: student.emergencyPhone || '',
-              status: student.status,
-            });
-          }
-          this.isLoading.set(false);
-        },
-        error: () => {
-          this.errorMessage.set('Error al cargar el estudiante');
-          this.isLoading.set(false);
-        },
-      });
-  }
+   private async saveStudent(): Promise<void> {
+      const formValue = this.studentForm.value
+      const userId = this.currentUserId()
+      const userName = this.currentUserName()
 
-  async onSubmit(): Promise<void> {
-    if (!this.validateForm()) {
-      return;
-    }
+      if (!userId || !userName) {
+         throw new Error('No se pudo obtener el usuario actual')
+      }
 
-    this.resetErrors();
-    this.isSubmitting.set(true);
+      if (this.isEditMode() && this.studentId()) {
+         const updateData: UpdateStudentDto = {
+            ...formValue,
+            email: formValue.email || undefined,
+            emergencyContact: formValue.emergencyContact || undefined,
+            emergencyPhone: formValue.emergencyPhone || undefined,
+         }
+         await this.studentService.updateStudent(this.studentId()!, updateData, userId, userName) // ✅ Pasar userId
+      } else {
+         const createData: CreateStudentDto = {
+            ...formValue,
+            email: formValue.email || undefined,
+            emergencyContact: formValue.emergencyContact || undefined,
+            emergencyPhone: formValue.emergencyPhone || undefined,
+         }
+         await this.studentService.createStudent(createData, userId, userName) // ✅ Ya está correcto
+      }
+   }
 
-    try {
-      await this.saveStudent();
-      this.saved.emit();
-    } catch (error) {
-      this.handleSaveError(error);
-    } finally {
-      this.isSubmitting.set(false);
-    }
-  }
+   private resetErrors(): void {
+      this.errorMessage.set(null)
+   }
 
-  private validateForm(): boolean {
-    if (this.studentForm.invalid) {
-      this.studentForm.markAllAsTouched();
-      this.errorMessage.set('Por favor, completa todos los campos requeridos');
-      return false;
-    }
-    return true;
-  }
+   private handleSaveError(error: unknown): void {
+      const message = error instanceof Error ? error.message : 'Error al guardar estudiante'
+      this.errorMessage.set(message)
+      console.error('Error al guardar estudiante:', error)
+   }
 
-  private async saveStudent(): Promise<void> {
-    const formValue = this.studentForm.value;
+   onCancel(): void {
+      this.cancelled.emit()
+   }
 
-    if (this.isEditMode() && this.studentId()) {
-      const updateData: UpdateStudentDto = {
-        ...formValue,
-        email: formValue.email || undefined,
-        emergencyContact: formValue.emergencyContact || undefined,
-        emergencyPhone: formValue.emergencyPhone || undefined,
-      };
-      await this.studentService.updateStudent(this.studentId()!, updateData);
-    } else {
-      const createData: CreateStudentDto = {
-        ...formValue,
-        email: formValue.email || undefined,
-        emergencyContact: formValue.emergencyContact || undefined,
-        emergencyPhone: formValue.emergencyPhone || undefined,
-      };
-      await this.studentService.createStudent(createData);
-    }
-  }
+   getFormTitle(): string {
+      return this.isEditMode() ? 'Editar Estudiante' : 'Registrar Estudiante'
+   }
 
-  private resetErrors(): void {
-    this.errorMessage.set(null);
-  }
+   hasError(field: string): boolean {
+      const control = this.studentForm.get(field)
+      return !!(control && control.invalid && (control.dirty || control.touched))
+   }
 
-  private handleSaveError(error: unknown): void {
-    const message = error instanceof Error ? error.message : 'Error al guardar estudiante';
-    this.errorMessage.set(message);
-    console.error('Error al guardar estudiante:', error);
-  }
+   getErrorMessage(field: string): string {
+      const control = this.studentForm.get(field)
+      if (!control) return ''
 
-  onCancel(): void {
-    this.cancelled.emit();
-  }
-
-  getFormTitle(): string {
-    return this.isEditMode() ? 'Editar Estudiante' : 'Registrar Estudiante';
-  }
-
-  hasError(field: string): boolean {
-    const control = this.studentForm.get(field);
-    return !!(control && control.invalid && (control.dirty || control.touched));
-  }
-
-  getErrorMessage(field: string): string {
-    const control = this.studentForm.get(field);
-    if (!control) return '';
-
-    if (control.hasError('required')) {
-      return 'Este campo es requerido';
-    }
-    if (control.hasError('minLength')) {
-      return `Mínimo ${control.getError('minLength').requiredLength} caracteres`;
-    }
-    if (control.hasError('email')) {
-      return 'Email no válido';
-    }
-    return '';
-  }
+      if (control.hasError('required')) {
+         return 'Este campo es requerido'
+      }
+      if (control.hasError('minLength')) {
+         return `Mínimo ${control.getError('minLength').requiredLength} caracteres`
+      }
+      if (control.hasError('email')) {
+         return 'Email no válido'
+      }
+      return ''
+   }
 }
