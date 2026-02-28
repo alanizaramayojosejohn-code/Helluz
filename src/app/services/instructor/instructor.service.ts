@@ -73,7 +73,7 @@ export class InstructorService {
 
    async deleteInstructor(id: string): Promise<void> {
       try {
-         await this.query.softDelete(id)
+         await this.query.delete(id)
       } catch (error) {
          console.error('Error al eliminar el instructor')
          throw error

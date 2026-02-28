@@ -9,10 +9,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { MatTooltipModule } from '@angular/material/tooltip'
 import { UserService } from '../../../../../../../services/user/user.service'
 import { User } from '../../../../../../../models/user.model'
+import { ConfirmDialogService } from '../../../../../../../../shared/services/confirm-dialog.service'
+import { MatIcon } from "@angular/material/icon";
 
 @Component({
    selector: 'x-user-list',
-   imports: [MatFormFieldModule, MatSelectModule, MatProgressSpinnerModule, MatTooltipModule, AsyncPipe],
+   imports: [MatFormFieldModule, MatSelectModule, MatProgressSpinnerModule, MatTooltipModule, AsyncPipe, MatIcon],
    templateUrl: './component.html',
 })
 export class UserList implements OnInit {
@@ -103,4 +105,18 @@ export class UserList implements OnInit {
    getRoleBadgeClass(role: string): string {
       return role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
    }
+   private readonly confirmDialog = inject(ConfirmDialogService)
+
+      async deleteUser(user: User): Promise<void> {
+         this.confirmDialog.confirmDelete(user.name, 'el usuario').subscribe(async (confirmed) => {
+            if (confirmed) {
+               try {
+                  await this.userService.deleteUser(user.id!)
+                  this.loadData()
+               } catch (error) {
+                  console.error('Error al eliminar:', error)
+               }
+            }
+         })
+      }
 }

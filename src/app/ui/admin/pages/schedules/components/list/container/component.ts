@@ -15,6 +15,7 @@ import { BranchService } from '../../../../../../../services/branch/branch.servi
 import { SeedService } from '../../../../../../../services/seed/seed.service'
 import { Schedule } from '../../../../../../../models/schedule.model'
 import { Branch } from '../../../../../../../models/branch.model'
+import { ConfirmDialogService } from '../../../../../../../../shared/services/confirm-dialog.service'
 
 @Component({
    selector: 'x-schedule-list',
@@ -150,4 +151,18 @@ export class ScheduleList implements OnInit {
    getTimeRange(schedule: Schedule): string {
       return `${schedule.startTime} - ${schedule.endTime}`
    }
+   private readonly confirmDialog = inject(ConfirmDialogService)
+
+    async deleteSchedule(schedule: Schedule): Promise<void> {
+         this.confirmDialog.confirmDelete(schedule.day, 'el horario').subscribe(async (confirmed) => {
+            if (confirmed) {
+               try {
+                  await this.scheduleService.deleteSchedule(schedule.id!)
+                  this.loadData()
+               } catch (error) {
+                  console.error('Error al eliminar:', error)
+               }
+            }
+         })
+      }
 }

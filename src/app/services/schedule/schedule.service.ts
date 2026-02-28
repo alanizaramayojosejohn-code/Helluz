@@ -6,7 +6,6 @@ import { collection, Firestore, getDocs, limit, query, where } from '@angular/fi
 
 @Injectable()
 export class ScheduleService {
-
    private query = inject(ScheduleQueryService)
    private firestore = inject(Firestore)
 
@@ -25,8 +24,8 @@ export class ScheduleService {
    getSchedulesByDay(branchId: string, day: string): Observable<Schedule[]> {
       return this.query.getByDay(branchId, day)
    }
-   getActiveSchedules(): Observable<Schedule[]>{
-    return this.query.getActive()
+   getActiveSchedules(): Observable<Schedule[]> {
+      return this.query.getActive()
    }
 
    checkTimeConflict$(
@@ -96,7 +95,7 @@ export class ScheduleService {
 
    async deleteSchedule(id: string): Promise<void> {
       try {
-         await this.query.softDelete(id)
+         await this.query.delete(id)
       } catch (error) {
          console.error('Error al eliminar el horario')
          throw error
@@ -123,28 +122,27 @@ export class ScheduleService {
    }
 
    async getInstructorScheduleForToday(instructorId: string, dayName: string): Promise<Schedule | null> {
-  try {
-    const col = collection(this.firestore, 'schedules');
-    const q = query(
-      col,
-      where('instructorId', '==', instructorId),
-      where('day', '==', dayName),
-      where('status', '==', 'activo'),
-      limit(1)
-    );
+      try {
+         const col = collection(this.firestore, 'schedules')
+         const q = query(
+            col,
+            where('instructorId', '==', instructorId),
+            where('day', '==', dayName),
+            where('status', '==', 'activo'),
+            limit(1)
+         )
 
-    const snapshot = await getDocs(q);
+         const snapshot = await getDocs(q)
 
-    if (snapshot.empty) {
-      return null;
-    }
+         if (snapshot.empty) {
+            return null
+         }
 
-    const doc = snapshot.docs[0];
-    return { id: doc.id, ...doc.data() } as Schedule;
-
-  } catch (error) {
-    console.error('Error al buscar horario del instructor:', error);
-    return null;
-  }
-}
+         const doc = snapshot.docs[0]
+         return { id: doc.id, ...doc.data() } as Schedule
+      } catch (error) {
+         console.error('Error al buscar horario del instructor:', error)
+         return null
+      }
+   }
 }

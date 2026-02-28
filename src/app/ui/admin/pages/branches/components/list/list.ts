@@ -3,7 +3,8 @@ import { BranchService } from '../../../../../../services/branch/branch.service'
 import { Observable } from 'rxjs'
 import { Branch } from '../../../../../../models/branch.model'
 import { CommonModule } from '@angular/common'
-import { MatIcon } from "@angular/material/icon";
+import { MatIcon } from '@angular/material/icon'
+import { ConfirmDialogService } from '../../../../../../../shared/services/confirm-dialog.service'
 
 @Component({
    selector: 'x-list',
@@ -13,7 +14,7 @@ import { MatIcon } from "@angular/material/icon";
 })
 export class List implements OnInit {
    private branchService = inject(BranchService)
-
+   private readonly confirmDialog = inject(ConfirmDialogService)
    branches$!: Observable<Branch[]>
 
    createBranch = output<void>()
@@ -28,10 +29,18 @@ export class List implements OnInit {
       this.branches$ = this.branchService.getBranches()
    }
 
-   async deleteBranch(branch: Branch) {
-      if (confirm(`Eliminar ${branch.name}?`)) {
-         await this.branchService.deleteBranch(branch.id!)
-      }
+   async deleteBranch(branch: Branch): Promise<void> {
+      this.confirmDialog.confirmDelete(branch.name, 'la sucursal').subscribe(async (confirmed) => {
+         if (confirmed) {
+            try {
+               await this.branchService.deleteBranch(branch.id!)
+               this.loadBranches() // Recargar lista
+            } catch (error) {
+               console.error('Error al eliminar:', error)
+               // Opcional: mostrar mensaje de error
+            }
+         }
+      })
    }
 
    onCreateBranch() {

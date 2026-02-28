@@ -10,6 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { MatTooltipModule } from '@angular/material/tooltip'
 import { MembershipService } from '../../../../../../../services/membership/membership.service'
 import { Membership } from '../../../../../../../models/membership.model'
+import { ConfirmDialogService } from '../../../../../../../../shared/services/confirm-dialog.service'
 
 @Component({
    selector: 'x-membership-list',
@@ -31,7 +32,7 @@ export class MembershipList implements OnInit {
    readonly createMembership = output<void>()
    readonly editMembership = output<string>()
    readonly viewDetail = output<string>()
-
+   private readonly confirmDialog = inject(ConfirmDialogService)
 
    memberships$!: Observable<Membership[]>
 
@@ -88,5 +89,18 @@ export class MembershipList implements OnInit {
    getDaysLabel(days: number[]): string {
       const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
       return days.map((d) => dayNames[d]).join(', ')
+   }
+
+   async deleteMembership(membership: Membership): Promise<void> {
+      this.confirmDialog.confirmDelete(membership.name, 'la sucursal').subscribe(async (confirmed) => {
+         if (confirmed) {
+            try {
+               await this.membershipService.deleteMembership(membership.id!)
+               this.loadData() 
+            } catch (error) {
+               console.error('Error al eliminar:', error)
+            }
+         }
+      })
    }
 }
