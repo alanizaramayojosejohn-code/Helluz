@@ -68,8 +68,8 @@ export class BranchForm implements OnInit {
       this.branchForm = this.fb.group({
          name: ['', [Validators.required, Validators.minLength(3)]],
          city: ['', [Validators.required, Validators.minLength(3)]],
-         ip: ['', [Validators.required, Validators.pattern(/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/)]],
-         mask: ['', [Validators.required, Validators.pattern(/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/)]],
+        //  ip: ['', [Validators.required, Validators.pattern(/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/)]],
+        //  mask: ['', [Validators.required, Validators.pattern(/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/)]],
          status: ['activo' as BranchStatus, Validators.required],
          userId: ['user-default'],
       })

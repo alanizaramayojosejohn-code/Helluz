@@ -15,11 +15,11 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                @for (branch of branches; track branch.id) {
                   <div
-                     class="bg-white shadow-sm shadow-black rounded-lg overflow-hidden hover:border-gray-600 transition"
+                     class="bg-white shadow-xl rounded-none shadow-gray-200 border-gray-100 border-solid overflow-hidden hover:shadow-gray-600 transition"
                   >
                      <div class="p-4">
                         <div class="flex justify-between items-start mb-2">
-                           <h3 class="text-2xl font-bold text-red-600">{{ branch.name }}</h3>
+                           <h3 class="text-2xl font-bold text-red-600 text-center">{{ branch.name }}</h3>
                            <span
                               [class.bg-green-600]="branch.status === 'activo'"
                               [class.bg-gray-600]="branch.status === 'inactivo'"
@@ -29,17 +29,17 @@
                            </span>
                         </div>
 
-                        <p class="text-gray-600 text-sm text-center mb-3 line-clamp-2">{{ branch.city }}</p>
+                        <p class="text-gray-600 text-3xl font-bold text-center mb-3 line-clamp-2">{{ branch.city }}</p>
 
-                        <div class="flex justify-between items-center mb-4">
+                        <!-- <div class="flex justify-between items-center mb-4">
                            <span class="text-lg text-black"> {{ branch.ip }}</span>
                         </div>
 
                         <div>
                            <span class="text-lg py-1 rounded"> {{ branch.mask }}</span>
-                        </div>
+                        </div> -->
 
-                        <div class="flex gap-2 mt-4">
+                        <div class="flex gap-2 mt-10">
                            <button
                               class="text-black hover:text-red-500 hover:bg-slate-100 mr-3 border-none rounded-full bg-white"
                               (click)="onViewDetail(branch.id!)"
