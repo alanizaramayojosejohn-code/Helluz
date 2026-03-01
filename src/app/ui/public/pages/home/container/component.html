@@ -1,41 +1,43 @@
 <div class="bg-black font-body text-white flex flex-col min-h-screen relative">
    <div class="absolute inset-0 bg-black/70 z-[1]"></div>
 
-   <section class="relative z-[2] flex-1 flex items-center justify-center text-center px-6 py-36">
+   <section class="relative z-[2] flex-1 flex items-center justify-center text-center px-6 py-16">
       <div class="max-w-3xl mx-auto">
          <h1
-            class="font-display text-5xl md:text-6xl text-gray-100 text-glow tracking-wide mb-4 transition-all hover:text-6xl hover:md:text-7xl duration-500"
+            class="font-display text-4xl md:text-5xl text-white text-glow tracking-wide mb-4 transition-all hover:text-5xl hover:md:text-6xl duration-500"
          >
             Control de Asistencia Academia HELLUZ
          </h1>
          <img
             src="/images/Logo.webp"
             alt="Logo Helluz"
-            class="w-40 mt-10 rounded-full shadow-lg shadow-red-700 transition-all hover:w-4/12 duration-500"
+            class="w-3/12 mt-10 rounded-full shadow-md shadow-red-700 transition-all hover:shadow-lg hover:shadow-red-500 hover:w-4/12 duration-500"
          />
 
-         <div class="flex flex-wrap justify-center gap-4">
+         <div class="flex flex-wrap m-10 justify-center gap-4">
             <a href="/log-in"
                ><button
-                  class="bg-black py-2 px-4 mt-10 border-slate-100 text-lg hover:text-xl shadow-md shadow-slate-500 rounded-full hover:shadow-lg hover:shadow-white text-white transition-all hover:px-6 hover:py-3 duration-500"
+                  class="bg-black py-2 px-4 border-solid border-gray-950 text-lg hover:text-xl shadow-sm shadow-red-700 rounded-full hover:shadow-md hover:shadow-red-500 text-white transition-all hover:px-6 hover:py-3 duration-500"
                >
                   Ingresar al Sistema
                </button>
             </a>
          </div>
 
-         <p class="m-6 text-xl text-gray-100 mt-10 transition-all hover:text-2xl duration-500"> Registrar Asistencia</p>
+         <div class="mt-12">
+            <p class="text-xl text-gray-100 transition-all hover:text-2xl duration-500"> Registrar Asistencia </p>
+         </div>
          <div class="flex flex-wrap justify-center gap-4 mt-4">
             <a href="/asistenciaalumnos"
                ><button
-                  class="bg-black py-2 px-8 m-2 mt-10 border-slate-100 text-lg hover:text-xl shadow-md shadow-slate-500 rounded-full hover:shadow-lg hover:shadow-white text-white transition-all hover:px-12 hover:py-3 duration-500"
+                  class="bg-black py-2 px-8 m-2 mt-10 border-solid border-gray-950 text-lg hover:text-xl shadow-sm shadow-red-900 rounded-full hover:shadow-md hover:shadow-red-500 text-white transition-all hover:px-12 hover:py-3 duration-500"
                >
                   Alumno
                </button>
             </a>
             <a href="/asistenciainstructores"
                ><button
-                  class="bg-black py-2 px-8 m-2 mt-10 border-slate-100 text-lg hover:text-xl shadow-md shadow-slate-500 rounded-full hover:shadow-lg hover:shadow-white text-white transition-all hover:px-12 hover:py-3 duration-500"
+                  class="bg-black py-2 px-8 m-2 mt-10 border-solid border-gray-950 text-lg hover:text-xl shadow-sm shadow-red-900 rounded-full hover:shadow-md hover:shadow-red-500 text-white transition-all hover:px-12 hover:py-3 duration-500"
                >
                   Instructor
                </button>
@@ -49,7 +51,6 @@
       <div class="max-w-5xl mx-auto">
          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div class="flex flex-col items-center">
-
                <h4 class="font-display text-2xl tracking-wider mb-2">Gestión de Alumnos</h4>
                <p class="text-gray-400 text-sm leading-relaxed">
                   Administra la asistencia y el rendimiento de tus luchadores fácilmente.
@@ -57,7 +58,6 @@
             </div>
 
             <div class="flex flex-col items-center">
-
                <h4 class="font-display text-2xl tracking-wider mb-2">Registro Automático</h4>
                <p class="text-gray-400 text-sm leading-relaxed">
                   Control de asistencia mediante lector, código o registro manual.
@@ -65,7 +65,6 @@
             </div>
 
             <div class="flex flex-col items-center">
-
                <h4 class="font-display text-2xl tracking-wider mb-2">Estadísticas en Tiempo Real</h4>
                <p class="text-gray-400 text-sm leading-relaxed">
                   Visualiza el progreso de tus alumnos y el desempeño de tus clases.
@@ -82,28 +81,36 @@
       <small class="basis-full text-gray-400 mb-1 block text-xs">
          © 2026 Academia HELLUZ | Sistema de Control de Asistencia
       </small>
-      <a href="https://www.facebook.com/AsociacionDepartamentalDeArtesMarcialesMixtasOruro"
-          target="_blank"
-          class="text-white hover:text-blue-500 transition-colors text-2xl">
-          <i class="fab fa-facebook"></i>
-        </a>
+      <a
+         href="https://www.facebook.com/AsociacionDepartamentalDeArtesMarcialesMixtasOruro"
+         target="_blank"
+         class="text-white hover:text-blue-500 transition-colors text-2xl"
+      >
+         <i class="fab fa-facebook"></i>
+      </a>
 
-        <a href="https://www.instagram.com/helluzteam_or/"
-          target="_blank"
-          class="text-white hover:text-pink-500 transition-colors text-2xl">
-          <i class="fab fa-instagram"></i>
-        </a>
+      <a
+         href="https://www.instagram.com/helluzteam_or/"
+         target="_blank"
+         class="text-white hover:text-pink-500 transition-colors text-2xl"
+      >
+         <i class="fab fa-instagram"></i>
+      </a>
 
-        <a href="https://www.tiktok.com/@teamhelluzmma"
-          target="_blank"
-          class="text-white hover:text-gray-500 transition-colors text-2xl">
-          <i class="fab fa-tiktok"></i>
-        </a>
+      <a
+         href="https://www.tiktok.com/@teamhelluzmma"
+         target="_blank"
+         class="text-white hover:text-gray-500 transition-colors text-2xl"
+      >
+         <i class="fab fa-tiktok"></i>
+      </a>
 
-        <a href="https://wa.me/59160422094?text=Hola,%20quiero%20más%20información"
-          target="_blank"
-          class="text-white hover:text-green-500 transition-colors text-2xl">
-          <i class="fab fa-whatsapp"></i>
-        </a>
+      <a
+         href="https://wa.me/59160422094?text=Hola,%20quiero%20más%20información"
+         target="_blank"
+         class="text-white hover:text-green-500 transition-colors text-2xl"
+      >
+         <i class="fab fa-whatsapp"></i>
+      </a>
    </footer>
 </div>
