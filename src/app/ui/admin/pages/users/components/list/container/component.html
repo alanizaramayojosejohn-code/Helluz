@@ -117,7 +117,7 @@
                               mat-icon-button
                               (click)="onViewDetail(user)"
                               matTooltip="Ver detalle"
-                              class="text-gray-600 hover:text-gray-800"
+                              class="text-gray-500 hover:text-blue-600 bg-transparent border-none shadow-none"
                            >
                               <mat-icon>visibility</mat-icon>
                            </button>
@@ -125,13 +125,13 @@
                               mat-icon-button
                               (click)="onEditUser(user)"
                               matTooltip="Editar"
-                              class="text-gray-600 hover:text-gray-800"
+                              class="text-gray-500 hover:text-gray-800 bg-transparent border-none shadow-none"
                            >
                               <mat-icon>edit</mat-icon>
                            </button>
 
                            <button
-                              class="text-orange-600 hover:text-orange-900 inline-flex items-center"
+                              class="text-gray-500 hover:text-yellow-300 bg-transparent border-none shadow-none"
                               (click)="onResetPassword(user)"
                               matTooltip="Restablecer contraseña"
                            >
@@ -145,7 +145,7 @@
                               </svg>
                            </button>
                            <button
-                              class="text-red-500 bg-white hover:text-white hover:bg-red-500 border-none rounded-full"
+                              class="text-gray-500 hover:text-red-600 bg-transparent border-none shadow-none"
                               (click)="deleteUser(user)"
                               mat-icon-button
                               matTooltip="Editar"

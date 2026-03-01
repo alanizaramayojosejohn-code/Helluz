@@ -98,12 +98,13 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                            {{ student.createdByName }}
                         </td>
+
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                            <button
                               mat-icon-button
                               (click)="onViewDetail(student)"
                               matTooltip="Ver detalle"
-                              class="text-gray-600 hover:text-gray-800 "
+                              class="text-gray-500 hover:text-blue-600 bg-transparent border-none shadow-none"
                            >
                               <mat-icon>visibility</mat-icon>
                            </button>
@@ -111,12 +112,12 @@
                               mat-icon-button
                               (click)="onEditStudent(student)"
                               matTooltip="Editar"
-                              class="text-gray-600 hover:text-gray-800"
+                              class="text-gray-500 hover:text-gray-800 bg-transparent border-none shadow-none"
                            >
                               <mat-icon>edit</mat-icon>
                            </button>
                            <button
-                              class="text-red-500 bg-white hover:text-white hover:bg-red-500 border-none rounded-full"
+                              class="text-gray-500 hover:text-red-600 bg-transparent border-none shadow-none"
                               (click)="deleteStudent(student)"
                               mat-icon-button
                               matTooltip="Editar"
