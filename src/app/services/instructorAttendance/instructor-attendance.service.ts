@@ -214,7 +214,7 @@ export class InstructorAttendanceService {
       const diff = actualMinutes - expectedMinutes
 
       return {
-         isLate: diff > 5,
+         isLate: diff > 10,
          minutesLate: diff > 0 ? diff : 0,
       }
    }
