@@ -32,7 +32,7 @@
                   <mat-label>Sucursal</mat-label>
                   <mat-select formControlName="branchId" required>
                      @for (branch of branches$ | async; track branch.id) {
-                        <mat-option [value]="branch.id">{{ branch.name }}</mat-option>
+                        <mat-option [value]="branch.id" getBrancheId>{{ branch.name }}</mat-option>
                      }
                   </mat-select>
                   @if (hasFieldError('branchId')) {
@@ -51,6 +51,21 @@
                   </mat-select>
                   @if (hasFieldError('membershipId')) {
                      <mat-error>{{ getFieldError('membershipId') }}</mat-error>
+                  }
+               </mat-form-field>
+            </div>
+
+            <!-- Horario -->
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Horario</mat-label>
+                  <mat-select formControlName="scheduleId" required>
+                     @for (sch of schedule$ | async; track sch.id) {
+                        <mat-option [value]="sch.id">{{ sch.startTime }} - {{ sch.endTime }}</mat-option>
+                     }
+                  </mat-select>
+                  @if (hasFieldError('branchId')) {
+                     <mat-error>{{ getFieldError('branchId') }}</mat-error>
                   }
                </mat-form-field>
             </div>

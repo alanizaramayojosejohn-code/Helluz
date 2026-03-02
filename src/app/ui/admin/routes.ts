@@ -27,6 +27,10 @@ export const AdminRoutes: Routes = [
       path: 'membresias',
       loadComponent: async () => await import('./pages/membership/container/component'),
    },
+   {
+      path: 'finanzas',
+      loadComponent: async () => await import('./pages/finance/container/component'),
+   },
   //  {
   //     path: 'alumnos',
   //     canActivate: [authGuard],

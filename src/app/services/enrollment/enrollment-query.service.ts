@@ -220,4 +220,40 @@ export class EnrollmentQueryService {
     }
   }
 
+  getFilteredForFinance(
+    branchId: string,
+    scheduleId: string,
+    start: Date,
+    end: Date
+  ): Observable<Enrollment[]> {
+    const constraints: QueryConstraint[] = [];
+
+    // Filtro obligatorio por sucursal
+    if (branchId) {
+      constraints.push(where('branchId', '==', branchId));
+    }
+
+    // Filtro por rango de fechas (usando el campo createdAt)
+    if (start && end) {
+      // Ajustamos el fin del día para que incluya todo el día final (23:59:59)
+      const endOfDay = new Date(end);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      constraints.push(where('createdAt', '>=', FirestoreTimestamp.fromDate(start)));
+      constraints.push(where('createdAt', '<=', FirestoreTimestamp.fromDate(endOfDay)));
+    }
+
+    // Filtro opcional por horario
+    if (scheduleId) {
+      constraints.push(where('scheduleId', '==', scheduleId));
+    }
+
+    // Ordenamos por fecha de creación
+    constraints.push(orderBy('createdAt', 'desc'));
+
+    const q = query(this.enrollmentsCollection, ...constraints);
+
+    return collectionData(q, { idField: 'id' }) as Observable<Enrollment[]>;
+  }
+
 }
