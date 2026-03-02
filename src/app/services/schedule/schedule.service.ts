@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core'
-import { from, Observable, catchError, throwError } from 'rxjs'
+import { from, Observable, catchError, throwError, firstValueFrom } from 'rxjs'
 import { Schedule, CreateScheduleDto, UpdateScheduleDto } from '../../models/schedule.model'
 import { ScheduleQueryService } from './schedule-query.service'
 import { collection, Firestore, getDocs, limit, query, where } from '@angular/fire/firestore'
@@ -41,15 +41,17 @@ export class ScheduleService {
    async addSchedule(schedule: CreateScheduleDto): Promise<string> {
       try {
          // Validar conflicto de horarios
-         const hasConflict = await this.query.checkTimeConflict(
-            schedule.branchId,
-            schedule.day,
-            schedule.startTime,
-            schedule.endTime
-         )
+         for (const day of schedule.days) {
+            const hasConflict = await this.query.checkTimeConflict(
+               schedule.branchId,
+               day,
+               schedule.startTime,
+               schedule.endTime
+            )
 
-         if (hasConflict) {
-            throw new Error('Ya existe un horario en ese rango de tiempo')
+            if (hasConflict) {
+               throw new Error('Ya existe un horario en ese rango de tiempo')
+            }
          }
 
          // Validar que la hora de fin sea mayor que la de inicio
@@ -68,21 +70,28 @@ export class ScheduleService {
    async updateSchedule(id: string, schedule: UpdateScheduleDto): Promise<void> {
       try {
          // Si se actualizan los horarios, validar conflictos
-         if (schedule.branchId && schedule.day && schedule.startTime && schedule.endTime) {
-            const hasConflict = await this.query.checkTimeConflict(
-               schedule.branchId,
-               schedule.day,
-               schedule.startTime,
-               schedule.endTime,
-               id
-            )
 
-            if (hasConflict) {
-               throw new Error('Ya existe un horario en ese rango de tiempo')
+         if (schedule.days || schedule.startTime || schedule.endTime) {
+            const currentSchedule = await firstValueFrom(this.query.getById(id))
+
+            if (!currentSchedule) {
+               throw new Error('Horario no encontrado')
             }
 
-            if (!this.isValidTimeRange(schedule.startTime, schedule.endTime)) {
-               throw new Error('La hora de fin debe ser posterior a la hora de inicio')
+            const branchId = schedule.branchId || currentSchedule.branchId
+            const days = schedule.days || currentSchedule.days
+            const startTime = schedule.startTime || currentSchedule.startTime
+            const endTime = schedule.endTime || currentSchedule.endTime
+
+            if (!this.isValidTimeRange(startTime, endTime)) {
+               throw new Error('La hora de fin debe de ser posterior a la hra de inicio')
+            }
+
+            for (const day of days) {
+               const hasConflict = await this.query.checkTimeConflict(branchId, day, startTime, endTime, id)
+               if (hasConflict) {
+                  throw new Error(`Ya existe un horario el ${days} en ese rango de tiempo`)
+               }
             }
          }
 
@@ -127,7 +136,7 @@ export class ScheduleService {
          const q = query(
             col,
             where('instructorId', '==', instructorId),
-            where('day', '==', dayName),
+            where('days', 'array-contains', dayName),
             where('status', '==', 'activo'),
             limit(1)
          )

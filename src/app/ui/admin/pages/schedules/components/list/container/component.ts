@@ -50,17 +50,17 @@ export class ScheduleList implements OnInit {
    readonly isLoading = signal(false)
    readonly errorMessage = signal<string | null>(null)
 
-   readonly displayedColumns = ['day', 'time', 'discipline', 'instructor', 'branch', 'actions']
+   readonly displayedColumns = ['days', 'time', 'discipline', 'instructor', 'branch', 'actions']
 
-   private readonly dayOrder: Record<string, number> = {
-      Lunes: 1,
-      Martes: 2,
-      Miercoles: 3,
-      Jueves: 4,
-      Viernes: 5,
-      Sábado: 6,
-      Domingo: 7,
-   }
+   //  private readonly dayOrder: Record<string, number> = {
+   //     Lunes: 1,
+   //     Martes: 2,
+   //     Miercoles: 3,
+   //     Jueves: 4,
+   //     Viernes: 5,
+   //     Sábado: 6,
+   //     Domingo: 7,
+   //  }
 
    ngOnInit(): void {
       this.loadData()
@@ -80,7 +80,7 @@ export class ScheduleList implements OnInit {
                return this.scheduleService.getSchedules()
             }
          }),
-         map((schedules) => this.sortSchedules(schedules)),
+         //  map((schedules) => this.sortSchedules(schedules)),
          takeUntilDestroyed(this.destroyRef)
       )
 
@@ -93,28 +93,28 @@ export class ScheduleList implements OnInit {
       })
    }
 
-   private sortSchedules(schedules: Schedule[]): Schedule[] {
-      return [...schedules].sort((a, b) => {
-         const dayOrderA = this.dayOrder[a.day] || 999
-         const dayOrderB = this.dayOrder[b.day] || 999
+   //  private sortSchedules(schedules: Schedule[]): Schedule[] {
+   //     return [...schedules].sort((a, b) => {
+   //        const dayOrderA = this.dayOrder[a.day] || 999
+   //        const dayOrderB = this.dayOrder[b.day] || 999
 
-         if (dayOrderA !== dayOrderB) {
-            return dayOrderA - dayOrderB
-         }
+   //        if (dayOrderA !== dayOrderB) {
+   //           return dayOrderA - dayOrderB
+   //        }
 
-         return this.compareTime(a.startTime, b.startTime)
-      })
-   }
+   //        return this.compareTime(a.startTime, b.startTime)
+   //     })
+   //  }
 
-   private compareTime(timeA: string, timeB: string): number {
-      const [hourA, minuteA] = timeA.split(':').map(Number)
-      const [hourB, minuteB] = timeB.split(':').map(Number)
+   //  private compareTime(timeA: string, timeB: string): number {
+   //     const [hourA, minuteA] = timeA.split(':').map(Number)
+   //     const [hourB, minuteB] = timeB.split(':').map(Number)
 
-      const totalMinutesA = hourA * 60 + minuteA
-      const totalMinutesB = hourB * 60 + minuteB
+   //     const totalMinutesA = hourA * 60 + minuteA
+   //     const totalMinutesB = hourB * 60 + minuteB
 
-      return totalMinutesA - totalMinutesB
-   }
+   //     return totalMinutesA - totalMinutesB
+   //  }
 
    onBranchFilterChange(branchId: string): void {
       this.selectedBranchId$.next(branchId === 'all' ? null : branchId)
@@ -140,6 +140,10 @@ export class ScheduleList implements OnInit {
       return dayId
    }
 
+   getDaysLabel(days: string[]): string {
+      return days.map((day) => this.getDayLabel(day)).join(', ')
+   }
+
    getDisciplineLabel(disciplineId: string): string {
       return disciplineId
    }
@@ -153,16 +157,16 @@ export class ScheduleList implements OnInit {
    }
    private readonly confirmDialog = inject(ConfirmDialogService)
 
-    async deleteSchedule(schedule: Schedule): Promise<void> {
-         this.confirmDialog.confirmDelete(schedule.day, 'el horario').subscribe(async (confirmed) => {
-            if (confirmed) {
-               try {
-                  await this.scheduleService.deleteSchedule(schedule.id!)
-                  this.loadData()
-               } catch (error) {
-                  console.error('Error al eliminar:', error)
-               }
+   async deleteSchedule(schedule: Schedule): Promise<void> {
+      this.confirmDialog.confirmDelete(schedule.startTime, 'el horario').subscribe(async (confirmed) => {
+         if (confirmed) {
+            try {
+               await this.scheduleService.deleteSchedule(schedule.id!)
+               this.loadData()
+            } catch (error) {
+               console.error('Error al eliminar:', error)
             }
-         })
-      }
+         }
+      })
+   }
 }

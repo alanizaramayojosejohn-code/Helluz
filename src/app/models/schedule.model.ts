@@ -4,7 +4,7 @@ export interface Schedule {
   id?: string;
   branchId: string;
   branchName?: string;
-  day: string;
+  days: string[];
   startTime: string;
   endTime: string;
   discipline: string;
