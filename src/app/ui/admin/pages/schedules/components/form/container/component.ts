@@ -156,7 +156,7 @@ export class ScheduleForm implements OnInit {
                   this.currentSchedule.set(schedule)
                   this.scheduleForm.patchValue({
                      branchId: schedule.branchId,
-                     days: [schedule.day], // ✅ Array con un solo día en edición
+                     days: schedule.days,
                      startTime: schedule.startTime,
                      endTime: schedule.endTime,
                      instructorId: schedule.instructorId || '',
@@ -212,31 +212,27 @@ export class ScheduleForm implements OnInit {
       if (this.isEditMode() && this.scheduleId()) {
          const updateData: UpdateScheduleDto = {
             ...formValue,
-            day: this.currentSchedule()?.day,
             branchName,
             instructorId: formValue.instructorId || undefined,
             instructorName,
-         }
+         };
 
          await this.scheduleService.updateSchedule(this.scheduleId()!, updateData)
       } else {
-         const selectedDays: string[] = formValue.days
 
-         for (const day of selectedDays) {
             const createData: CreateScheduleDto = {
                branchId: formValue.branchId,
                branchName,
-               day: day,
+               days: formValue.days,
                startTime: formValue.startTime,
                endTime: formValue.endTime,
                discipline: 'MMA',
                instructorId: formValue.instructorId || undefined,
                instructorName,
                status: formValue.status,
-            }
 
-            await this.scheduleService.addSchedule(createData)
-         }
+              }
+              await this.scheduleService.addSchedule(createData)
       }
    }
    private getInstructorName(instructorId: string): string {
