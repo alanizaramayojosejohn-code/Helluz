@@ -19,6 +19,8 @@ import { Branch } from '../../../../../../../models/branch.model'
 import { Student } from '../../../../../../../models/student.model'
 import { Membership } from '../../../../../../../models/membership.model'
 import { Timestamp } from '@angular/fire/firestore'
+import { ScheduleService } from '../../../../../../../services/schedule/schedule.service'
+import { Schedule } from '../../../../../../../models/schedule.model'
 
 @Component({
    selector: 'x-enrollment-form',
@@ -43,6 +45,7 @@ export class EnrollmentForm implements OnInit {
    private readonly membershipService = inject(MembershipService)
    private readonly destroyRef = inject(DestroyRef)
    private readonly authService = inject(AuthService)
+   private readonly scheduleService = inject(ScheduleService)
 
    readonly enrollmentId = input<string | null>(null)
    readonly isEditMode = input<boolean>(false)
@@ -54,15 +57,19 @@ export class EnrollmentForm implements OnInit {
    readonly currentEnrollment = signal<Enrollment | null>(null)
    readonly formValid = signal<boolean>(false)
 
+   brancheId = signal<string | null>(null)
+
    // ✅ Cambiar signals por observables
    branches$!: Observable<Branch[]>
    students$!: Observable<Student[]>
    memberships$!: Observable<Membership[]>
+   schedule$!: Observable<Schedule[]>
 
    // ✅ Caches para desnormalización
    private branchesCache: Branch[] = []
    private studentsCache: Student[] = []
    private membershipsCache: Membership[] = []
+   private scheduleCache: Schedule[] = []
    private currentUserId: string | null = null
    private currentUserName: string | null = null
 
@@ -118,6 +125,7 @@ export class EnrollmentForm implements OnInit {
          studentId: ['', Validators.required],
          branchId: ['', Validators.required],
          membershipId: ['', Validators.required],
+         scheduleId: ['', Validators.required],
          startDate: [new Date(), Validators.required],
          paymentMethod: ['Efectivo' as 'Efectivo' | 'Qr', Validators.required],
          status: ['activa' as 'activa' | 'vencida' | 'cancelada' | 'completada', Validators.required],
@@ -156,6 +164,18 @@ export class EnrollmentForm implements OnInit {
          tap((memberships) => (this.membershipsCache = memberships)),
          takeUntilDestroyed(this.destroyRef)
       )
+
+      // ✅ Cargar y cachear Horarios
+      /*
+      this.schedule$ = this.scheduleService.getSchedulesByBranch(branchId).pipe(
+         tap((scheduleships) => (this.scheduleCache = scheduleships)),
+         takeUntilDestroyed(this.destroyRef)
+      )
+      */
+   }
+
+   getBranchId (id:string): void {
+    this.brancheId.set(id)
    }
 
    private setupMembershipListener(): void {
@@ -249,9 +269,15 @@ export class EnrollmentForm implements OnInit {
       const student = this.studentsCache.find((s) => s.id === formValue.studentId)
       const branch = this.branchesCache.find((b) => b.id === formValue.branchId)
 
-      if (!student || !branch) {
-         throw new Error('Datos incompletos')
-      }
+      // Buscamos el objeto del horario para guardar su nombre legible
+        const selectedSchedule = this.scheduleCache.find(s => s.id === formValue.scheduleSelect);
+        const scheduleLabel = selectedSchedule
+          ? `${selectedSchedule.day} ${selectedSchedule.startTime}`
+          : '';
+
+        if (!this.currentUserId || !student || !branch || !membership) {
+          throw new Error('Datos incompletos');
+        }
 
       const startDate = new Date(formValue.startDate)
       const endDate = this.enrollmentService.calculateEndDate(startDate, membership.durationDays)
@@ -269,6 +295,7 @@ export class EnrollmentForm implements OnInit {
             membershipName: membership.name,
             branchId: branch.id!,
             branchName: branch.name,
+            scheduleSelect: formValue.scheduleSelect,
             startDate: Timestamp.fromDate(startDate),
             endDate: Timestamp.fromDate(endDate),
             totalSessions: membership.totalSessions,
@@ -344,4 +371,6 @@ export class EnrollmentForm implements OnInit {
       const option = this.statusOptions.find((opt) => opt.value === status)
       return option?.label || status
    }
+
+
 }

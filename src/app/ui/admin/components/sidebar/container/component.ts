@@ -33,6 +33,7 @@ export class SidebarComponent implements OnInit {
       { label: 'Sucursales', icon: 'business', route: '/admin/sucursales', roles: ['admin'] },
       { label: 'Asistencias Alumnos', icon: 'list_alt', route: '/admin/asistenciasa', roles: ['admin'] },
       { label: 'Asistencias Instructores', icon: 'list_alt', route: '/admin/asistenciasi', roles: ['admin'] },
+      { label: 'Finanzas', icon: 'account_balance', route: '/admin/finanzas', roles: ['admin'] },
    ]
   //  done_all
 

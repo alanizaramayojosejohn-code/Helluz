@@ -23,6 +23,8 @@ export interface Enrollment {
 
   status: 'activa' | 'vencida' | 'cancelada' | 'completada';
 
+  scheduleSelect?: string;
+
   createdAt?: Timestamp;
   updatedAt?: Timestamp;
   createdBy?: string;
@@ -40,6 +42,7 @@ export interface EnrollmentFormValue {
   branchId: string;
   startDate: Date;
   paymentStatus: 'pendiente' | 'pagado' | 'parcial';
+  scheduleSelect: string
 }
 
 

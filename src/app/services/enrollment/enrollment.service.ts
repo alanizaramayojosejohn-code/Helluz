@@ -33,6 +33,11 @@ export class EnrollmentService {
       return this.query.getExpiring(days)
    }
 
+   // Filtrar por fechas
+    getEnrollmentsByFilters(branchId: string, scheduleId: string, start: Date, end: Date): Observable<Enrollment[]> {
+      return this.query.getFilteredForFinance(branchId, scheduleId, start, end);
+    }
+
    async addEnrollment(enrollment: CreateEnrollmentDto, currentUserId:string, currentUserName: string): Promise<string> {
       try {
          const id = uuidv7()
