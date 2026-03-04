@@ -60,8 +60,8 @@
                <mat-form-field appearance="outline" class="w-full">
                   <mat-label>Horario</mat-label>
                   <mat-select formControlName="scheduleId" required>
-                     @for (sch of schedule$ | async; track sch.id) {
-                        <mat-option [value]="sch.id">{{ sch.startTime }} - {{ sch.endTime }}</mat-option>
+                     @for (schedule of schedule$ | async; track schedule.id) {
+                        <mat-option [value]="schedule.id">{{ schedule.startTime }} - {{ schedule.endTime }}</mat-option>
                      }
                   </mat-select>
                   @if (hasFieldError('branchId')) {

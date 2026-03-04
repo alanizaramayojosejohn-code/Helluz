@@ -24,6 +24,7 @@ export class ScheduleService {
    getSchedulesByDay(branchId: string, day: string): Observable<Schedule[]> {
       return this.query.getByDay(branchId, day)
    }
+
    getActiveSchedules(): Observable<Schedule[]> {
       return this.query.getActive()
    }
@@ -153,5 +154,9 @@ export class ScheduleService {
          console.error('Error al buscar horario del instructor:', error)
          return null
       }
+   }
+
+   getScheduleByBranch(branchId: string): Observable<Schedule[]> {
+      return this.query.getByBranch(branchId)
    }
 }

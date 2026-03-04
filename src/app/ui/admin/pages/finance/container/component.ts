@@ -1,282 +1,170 @@
-import { Component, inject, signal, output, OnInit } from '@angular/core'
-import { CommonModule } from '@angular/common'
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
-import { MatTableModule } from '@angular/material/table'
-import { MatButtonModule } from '@angular/material/button'
-import { MatIconModule } from '@angular/material/icon'
-import { DateRange, MatDatepickerInputEvent, MatDatepickerModule } from '@angular/material/datepicker'
-import { MatNativeDateModule } from '@angular/material/core'
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core'
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms'
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatInputModule } from '@angular/material/input'
 import { MatSelectModule } from '@angular/material/select'
-import { MatDialogModule, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
-import { Observable, BehaviorSubject, combineLatest } from 'rxjs'
-import { switchMap, map } from 'rxjs/operators'
-import { StudentAttendanceService } from '../../../../../services/studentAttendance/student-attendance.service'
+import { MatButtonModule } from '@angular/material/button'
+import { MatDatepickerModule } from '@angular/material/datepicker'
+import { MatNativeDateModule } from '@angular/material/core'
+import { AsyncPipe, CurrencyPipe } from '@angular/common'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
+import { Observable } from 'rxjs'
+import { Enrollment } from '../../../../../models/enrollment.model'
 import { BranchService } from '../../../../../services/branch/branch.service'
-import { StudentAttendance, StudentAttendanceStats } from '../../../../../models/studentattendance.model'
-import { StudentAttendanceQueryService } from '../../../../../services/studentAttendance/student-attendance-query.service'
+import { EnrollmentService } from '../../../../../services/enrollment/enrollment.service'
+import { Branch } from '../../../../../models/branch.model'
 import { QueryService } from '../../../../../services/branch/query.service'
 import { EnrollmentQueryService } from '../../../../../services/enrollment/enrollment-query.service'
-import { EnrollmentService } from '../../../../../services/enrollment/enrollment.service'
-import { ScheduleQueryService } from '../../../../../services/schedule/schedule-query.service'
-import { ScheduleService } from '../../../../../services/schedule/schedule.service'
-import { StudentQueryService } from '../../../../../services/student/student-query.service'
-import { StudentService } from '../../../../../services/student/student.service'
-import { Schedule } from '../../../../../models/schedule.model'
 
+export interface ScheduleGroup {
+   scheduleId: string
+   scheduleLabel: string // "Lunes, Miércoles | 08:00 - 09:00"
+   instructorName: string
+   enrollments: Enrollment[]
+   count: number
+   subtotal: number
+}
 
 @Component({
-   selector: 'x-student-attendance-list',
-   standalone: true,
+   selector: 'x-finance-list',
    imports: [
-      CommonModule,
       ReactiveFormsModule,
-      MatTableModule,
-      MatButtonModule,
-      MatIconModule,
-      MatDatepickerModule,
-      MatNativeDateModule,
       MatFormFieldModule,
       MatInputModule,
       MatSelectModule,
-      MatDialogModule,
+      MatButtonModule,
+      MatDatepickerModule,
+      MatNativeDateModule,
+      AsyncPipe,
+      CurrencyPipe,
    ],
-   providers: [
-      EnrollmentService,
-      StudentAttendanceService,
-      StudentAttendanceQueryService,
-      BranchService,
-      QueryService,
-      EnrollmentQueryService,
-      EnrollmentService,
-      ScheduleQueryService,
-      ScheduleService,
-      StudentQueryService, StudentService
-   ],
+   providers: [BranchService, QueryService, EnrollmentService, EnrollmentQueryService],
    templateUrl: './component.html',
 })
-export default class StudentAttendanceListComponent implements OnInit {
-
-   //private readonly attendanceService = inject(StudentAttendanceService)
+export default class FinanceListComponent implements OnInit {
+   private readonly fb = inject(FormBuilder)
    private readonly branchService = inject(BranchService)
-   private readonly scheduleService = inject(ScheduleService)
-   private readonly dialog = inject(MatDialog)
    private readonly enrollmentService = inject(EnrollmentService)
+   private readonly destroyRef = inject(DestroyRef)
 
-   backToMark = output<void>()
+   branches$!: Observable<Branch[]>
 
-   displayedColumns: string[] = ['studentName', 'plan', 'amount', 'balance', 'createdAt', 'actions']
+   readonly isLoading = signal<boolean>(false)
+   readonly errorMessage = signal<string | null>(null)
+   readonly scheduleGroups = signal<ScheduleGroup[]>([])
+   readonly hasSearched = signal<boolean>(false)
+   readonly formValid = signal<boolean>(false)
 
-   private selectedBranchId$ = new BehaviorSubject<string>('')
-   private startDate$ = new BehaviorSubject<Date | null>(null)
-   private endDate$ = new BehaviorSubject<Date | null>(null)
-   private selectedSchedule$ = new BehaviorSubject<string>('')
+   // ── Computed ──────────────────────────────────────────────────────────────
+   readonly totalRecaudado = computed(() => this.scheduleGroups().reduce((acc, g) => acc + g.subtotal, 0))
 
-   branches$: Observable<any[]>
-   //stats$: Observable<StudentAttendanceStats>
-   //filteredAttendances$: Observable<StudentAttendance[]>
-   schedule$: Observable<Schedule[]>
+   readonly totalInscripciones = computed(() => this.scheduleGroups().reduce((acc, g) => acc + g.count, 0))
 
-   enrollments$: Observable<any[]>
-   constructor() {
-      this.branches$ = this.branchService.getActiveBranches()
-      this.schedule$ = this.scheduleService.getActiveSchedules()
+   readonly hasResults = computed(() => this.scheduleGroups().length > 0)
+   readonly canSearch = computed(() => this.formValid() && !this.isLoading())
 
-
-      this.enrollments$ = combineLatest([
-        this.selectedBranchId$,
-        this.selectedSchedule$,
-        this.startDate$,
-        this.endDate$
-      ]).pipe(
-        switchMap(([branchId, scheduleId, start, end]) => {
-          if (!branchId || !start || !end) return [[]];
-
-          return this.enrollmentService.getEnrollmentsByFilters(branchId, scheduleId, start, end);
-        })
-      )
-
-
-      /* Stats basado en branchId y date
-      this.stats$ = combineLatest([this.selectedBranchId$, this.selectedDate$]).pipe(
-         switchMap(([branchId, date]) => {
-            if (!branchId) {
-               return new Observable<StudentAttendanceStats>((observer) => {
-                  observer.next({ total: 0, presente: 0, falta: 0, permiso: 0, attendances: [] })
-               })
-            }
-            return this.attendanceService.getAttendanceStats(branchId, date)
-         })
-      )
-      */
-      /* Attendances filtradas por status
-      this.filteredAttendances$ = combineLatest([this.stats$, this.selectedStatus$]).pipe(
-         map(([stats, status]) => {
-            if (!status) return stats.attendances
-            return stats.attendances.filter((a) => a.status === status)
-         })
-      )
-      */
-   }
+   // ── Formulario ────────────────────────────────────────────────────────────
+   filterForm!: FormGroup
 
    ngOnInit(): void {
-      this.branches$.subscribe((branches) => {
-         if (branches.length > 0 && !this.selectedBranchId$.value) {
-            this.selectedBranchId$.next(branches[0].id!)
-         }
+      this.initForm()
+      this.branches$ = this.branchService.getActiveBranches()
+   }
+
+   private initForm(): void {
+      this.filterForm = this.fb.group({
+         branchId: ['', Validators.required],
+         startDate: ['', Validators.required],
+         endDate: ['', Validators.required],
       })
+
+      this.filterForm.statusChanges
+         .pipe(takeUntilDestroyed(this.destroyRef))
+         .subscribe(() => this.formValid.set(this.filterForm.valid))
    }
 
-   onBranchChange(branchId: string): void {
-      this.selectedBranchId$.next(branchId)
-   }
-
-   onScheduleChange(scheduleId: string): void {
-      this.selectedSchedule$.next(scheduleId)
-   }
-/*
-   onDateChange(event: any): void {
-      this.selectedDate$.next(event.value)
-   }
-
-   onStatusChange(status: 'presente' | 'falta' | 'permiso' | undefined): void {
-      this.selectedStatus$.next(status)
-   }
-*/
-  onStartDateChange(event: any): void {
-    this.startDate$.next(event.value);
-  }
-
-  onEndDateChange(event: any): void {
-    this.endDate$.next(event.value);
-  }
-
-   getStatusClass(status: string): string {
-      const classes: Record<string, string> = {
-         presente: 'bg-green-100 text-green-800',
-         falta: 'bg-red-100 text-red-800',
-         permiso: 'bg-yellow-100 text-yellow-800',
+   // ── Búsqueda ──────────────────────────────────────────────────────────────
+   onSearch(): void {
+      if (this.filterForm.invalid) {
+         this.filterForm.markAllAsTouched()
+         return
       }
-      return classes[status] || 'bg-gray-100 text-gray-800'
-   }
 
-   formatDateTime(timestamp: any): string {
-      return timestamp.toDate().toLocaleString('es-BO', {
-         day: '2-digit',
-         month: '2-digit',
-         year: 'numeric',
-         hour: '2-digit',
-         minute: '2-digit',
-      })
-   }
+      const start: Date = this.filterForm.value.startDate
+      const end: Date = this.filterForm.value.endDate
 
-   openEditDialog(attendance: StudentAttendance): void {
-      const dialogRef = this.dialog.open(EditStudentAttendanceDialog, {
-         width: '400px',
-         data: attendance,
-      })
-
-      dialogRef.afterClosed().subscribe((result) => {
-         if (result) {
-            // La lista se actualiza automáticamente
-         }
-      })
-   }
-
-   /*
-   async deleteAttendance(attendance: StudentAttendance): Promise<void> {
-      if (confirm('¿Estás seguro de eliminar esta asistencia?')) {
-         try {
-            await this.attendanceService.deleteAttendance(attendance.id, attendance.enrollmentId)
-         } catch (error: any) {
-            alert('Error al eliminar: ' + error.message)
-         }
+      if (start > end) {
+         this.errorMessage.set('La fecha de inicio no puede ser mayor que la fecha de fin')
+         return
       }
-   }
-    */
 
-   onBack(): void {
-      this.backToMark.emit()
-   }
+      const { branchId } = this.filterForm.value
 
-   calculateTotal(enrollments: any[]): number {
-  // Cambia 'price' por el nombre del campo donde guardas el costo en tu Firebase
-  return enrollments.reduce((acc, curr) => acc + (curr.price || 0), 0);
-}
-}
+      this.isLoading.set(true)
+      this.errorMessage.set(null)
+      this.hasSearched.set(true)
 
-// ==================== DIALOG PARA EDITAR ====================
-
-@Component({
-   selector: 'edit-student-attendance-dialog',
-   standalone: true,
-   imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatSelectModule, MatButtonModule, MatDialogModule],
-   providers: [StudentAttendanceService],
-   template: `
-      <h2 mat-dialog-title>Editar Asistencia</h2>
-      <mat-dialog-content>
-         <form [formGroup]="form" class="py-4">
-            <div class="mb-4">
-               <p class="text-sm text-gray-600"
-                  >Estudiante: <strong>{{ data.studentName }}</strong></p
-               >
-               <p class="text-sm text-gray-600"
-                  >Sesión: <strong>#{{ data.sessionNumber }}</strong></p
-               >
-            </div>
-
-            <mat-form-field appearance="outline" class="w-full">
-               <mat-label>Estado</mat-label>
-               <mat-select formControlName="status">
-                  <mat-option value="presente">Presente</mat-option>
-                  <mat-option value="falta">Falta</mat-option>
-                  <mat-option value="permiso">Permiso</mat-option>
-               </mat-select>
-            </mat-form-field>
-         </form>
-      </mat-dialog-content>
-      <mat-dialog-actions align="end">
-         <button mat-button (click)="onCancel()">Cancelar</button>
-         <button mat-raised-button color="primary" (click)="onSave()" [disabled]="!form.valid || isSaving">
-            @if (isSaving) {
-               Guardando...
-            } @else {
-               Guardar
-            }
-         </button>
-      </mat-dialog-actions>
-   `,
-})
-export class EditStudentAttendanceDialog {
-   private readonly dialogRef = inject(MatDialogRef<EditStudentAttendanceDialog>)
-   private readonly attendanceService = inject(StudentAttendanceService)
-   readonly data: StudentAttendance = inject(MAT_DIALOG_DATA)
-   private readonly fb = inject(FormBuilder)
-
-   form: FormGroup
-   isSaving = false
-
-   constructor() {
-      this.form = this.fb.group({
-         status: [this.data.status, Validators.required],
-      })
+      this.enrollmentService
+         .getEnrollmentsByBranchAndDateRange(branchId, start, end)
+         .pipe(takeUntilDestroyed(this.destroyRef))
+         .subscribe({
+            next: (enrollments) => {
+               this.scheduleGroups.set(this.groupBySchedule(enrollments))
+               this.isLoading.set(false)
+            },
+            error: (err) => {
+               console.error('Error detallado:', err)
+               this.errorMessage.set('Error al obtener las inscripciones')
+               this.isLoading.set(false)
+            },
+         })
    }
 
-   async onSave(): Promise<void> {
-      if (this.form.valid && !this.isSaving) {
-         this.isSaving = true
-         try {
-            await this.attendanceService.updateAttendanceStatus(this.data.id, this.form.value.status)
-            this.dialogRef.close(true)
-         } catch (error: any) {
-            alert('Error al actualizar: ' + error.message)
-            this.isSaving = false
+   onClear(): void {
+      this.filterForm.reset()
+      this.scheduleGroups.set([])
+      this.hasSearched.set(false)
+      this.errorMessage.set(null)
+   }
+
+   // ── Agrupación ────────────────────────────────────────────────────────────
+   private groupBySchedule(enrollments: Enrollment[]): ScheduleGroup[] {
+      const map = new Map<string, ScheduleGroup>()
+
+      for (const enrollment of enrollments) {
+         const key = enrollment.scheduleId ?? 'sin-horario'
+
+         if (!map.has(key)) {
+            map.set(key, {
+               scheduleId: key,
+               scheduleLabel: enrollment.scheduleLabel ?? 'Sin horario asignado',
+               instructorName: enrollment.instructorName ?? 'Sin instructor',
+               enrollments: [],
+               count: 0,
+               subtotal: 0,
+            })
          }
+
+         const group = map.get(key)!
+         group.enrollments.push(enrollment)
+         group.count++
+         group.subtotal += enrollment.cost ?? 0
       }
+
+      // Ordenar grupos por label alfabéticamente
+      return Array.from(map.values()).sort((a, b) => a.scheduleLabel.localeCompare(b.scheduleLabel))
    }
 
-   onCancel(): void {
-      this.dialogRef.close()
+   // ── Helpers ───────────────────────────────────────────────────────────────
+   hasFieldError(fieldName: string): boolean {
+      const field = this.filterForm.get(fieldName)
+      return !!(field?.invalid && field?.touched)
+   }
+
+   getFieldError(fieldName: string): string | null {
+      const field = this.filterForm.get(fieldName)
+      if (!field?.errors || !field.touched) return null
+      if (field.errors['required']) return 'Campo requerido'
+      return null
    }
 }

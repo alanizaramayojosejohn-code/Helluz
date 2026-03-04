@@ -63,7 +63,7 @@ export class EnrollmentForm implements OnInit {
    branches$!: Observable<Branch[]>
    students$!: Observable<Student[]>
    memberships$!: Observable<Membership[]>
-   schedule$!: Observable<Schedule[]>
+   schedule$: Observable<Schedule[]> | null = null
 
    // ✅ Caches para desnormalización
    private branchesCache: Branch[] = []
@@ -107,17 +107,16 @@ export class EnrollmentForm implements OnInit {
       this.loadData()
       this.setupMembershipListener()
       this.loadEnrollmentIfEditMode()
+      this.setupBranchListener()
    }
 
    private loadCurrentUser(): void {
-      this.authService.currentUser$
-         .pipe(takeUntilDestroyed(this.destroyRef))
-         .subscribe((user) => {
-            if (user?.uid) {
-               this.currentUserId = user.uid
-               this.currentUserName = `${user.name} ${user.lastname}`
-            }
-         })
+      this.authService.currentUser$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((user) => {
+         if (user?.uid) {
+            this.currentUserId = user.uid
+            this.currentUserName = `${user.name} ${user.lastname}`
+         }
+      })
    }
 
    private initForm(): void {
@@ -144,6 +143,27 @@ export class EnrollmentForm implements OnInit {
       this.enrollmentForm.statusChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
          this.formValid.set(this.enrollmentForm.valid)
       })
+   }
+
+   private setupBranchListener(): void {
+      this.enrollmentForm
+         .get('branchId')
+         ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+         .subscribe((branchId) => {
+            this.enrollmentForm.patchValue({ scheduleId: '' }, { emitEvent: false })
+
+            if (branchId) {
+               this.loadScheduleByBranch(branchId)
+            } else {
+               this.schedule$ = null
+            }
+         })
+   }
+
+   private loadScheduleByBranch(branchId: string): void {
+      this.schedule$ = this.scheduleService
+         .getSchedulesByBranch(branchId)
+         .pipe(tap((schedules) => (this.scheduleCache = schedules)))
    }
 
    private loadData(): void {
@@ -174,8 +194,8 @@ export class EnrollmentForm implements OnInit {
       */
    }
 
-   getBranchId (id:string): void {
-    this.brancheId.set(id)
+   getBranchId(id: string): void {
+      this.brancheId.set(id)
    }
 
    private setupMembershipListener(): void {
@@ -256,7 +276,6 @@ export class EnrollmentForm implements OnInit {
       const formValue = this.enrollmentForm.value
       const membership = this.selectedMembership()
 
-      // ✅ Validar usuario actual
       if (!this.currentUserId || !this.currentUserName) {
          throw new Error('No se pudo obtener el usuario actual')
       }
@@ -265,19 +284,16 @@ export class EnrollmentForm implements OnInit {
          throw new Error('Membresía no seleccionada')
       }
 
-      // ✅ Usar caches
       const student = this.studentsCache.find((s) => s.id === formValue.studentId)
       const branch = this.branchesCache.find((b) => b.id === formValue.branchId)
+      const selectedSchedule = this.scheduleCache.find((s) => s.id === formValue.scheduleId)
 
-      // Buscamos el objeto del horario para guardar su nombre legible
-        const selectedSchedule = this.scheduleCache.find(s => s.id === formValue.scheduleSelect);
-        const scheduleLabel = selectedSchedule
-          ? `${selectedSchedule.day} ${selectedSchedule.startTime}`
-          : '';
+      if (!student || !branch) {
+         throw new Error('Datos incompletos')
+      }
 
-        if (!this.currentUserId || !student || !branch || !membership) {
-          throw new Error('Datos incompletos');
-        }
+      // ✅ Fix 3: guarda el label antes de usarlo, con fallback seguro
+      const scheduleLabel = selectedSchedule ? `${selectedSchedule.startTime} - ${selectedSchedule.endTime}` : ''
 
       const startDate = new Date(formValue.startDate)
       const endDate = this.enrollmentService.calculateEndDate(startDate, membership.durationDays)
@@ -295,7 +311,9 @@ export class EnrollmentForm implements OnInit {
             membershipName: membership.name,
             branchId: branch.id!,
             branchName: branch.name,
-            scheduleSelect: formValue.scheduleSelect,
+            scheduleId: formValue.scheduleId,
+            scheduleLabel: scheduleLabel, // ✅ Fix 1: era scheduleName
+            instructorName: selectedSchedule?.instructorName ?? '',
             startDate: Timestamp.fromDate(startDate),
             endDate: Timestamp.fromDate(endDate),
             totalSessions: membership.totalSessions,
@@ -307,7 +325,12 @@ export class EnrollmentForm implements OnInit {
             status: formValue.status,
          }
 
-         await this.enrollmentService.updateEnrollment(this.enrollmentId()!, updateData, this.currentUserId, this.currentUserName)
+         await this.enrollmentService.updateEnrollment(
+            this.enrollmentId()!,
+            updateData,
+            this.currentUserId,
+            this.currentUserName
+         )
       } else {
          const createData: CreateEnrollmentDto = {
             studentId: student.id!,
@@ -316,7 +339,10 @@ export class EnrollmentForm implements OnInit {
             membershipName: membership.name,
             branchId: branch.id!,
             branchName: branch.name,
-            startDate: Timestamp.fromDate(startDate),
+            scheduleId: formValue.scheduleId,
+            scheduleLabel: scheduleLabel,
+            instructorName: selectedSchedule?.instructorName ?? '',
+            startDate: Timestamp.fromDate(startDate), // ✅ Fix 2: faltaban estas dos
             endDate: Timestamp.fromDate(endDate),
             totalSessions: membership.totalSessions,
             usedSessions: 0,
@@ -371,6 +397,4 @@ export class EnrollmentForm implements OnInit {
       const option = this.statusOptions.find((opt) => opt.value === status)
       return option?.label || status
    }
-
-
 }

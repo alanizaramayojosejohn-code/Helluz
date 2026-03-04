@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core'
+import { ApplicationConfig, LOCALE_ID, provideZoneChangeDetection } from '@angular/core'
 import { provideRouter } from '@angular/router'
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'
 
@@ -10,6 +10,8 @@ import { provideStorage, getStorage } from '@angular/fire/storage'
 
 import { routes } from './app.routes'
 import { environment } from '../environments/environment'
+import { MAT_DATE_FORMATS, MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core'
+import { MY_DATE_FORMATS } from './models/interfaces.config.model'
 
 export const appConfig: ApplicationConfig = {
    providers: [
@@ -21,5 +23,10 @@ export const appConfig: ApplicationConfig = {
       provideAuth(() => getAuth()),
       provideFirestore(() => getFirestore()),
       provideStorage(() => getStorage()),
+
+  provideNativeDateAdapter(),
+  { provide: LOCALE_ID,       useValue: 'es-ES' },
+  { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
+  { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
    ],
 }

@@ -34,8 +34,8 @@ export class EnrollmentService {
    }
 
    // Filtrar por fechas
-    getEnrollmentsByFilters(branchId: string, scheduleId: string, start: Date, end: Date): Observable<Enrollment[]> {
-      return this.query.getFilteredForFinance(branchId, scheduleId, start, end);
+    getEnrollmentsByBranchAndDateRange( scheduleId: string, startDate: Date, endDate: Date): Observable<Enrollment[]> {
+      return this.query.getByBranchAndDateRange( scheduleId, startDate, endDate);
     }
 
    async addEnrollment(enrollment: CreateEnrollmentDto, currentUserId:string, currentUserName: string): Promise<string> {
