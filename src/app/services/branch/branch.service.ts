@@ -45,8 +45,6 @@ export class BranchService {
          await this.query.create(id, {
             ...branch,
             name: normalizedName,
-            ip: '192.168.10.10',
-            mask: '255.255.255.255',
          })
 
          return id

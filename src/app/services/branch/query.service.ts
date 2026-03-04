@@ -6,21 +6,17 @@ import { deleteDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, where } 
 
 @Injectable()
 export class QueryService {
+   private firestore = inject(Firestore)
+   private branchesCollection = collection(this.firestore, 'branches')
 
-  private firestore = inject(Firestore)
-  private branchesCollection = collection(this.firestore, 'branches')
-
-
-  getAll(): Observable<Branch[]> {
-    return collectionData(this.branchesCollection,{ idField: 'id'}) as Observable<Branch[]>
-  }
-
-
-   getById(id: string): Observable<Branch | undefined> {
-      const refBranchDoc = doc(this.firestore, 'bracnhes', id)
-      return docData(refBranchDoc, { idField: 'id' }) as Observable<Branch | undefined>
+   getAll(): Observable<Branch[]> {
+      return collectionData(this.branchesCollection, { idField: 'id' }) as Observable<Branch[]>
    }
 
+   getById(id: string): Observable<Branch | undefined> {
+      const refBranchDoc = doc(this.firestore, 'branches', id) // ✅ 'branches' no 'bracnhes'
+      return docData(refBranchDoc, { idField: 'id' }) as Observable<Branch | undefined>
+   }
    async existByName(name: string, excludeId?: string): Promise<boolean> {
       const normalizedName = name.trim().toLowerCase()
       const q = query(this.branchesCollection, where('name', '==', normalizedName))
