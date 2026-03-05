@@ -23,4 +23,9 @@ export const SharedRoutes: Routes = [
       canActivate: [adminOrInstructorGuard],
       loadComponent: () => import('../ui/admin/pages/studentAttendance/container/component'),
    },
+   {
+      path: 'asistenciainstructores',
+      canActivate: [adminOrInstructorGuard],
+      loadComponent: () => import('../ui/public/pages/markInstructorAttendance/container/component'),
+   },
 ]
