@@ -7,7 +7,7 @@ import { MatButtonModule } from '@angular/material/button'
 import { MatDatepickerModule } from '@angular/material/datepicker'
 import { MatNativeDateModule } from '@angular/material/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
-import { Observable, tap } from 'rxjs'
+import { Observable, combineLatest, map, tap } from 'rxjs';
 import { AsyncPipe } from '@angular/common'
 import { EnrollmentService } from '../../../../../../../services/enrollment/enrollment.service'
 import { BranchService } from '../../../../../../../services/branch/branch.service'
@@ -21,6 +21,8 @@ import { Membership } from '../../../../../../../models/membership.model'
 import { Timestamp } from '@angular/fire/firestore'
 import { ScheduleService } from '../../../../../../../services/schedule/schedule.service'
 import { Schedule } from '../../../../../../../models/schedule.model'
+import { FormsModule } from '@angular/forms'
+import { toObservable } from '@angular/core/rxjs-interop';
 
 @Component({
    selector: 'x-enrollment-form',
@@ -57,11 +59,30 @@ export class EnrollmentForm implements OnInit {
    readonly currentEnrollment = signal<Enrollment | null>(null)
    readonly formValid = signal<boolean>(false)
 
+   readonly searchText = signal<string>('')
+
+   readonly students$: Observable<Student[]> = combineLatest([
+      this.studentService.getActiveStudents(),
+      toObservable(this.searchText)
+   ]).pipe(
+      map(([students, term]) => {
+         this.studentsCache = students; // Guardamos para el submit
+         const lowTerm = term.toLowerCase().trim();
+         if (!lowTerm) return students;
+
+         return students.filter(s =>
+            s.name.toLowerCase().includes(lowTerm) ||
+            s.lastname.toLowerCase().includes(lowTerm) ||
+            s.ci.includes(lowTerm)
+         );
+      })
+   );
+
    brancheId = signal<string | null>(null)
 
    // ✅ Cambiar signals por observables
    branches$!: Observable<Branch[]>
-   students$!: Observable<Student[]>
+   //students$!: Observable<Student[]>
    memberships$!: Observable<Membership[]>
    schedule$: Observable<Schedule[]> | null = null
 
@@ -167,31 +188,13 @@ export class EnrollmentForm implements OnInit {
    }
 
    private loadData(): void {
-      // ✅ Cargar y cachear branches
+      // Aquí solo cargas lo que no depende de filtros dinámicos
       this.branches$ = this.branchService.getActiveBranches().pipe(
-         tap((branches) => (this.branchesCache = branches)),
-         takeUntilDestroyed(this.destroyRef)
-      )
-
-      // ✅ Cargar y cachear students
-      this.students$ = this.studentService.getActiveStudents().pipe(
-         tap((students) => (this.studentsCache = students)),
-         takeUntilDestroyed(this.destroyRef)
-      )
-
-      // ✅ Cargar y cachear memberships
+         tap(b => this.branchesCache = b)
+      );
       this.memberships$ = this.membershipService.getActiveMemberships().pipe(
-         tap((memberships) => (this.membershipsCache = memberships)),
-         takeUntilDestroyed(this.destroyRef)
-      )
-
-      // ✅ Cargar y cachear Horarios
-      /*
-      this.schedule$ = this.scheduleService.getSchedulesByBranch(branchId).pipe(
-         tap((scheduleships) => (this.scheduleCache = scheduleships)),
-         takeUntilDestroyed(this.destroyRef)
-      )
-      */
+         tap(m => this.membershipsCache = m)
+      );
    }
 
    getBranchId(id: string): void {
@@ -369,6 +372,11 @@ export class EnrollmentForm implements OnInit {
 
       this.errorMessage.set(errorMsg)
    }
+
+   onSearchInputChange(event: Event): void {
+      const input = event.target as HTMLInputElement;
+      this.searchText.set(input.value);
+    }
 
    onCancel(): void {
       this.cancel.emit()
