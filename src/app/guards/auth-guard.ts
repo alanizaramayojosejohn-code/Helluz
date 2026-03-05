@@ -34,7 +34,6 @@ export const noAuthGuard: CanActivateFn = (route, state) => {
          if (!user) {
             return true
          } else {
-            // Redirigir según el rol
             if (user.role === 'admin') {
                router.navigate(['/admin/home'])
             } else {
@@ -46,7 +45,6 @@ export const noAuthGuard: CanActivateFn = (route, state) => {
    )
 }
 
-// Guard para verificar que sea admin
 export const adminGuard: CanActivateFn = (route, state) => {
    const authService = inject(AuthService)
    const router = inject(Router)

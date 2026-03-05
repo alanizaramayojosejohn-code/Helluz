@@ -52,10 +52,7 @@ export const AdminRoutes: Routes = [
       path: 'asistenciasi',
       loadComponent: async () => await import('./pages/instructorAttendance/container/component'),
    },
-   {
-      path: 'asistenciainstructores',
-      loadComponent: async () => await import('./../public/pages/markInstructorAttendance/container/component'),
-   },
+   
    {
       path: '',
       redirectTo: 'home',
