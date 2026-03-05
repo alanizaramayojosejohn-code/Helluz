@@ -41,7 +41,7 @@ export class InstructorSidebarComponent implements OnInit {
          label: 'Marcar Asistencia',
          icon: 'list_alt',
          route: '/instructor/asistenciainstructores',
-         roles: ['instructor'],
+         roles: ['admin', 'instructor'],
       },
    ]
    //  done_all

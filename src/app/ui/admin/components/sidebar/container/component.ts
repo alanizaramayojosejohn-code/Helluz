@@ -34,6 +34,8 @@ export class SidebarComponent implements OnInit {
       { label: 'Asistencias Alumnos', icon: 'list_alt', route: '/admin/asistenciasa', roles: ['admin'] },
       { label: 'Asistencias Instructores', icon: 'list_alt', route: '/admin/asistenciasi', roles: ['admin'] },
       { label: 'Finanzas', icon: 'account_balance', route: '/admin/finanzas', roles: ['admin'] },
+{label: 'Marcar Asistencia',icon: 'list_alt',route: '/admin/asistenciainstructores',roles: ['admin', 'instructor'],
+      },
    ]
   //  done_all
 

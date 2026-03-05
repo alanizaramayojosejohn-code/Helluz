@@ -156,7 +156,7 @@ export class InstructorAttendanceService {
    }
 
    private getDayName(dayNumber: number): string {
-      const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+      const days = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado']
       return days[dayNumber]
    }
 
