@@ -1,10 +1,13 @@
-<!-- components/header/component.html -->
-<header class="bg-white border-b border-gray-200 z-40 shadow-sm fixed top-0 w-full left-0">
+<header class="bg-gray-950 border-b border-gray-200 z-40 shadow-sm fixed top-0 w-full left-0">
    <div class="flex items-center justify-between h-16 px-4">
       <!-- Left: Menu toggle + Logo -->
       <div class="flex items-center gap-4">
          <!-- Botón hamburguesa -->
-         <button (click)="toggleSidebar()" class="p-2 rounded-lg hover:bg-gray-100 transition-colors" matTooltip="Menu">
+         <button
+            (click)="toggleSidebar()"
+            class="p-2 rounded-lg bg-black border-none hover:bg-gray-900 transition-colors"
+            matTooltip="Menu"
+         >
             <mat-icon class="text-gray-600">menu</mat-icon>
          </button>
 

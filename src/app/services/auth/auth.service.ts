@@ -79,7 +79,6 @@ export class AuthService {
 
          console.log('✅ Login exitoso, rol:', userData.role)
 
-         // ✅ Forzar recarga completa (solución temporal pero funcional)
          if (userData.role === 'admin') {
             window.location.href = '/admin/home'
          } else if (userData.role === 'instructor') {

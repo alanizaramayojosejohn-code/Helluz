@@ -11,12 +11,14 @@ import { ScheduleService } from '../schedule/schedule.service'
 import { InstructorService } from '../instructor/instructor.service'
 import { v7 as uuidv7 } from 'uuid'
 import { Timestamp } from '@angular/fire/firestore'
+import { BranchService } from '../branch/branch.service'
 
 @Injectable()
 export class InstructorAttendanceService {
    private readonly query = inject(InstructorAttendanceQueryService)
    private readonly scheduleService = inject(ScheduleService)
    private readonly instructorService = inject(InstructorService)
+   private readonly branchService = inject(BranchService)
 
    getAttendancesByBranchAndDate(
       branchId: string,
@@ -67,7 +69,6 @@ export class InstructorAttendanceService {
          }
 
          if (instructor.status !== 'activo') {
-            console.log('CI encontrado')
             throw new Error('Tu cuenta está inactiva. Contacta con administración')
          }
 
@@ -77,9 +78,36 @@ export class InstructorAttendanceService {
             throw new Error(`No tienes horarios asignados para hoy (${dayName})`)
          }
 
-         console.log('schedule')
          if (schedule.status !== 'activo') {
             throw new Error('Este horario está inactivo. Contacta con administración')
+         }
+         const branch = await firstValueFrom(this.branchService.getBranchById(schedule.branchId))
+         if (!branch) {
+            throw new Error('Sucursal no encontrada')
+         }
+
+         if (!branch.latitude || !branch.longitude) {
+            console.warn('⚠️ Sucursal sin coordenadas, saltando validación de ubicación')
+         } else {
+            // ✅ Validar ubicación
+            const userLocation = await this.getCurrentLocation()
+
+            const distance = this.calculateDistance(
+               userLocation.latitude,
+               userLocation.longitude,
+               branch.latitude,
+               branch.longitude
+            )
+
+            const MAX_DISTANCE = 100 // 100 metros de radio
+
+            if (distance > MAX_DISTANCE) {
+               throw new Error(
+                  `Debes estar en la sucursal para marcar asistencia. Estás a ${Math.round(distance)}m de distancia (máximo ${MAX_DISTANCE}m)`
+               )
+            }
+
+            console.log(`✅ Ubicación validada: ${Math.round(distance)}m de la sucursal`)
          }
 
          const alreadyMarked = await this.query.checkAlreadyMarkedToday(instructor.id, schedule.id!, today)
@@ -87,14 +115,12 @@ export class InstructorAttendanceService {
          if (alreadyMarked) {
             throw new Error('Ya marcaste entrada en esta clase hoy')
          }
-         console.log('already marked')
 
          const { isLate, minutesLate } = this.calculateLateness(schedule.startTime, currentTime)
 
          const scheduledHours = this.calculateScheduledHours(schedule.startTime, schedule.endTime)
 
          const id = uuidv7()
-         console.log('uuid')
          const attendanceData: CreateInstructorAttendanceDto = {
             instructorId: instructor.id,
             instructorName: `${instructor.name} ${instructor.lastname}`,
@@ -130,7 +156,7 @@ export class InstructorAttendanceService {
    }
 
    private getDayName(dayNumber: number): string {
-      const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+      const days = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado']
       return days[dayNumber]
    }
 
@@ -247,5 +273,64 @@ export class InstructorAttendanceService {
       const actualMinutes = actualHour * 60 + actualMin
 
       return actualMinutes < expectedMinutes - 5
+   }
+
+   // instructor-attendance.service.ts
+
+   private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+      const R = 6371e3 // Radio de la Tierra en metros
+      const φ1 = (lat1 * Math.PI) / 180
+      const φ2 = (lat2 * Math.PI) / 180
+      const Δφ = ((lat2 - lat1) * Math.PI) / 180
+      const Δλ = ((lon2 - lon1) * Math.PI) / 180
+
+      const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2)
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+
+      const distance = R * c // Distancia en metros
+      return distance
+   }
+
+   private async getCurrentLocation(): Promise<{
+      latitude: number
+      longitude: number
+   }> {
+      return new Promise((resolve, reject) => {
+         if (!navigator.geolocation) {
+            reject(new Error('Geolocalización no disponible'))
+            return
+         }
+
+         navigator.geolocation.getCurrentPosition(
+            (position) => {
+               resolve({
+                  latitude: position.coords.latitude,
+                  longitude: position.coords.longitude,
+               })
+            },
+            (error) => {
+               let errorMessage = 'Error al obtener ubicación'
+
+               switch (error.code) {
+                  case error.PERMISSION_DENIED:
+                     errorMessage = 'Debes permitir el acceso a tu ubicación para marcar asistencia'
+                     break
+                  case error.POSITION_UNAVAILABLE:
+                     errorMessage = 'No se pudo determinar tu ubicación. Asegúrate de tener GPS activado'
+                     break
+                  case error.TIMEOUT:
+                     errorMessage = 'Tiempo de espera agotado. Intenta de nuevo'
+                     break
+               }
+
+               reject(new Error(errorMessage))
+            },
+            {
+               enableHighAccuracy: true,
+               timeout: 15000,
+               maximumAge: 0,
+            }
+         )
+      })
    }
 }

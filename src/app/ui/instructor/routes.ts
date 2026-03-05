@@ -14,6 +14,11 @@ export const InstructorRoutes: Routes = [
    //     path: 'inscripciones',
    //     loadComponent: async () => await import('./../admin/pages/enrollments/container/component'),
    //  },
+   
+   {
+      path: 'asistenciainstructores',
+      loadComponent: async () => await import('./../public/pages/markInstructorAttendance/container/component'),
+   },
    {
       path: '',
       redirectTo: 'home',

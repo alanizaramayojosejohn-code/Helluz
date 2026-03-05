@@ -31,6 +31,25 @@
                </mat-form-field>
             </div>
 
+            <div>
+
+              
+              <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Latitud</mat-label>
+                  <input matInput formControlName="latitude" placeholder="Nombre...." autocomplete="off" />
+                  @if (hasFieldError('latitude')) {
+                     <mat-error>{{ getFieldError('latitude') }}</mat-error>
+                  }
+               </mat-form-field>
+              <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Longitud</mat-label>
+                  <input matInput formControlName="longitude" placeholder="Nombre...." autocomplete="off" />
+                  @if (hasFieldError('longitude')) {
+                     <mat-error>{{ getFieldError('longitude') }}</mat-error>
+                  }
+               </mat-form-field>
+               
+              </div>
             <!-- <div>
                <mat-form-field appearance="outline" class="w-full">
                   <mat-label>ip</mat-label>

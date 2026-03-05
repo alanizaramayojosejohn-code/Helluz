@@ -69,21 +69,14 @@ export const instructorGuard: CanActivateFn = (route, state) => {
    const authService = inject(AuthService)
    const router = inject(Router)
 
-   console.log('🛡️ instructorGuard ejecutándose...') // Debug
 
    return authService.currentUser$.pipe(
       take(1),
       map((user: AuthUser | null) => {
-         console.log('🛡️ instructorGuard - Usuario recibido:', user) // Debug
 
          if (user && user.status === 'activo' && user.role === 'instructor') {
-            console.log('✅ instructorGuard permitido') // Debug
             return true
          } else {
-            console.log('❌ instructorGuard bloqueado') // Debug
-            console.log('   - Usuario existe:', !!user)
-            console.log('   - Status:', user?.status)
-            console.log('   - Role:', user?.role)
             router.navigate(['/log-in'])
             return false
          }
