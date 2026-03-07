@@ -33,6 +33,11 @@ export class EnrollmentService {
       return this.query.getExpiring(days)
    }
 
+   // Filtrar por fechas
+    getEnrollmentsByBranchAndDateRange( scheduleId: string, startDate: Date, endDate: Date): Observable<Enrollment[]> {
+      return this.query.getByBranchAndDateRange( scheduleId, startDate, endDate);
+    }
+
    async addEnrollment(enrollment: CreateEnrollmentDto, currentUserId:string, currentUserName: string): Promise<string> {
       try {
          const id = uuidv7()

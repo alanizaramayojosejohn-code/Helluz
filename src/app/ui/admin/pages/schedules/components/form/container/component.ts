@@ -49,13 +49,11 @@ export class ScheduleForm implements OnInit {
    readonly currentSchedule = signal<Schedule | null>(null)
    readonly formValid = signal<boolean>(false)
 
-   // Observables para los selects
    branches$!: Observable<Branch[]>
    days$!: Observable<Day[]>
    disciplines$!: Observable<Discipline[]>
    instructors$: Observable<Instructor[]> | null = null
 
-   // Cache para desnormalizar
    private branchesCache: Branch[] = []
    private instructorsCache: Instructor[] = []
 

@@ -31,6 +31,7 @@ export class ScheduleQueryService {
       const refScheduleDoc = doc(this.firestore, 'schedules', id)
       return docData(refScheduleDoc, { idField: 'id' }) as Observable<Schedule | undefined>
    }
+
    getByBranch(branchId: string): Observable<Schedule[]> {
       const q = query(this.schedulesCollection, where('branchId', '==', branchId))
       return collectionData(q, { idField: 'id' }) as Observable<Schedule[]>

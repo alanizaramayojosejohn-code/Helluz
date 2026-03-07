@@ -7,7 +7,7 @@ import { MatButtonModule } from '@angular/material/button'
 import { MatDatepickerModule } from '@angular/material/datepicker'
 import { MatNativeDateModule } from '@angular/material/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
-import { Observable, tap } from 'rxjs'
+import { Observable, combineLatest, map, tap } from 'rxjs';
 import { AsyncPipe } from '@angular/common'
 import { EnrollmentService } from '../../../../../../../services/enrollment/enrollment.service'
 import { BranchService } from '../../../../../../../services/branch/branch.service'
@@ -19,6 +19,10 @@ import { Branch } from '../../../../../../../models/branch.model'
 import { Student } from '../../../../../../../models/student.model'
 import { Membership } from '../../../../../../../models/membership.model'
 import { Timestamp } from '@angular/fire/firestore'
+import { ScheduleService } from '../../../../../../../services/schedule/schedule.service'
+import { Schedule } from '../../../../../../../models/schedule.model'
+import { FormsModule } from '@angular/forms'
+import { toObservable } from '@angular/core/rxjs-interop';
 
 @Component({
    selector: 'x-enrollment-form',
@@ -43,6 +47,7 @@ export class EnrollmentForm implements OnInit {
    private readonly membershipService = inject(MembershipService)
    private readonly destroyRef = inject(DestroyRef)
    private readonly authService = inject(AuthService)
+   private readonly scheduleService = inject(ScheduleService)
 
    readonly enrollmentId = input<string | null>(null)
    readonly isEditMode = input<boolean>(false)
@@ -54,15 +59,38 @@ export class EnrollmentForm implements OnInit {
    readonly currentEnrollment = signal<Enrollment | null>(null)
    readonly formValid = signal<boolean>(false)
 
+   readonly searchText = signal<string>('')
+
+   readonly students$: Observable<Student[]> = combineLatest([
+      this.studentService.getActiveStudents(),
+      toObservable(this.searchText)
+   ]).pipe(
+      map(([students, term]) => {
+         this.studentsCache = students; // Guardamos para el submit
+         const lowTerm = term.toLowerCase().trim();
+         if (!lowTerm) return students;
+
+         return students.filter(s =>
+            s.name.toLowerCase().includes(lowTerm) ||
+            s.lastname.toLowerCase().includes(lowTerm) ||
+            s.ci.includes(lowTerm)
+         );
+      })
+   );
+
+   brancheId = signal<string | null>(null)
+
    // ✅ Cambiar signals por observables
    branches$!: Observable<Branch[]>
-   students$!: Observable<Student[]>
+   //students$!: Observable<Student[]>
    memberships$!: Observable<Membership[]>
+   schedule$: Observable<Schedule[]> | null = null
 
    // ✅ Caches para desnormalización
    private branchesCache: Branch[] = []
    private studentsCache: Student[] = []
    private membershipsCache: Membership[] = []
+   private scheduleCache: Schedule[] = []
    private currentUserId: string | null = null
    private currentUserName: string | null = null
 
@@ -100,17 +128,16 @@ export class EnrollmentForm implements OnInit {
       this.loadData()
       this.setupMembershipListener()
       this.loadEnrollmentIfEditMode()
+      this.setupBranchListener()
    }
 
    private loadCurrentUser(): void {
-      this.authService.currentUser$
-         .pipe(takeUntilDestroyed(this.destroyRef))
-         .subscribe((user) => {
-            if (user?.uid) {
-               this.currentUserId = user.uid
-               this.currentUserName = `${user.name} ${user.lastname}`
-            }
-         })
+      this.authService.currentUser$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((user) => {
+         if (user?.uid) {
+            this.currentUserId = user.uid
+            this.currentUserName = `${user.name} ${user.lastname}`
+         }
+      })
    }
 
    private initForm(): void {
@@ -118,6 +145,7 @@ export class EnrollmentForm implements OnInit {
          studentId: ['', Validators.required],
          branchId: ['', Validators.required],
          membershipId: ['', Validators.required],
+         scheduleId: ['', Validators.required],
          startDate: [new Date(), Validators.required],
          paymentMethod: ['Efectivo' as 'Efectivo' | 'Qr', Validators.required],
          status: ['activa' as 'activa' | 'vencida' | 'cancelada' | 'completada', Validators.required],
@@ -138,24 +166,39 @@ export class EnrollmentForm implements OnInit {
       })
    }
 
+   private setupBranchListener(): void {
+      this.enrollmentForm
+         .get('branchId')
+         ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+         .subscribe((branchId) => {
+            this.enrollmentForm.patchValue({ scheduleId: '' }, { emitEvent: false })
+
+            if (branchId) {
+               this.loadScheduleByBranch(branchId)
+            } else {
+               this.schedule$ = null
+            }
+         })
+   }
+
+   private loadScheduleByBranch(branchId: string): void {
+      this.schedule$ = this.scheduleService
+         .getSchedulesByBranch(branchId)
+         .pipe(tap((schedules) => (this.scheduleCache = schedules)))
+   }
+
    private loadData(): void {
-      // ✅ Cargar y cachear branches
+      // Aquí solo cargas lo que no depende de filtros dinámicos
       this.branches$ = this.branchService.getActiveBranches().pipe(
-         tap((branches) => (this.branchesCache = branches)),
-         takeUntilDestroyed(this.destroyRef)
-      )
-
-      // ✅ Cargar y cachear students
-      this.students$ = this.studentService.getActiveStudents().pipe(
-         tap((students) => (this.studentsCache = students)),
-         takeUntilDestroyed(this.destroyRef)
-      )
-
-      // ✅ Cargar y cachear memberships
+         tap(b => this.branchesCache = b)
+      );
       this.memberships$ = this.membershipService.getActiveMemberships().pipe(
-         tap((memberships) => (this.membershipsCache = memberships)),
-         takeUntilDestroyed(this.destroyRef)
-      )
+         tap(m => this.membershipsCache = m)
+      );
+   }
+
+   getBranchId(id: string): void {
+      this.brancheId.set(id)
    }
 
    private setupMembershipListener(): void {
@@ -236,7 +279,6 @@ export class EnrollmentForm implements OnInit {
       const formValue = this.enrollmentForm.value
       const membership = this.selectedMembership()
 
-      // ✅ Validar usuario actual
       if (!this.currentUserId || !this.currentUserName) {
          throw new Error('No se pudo obtener el usuario actual')
       }
@@ -245,13 +287,16 @@ export class EnrollmentForm implements OnInit {
          throw new Error('Membresía no seleccionada')
       }
 
-      // ✅ Usar caches
       const student = this.studentsCache.find((s) => s.id === formValue.studentId)
       const branch = this.branchesCache.find((b) => b.id === formValue.branchId)
+      const selectedSchedule = this.scheduleCache.find((s) => s.id === formValue.scheduleId)
 
       if (!student || !branch) {
          throw new Error('Datos incompletos')
       }
+
+      // ✅ Fix 3: guarda el label antes de usarlo, con fallback seguro
+      const scheduleLabel = selectedSchedule ? `${selectedSchedule.startTime} - ${selectedSchedule.endTime}` : ''
 
       const startDate = new Date(formValue.startDate)
       const endDate = this.enrollmentService.calculateEndDate(startDate, membership.durationDays)
@@ -269,6 +314,9 @@ export class EnrollmentForm implements OnInit {
             membershipName: membership.name,
             branchId: branch.id!,
             branchName: branch.name,
+            scheduleId: formValue.scheduleId,
+            scheduleLabel: scheduleLabel, // ✅ Fix 1: era scheduleName
+            instructorName: selectedSchedule?.instructorName ?? '',
             startDate: Timestamp.fromDate(startDate),
             endDate: Timestamp.fromDate(endDate),
             totalSessions: membership.totalSessions,
@@ -280,7 +328,12 @@ export class EnrollmentForm implements OnInit {
             status: formValue.status,
          }
 
-         await this.enrollmentService.updateEnrollment(this.enrollmentId()!, updateData, this.currentUserId, this.currentUserName)
+         await this.enrollmentService.updateEnrollment(
+            this.enrollmentId()!,
+            updateData,
+            this.currentUserId,
+            this.currentUserName
+         )
       } else {
          const createData: CreateEnrollmentDto = {
             studentId: student.id!,
@@ -289,7 +342,10 @@ export class EnrollmentForm implements OnInit {
             membershipName: membership.name,
             branchId: branch.id!,
             branchName: branch.name,
-            startDate: Timestamp.fromDate(startDate),
+            scheduleId: formValue.scheduleId,
+            scheduleLabel: scheduleLabel,
+            instructorName: selectedSchedule?.instructorName ?? '',
+            startDate: Timestamp.fromDate(startDate), // ✅ Fix 2: faltaban estas dos
             endDate: Timestamp.fromDate(endDate),
             totalSessions: membership.totalSessions,
             usedSessions: 0,
@@ -316,6 +372,11 @@ export class EnrollmentForm implements OnInit {
 
       this.errorMessage.set(errorMsg)
    }
+
+   onSearchInputChange(event: Event): void {
+      const input = event.target as HTMLInputElement;
+      this.searchText.set(input.value);
+    }
 
    onCancel(): void {
       this.cancel.emit()

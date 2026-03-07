@@ -7,8 +7,8 @@ export interface Branch {
    id: string
    name: string
    city: string
-   ip: string
-   mask: string
+  latitude?: number
+  longitude?: number
    status: BranchStatus
    createdAt: Timestamp
    updatedAt: Timestamp

@@ -27,27 +27,32 @@ export const AdminRoutes: Routes = [
       path: 'membresias',
       loadComponent: async () => await import('./pages/membership/container/component'),
    },
-  //  {
-  //     path: 'alumnos',
-  //     canActivate: [authGuard],
-  //     loadComponent: async () => await import('./pages/student/container/component'),
-  //  },
-  //  {
-  //     path: 'inscripciones',
-  //     loadComponent: async () => await import('./pages/enrollments/container/component'),
-  //  },
+   {
+      path: 'finanzas',
+      loadComponent: async () => await import('./pages/finance/container/component'),
+   },
+   //  {
+   //     path: 'alumnos',
+   //     canActivate: [authGuard],
+   //     loadComponent: async () => await import('./pages/student/container/component'),
+   //  },
+   //  {
+   //     path: 'inscripciones',
+   //     loadComponent: async () => await import('./pages/enrollments/container/component'),
+   //  },
    {
       path: 'usuarios',
       loadComponent: async () => await import('./pages/users/container/component'),
    },
-  //  {
-  //     path: 'asistenciasa',
-  //     loadComponent: async () => await import('./pages/studentAttendance/container/component'),
-  //  },
+   //  {
+   //     path: 'asistenciasa',
+   //     loadComponent: async () => await import('./pages/studentAttendance/container/component'),
+   //  },
    {
       path: 'asistenciasi',
       loadComponent: async () => await import('./pages/instructorAttendance/container/component'),
    },
+   
    {
       path: '',
       redirectTo: 'home',

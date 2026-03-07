@@ -219,5 +219,19 @@ export class EnrollmentQueryService {
       return 0;
     }
   }
-
+  
+getByBranchAndDateRange(
+  branchId: string,
+  startDate: Date,
+  endDate: Date
+): Observable<Enrollment[]> {
+  const q = query(
+    this.enrollmentsCollection,
+    where('branchId', '==', branchId),
+    where('startDate', '>=', FirestoreTimestamp.fromDate(startDate)),
+    where('startDate', '<=', FirestoreTimestamp.fromDate(endDate)),
+    orderBy('startDate', 'desc')
+  )
+  return collectionData(q, { idField: 'id' }) as Observable<Enrollment[]>
+}
 }

@@ -12,6 +12,7 @@
       <form [formGroup]="enrollmentForm" (ngSubmit)="onSubmit()" class="space-y-6">
          <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-6 space-y-6">
             <!-- Alumno -->
+             <!--
             <mat-form-field appearance="outline" class="w-full">
                <mat-label>Alumno</mat-label>
                <mat-select formControlName="studentId" required>
@@ -25,6 +26,32 @@
                   <mat-error>{{ getFieldError('studentId') }}</mat-error>
                }
             </mat-form-field>
+            -->
+            <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Alumno</mat-label>
+            <mat-select formControlName="studentId" required>
+              <div class="px-3 py-2 sticky top-0 bg-white z-10 border-b">
+                <input
+                  matInput
+                  placeholder="Buscar por nombre o CI..."
+                  (input)="onSearchInputChange($event)"
+                  (keydown)="$event.stopPropagation()"
+                  class="w-full p-2 bg-gray-50 border rounded-md text-black"
+                />
+              </div>
+
+              @for (student of students$ | async; track student.id) {
+                <mat-option [value]="student.id">
+                  {{ getStudentFullName(student) }} - CI: {{ student.ci }}
+                </mat-option>
+              } @empty {
+                <mat-option disabled>No se encontraron alumnos</mat-option>
+              }
+            </mat-select>
+            @if (hasFieldError('studentId')) {
+              <mat-error>{{ getFieldError('studentId') }}</mat-error>
+            }
+          </mat-form-field>
 
             <!-- Sucursal y Membresía -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -32,7 +59,7 @@
                   <mat-label>Sucursal</mat-label>
                   <mat-select formControlName="branchId" required>
                      @for (branch of branches$ | async; track branch.id) {
-                        <mat-option [value]="branch.id">{{ branch.name }}</mat-option>
+                        <mat-option [value]="branch.id" getBrancheId>{{ branch.name }}</mat-option>
                      }
                   </mat-select>
                   @if (hasFieldError('branchId')) {
@@ -51,6 +78,21 @@
                   </mat-select>
                   @if (hasFieldError('membershipId')) {
                      <mat-error>{{ getFieldError('membershipId') }}</mat-error>
+                  }
+               </mat-form-field>
+            </div>
+
+            <!-- Horario -->
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Horario</mat-label>
+                  <mat-select formControlName="scheduleId" required>
+                     @for (schedule of schedule$ | async; track schedule.id) {
+                        <mat-option [value]="schedule.id">{{ schedule.startTime }} - {{ schedule.endTime }}</mat-option>
+                     }
+                  </mat-select>
+                  @if (hasFieldError('branchId')) {
+                     <mat-error>{{ getFieldError('branchId') }}</mat-error>
                   }
                </mat-form-field>
             </div>
