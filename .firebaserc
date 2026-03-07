@@ -1,7 +1,7 @@
 {
   "projects": {
-    "default": "helluz",
-    "helluz": "helluz"
+    "default": "helluz-dev",
+    "production": "helluz"
   },
   "targets": {},
   "etags": {}
