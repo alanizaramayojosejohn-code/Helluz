@@ -13,7 +13,6 @@ import { routes } from './app.routes'
 import { environment } from '../environments/environment'
 import { MAT_DATE_FORMATS, MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core'
 import { MY_DATE_FORMATS } from './models/interfaces.config.model'
-
 export const appConfig: ApplicationConfig = {
    providers: [
       provideZoneChangeDetection({ eventCoalescing: true }),
@@ -21,12 +20,16 @@ export const appConfig: ApplicationConfig = {
       provideAnimationsAsync(),
 
       provideFirebaseApp(() => initializeApp(environment.firebase)),
-      provideAppCheck(() =>
-         initializeAppCheck(getApp(), {
-            provider: new ReCaptchaV3Provider(environment.recaptchaSiteKey),
-            isTokenAutoRefreshEnabled: true,
-         })
-      ),
+      ...(environment.production
+         ? [
+              provideAppCheck(() =>
+                 initializeAppCheck(getApp(), {
+                    provider: new ReCaptchaV3Provider(environment.recaptchaSiteKey),
+                    isTokenAutoRefreshEnabled: true,
+                 })
+              ),
+           ]
+         : []),
       provideAuth(() => getAuth()),
       provideFirestore(() => getFirestore()),
       provideStorage(() => getStorage()),
