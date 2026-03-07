@@ -20,20 +20,7 @@ export const appConfig: ApplicationConfig = {
       provideRouter(routes),
       provideAnimationsAsync(),
 
-      provideFirebaseApp(() => {
-         console.log('recaptchaSiteKey:', environment.recaptchaSiteKey)
-         return initializeApp(environment.firebase)
-      }),
-      ...(environment.production
-         ? [
-              provideAppCheck(() =>
-                 initializeAppCheck(getApp(), {
-                    provider: new ReCaptchaV3Provider(environment.recaptchaSiteKey),
-                    isTokenAutoRefreshEnabled: true,
-                 })
-              ),
-           ]
-         : []),
+      provideFirebaseApp(() => initializeApp(environment.firebase)),
       provideAuth(() => getAuth()),
       provideFirestore(() => getFirestore()),
       provideStorage(() => getStorage()),
