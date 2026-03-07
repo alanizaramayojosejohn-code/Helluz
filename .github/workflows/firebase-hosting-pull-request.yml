@@ -27,21 +27,9 @@ jobs:
               PROD_MEASUREMENT_ID: ${{ secrets.PROD_MEASUREMENT_ID }}
               PROD_RECAPTCHA_KEY: ${{ secrets.PROD_RECAPTCHA_KEY }}
            run: |
-              cat > src/environments/environment.prod.ts << EOF
-              export const environment = {
-               production: true,
-               firebase: {
-                 apiKey: "${PROD_API_KEY}",
-                 authDomain: "${PROD_AUTH_DOMAIN}",
-                 projectId: "${PROD_PROJECT_ID}",
-                 storageBucket: "${PROD_STORAGE_BUCKET}",
-                 messagingSenderId: "${PROD_MESSAGING_SENDER_ID}",
-                 appId: "${PROD_APP_ID}",
-                 measurementId: "${PROD_MEASUREMENT_ID}"
-               },
-               recaptchaSiteKey: "${ PROD_RECAPTCHA_KEY }"
-              };
-              EOF
+              printf 'export const environment = {\n  production: true,\n  firebase: {\n    apiKey: "%s",\n    authDomain: "%s",\n    projectId: "%s",\n    storageBucket: "%s",\n    messagingSenderId: "%s",\n    appId: "%s",\n    measurementId: "%s"\n  },\n  recaptchaSiteKey: "%s"\n};\n' \
+              "$PROD_API_KEY" "$PROD_AUTH_DOMAIN" "$PROD_PROJECT_ID" "$PROD_STORAGE_BUCKET" "$PROD_MESSAGING_SENDER_ID" "$PROD_APP_ID" "$PROD_MEASUREMENT_ID" "$PROD_RECAPTCHA_KEY" \
+              > src/environments/environment.prod.ts
 
          - run: bun install
 
