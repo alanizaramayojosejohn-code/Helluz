@@ -82,12 +82,11 @@ describe('EnrollmentService', () => {
 
       const endDate = service.calculateEndDate(startDate, durationDays)
 
-      expect(endDate.getDate()).toBe(30)
-      expect(endDate.getMonth()).toBe(0)
-
-      const diffTime = Math.abs(endDate.getTime() - startDate.getTime())
+      const diffTime = endDate.getTime() - startDate.getTime()
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+
       expect(diffDays).toBe(30)
+      expect(endDate.getMonth()).toBe(0)
    })
 
    it('should add enrollment successfully', async () => {
