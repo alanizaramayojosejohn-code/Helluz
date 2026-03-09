@@ -23,9 +23,9 @@ export interface Enrollment {
 
    status: 'activa' | 'vencida' | 'cancelada' | 'completada'
 
-   scheduleId?:     string   // id del horario
-   scheduleLabel?:  string   // ej: "08:00 - 09:00"
-   instructorName?: string   // ej: "Juan Pérez"
+   scheduleId?:     string   
+   scheduleLabel?:  string   
+   instructorName?: string   
 
    createdAt?:      Timestamp
    updatedAt?:      Timestamp
