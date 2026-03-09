@@ -27,7 +27,7 @@ import { Observable, tap } from 'rxjs'
       MatCheckboxModule,
       ReactiveFormsModule,
       MatFormFieldModule,
-      AsyncPipe, // ← IMPORTANTE: Agregar AsyncPipe
+      AsyncPipe, 
    ],
    templateUrl: './component.html',
 })
@@ -95,13 +95,11 @@ export class ScheduleForm implements OnInit {
    }
 
    private loadData(): void {
-      // Cargar sucursales y cachear
-      this.branches$ = this.branchService.getActiveBranches().pipe(tap((branches) => (this.branchesCache = branches)))
 
-      // Cargar días
+    this.branches$ = this.branchService.getActiveBranches().pipe(tap((branches) => (this.branchesCache = branches)))
+
       this.days$ = this.seedService.getDays()
 
-      // Cargar disciplinas
       this.disciplines$ = this.seedService.getDiscipline()
    }
 

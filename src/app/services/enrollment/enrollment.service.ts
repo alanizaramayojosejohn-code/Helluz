@@ -205,9 +205,6 @@ export class EnrollmentService {
       }
    }
 
-   /**
-    * Cuenta el total de inscripciones
-    */
    async countEnrollments(branchId?: string, status?: string): Promise<number> {
       try {
          return await this.query.countEnrollments(branchId, status)

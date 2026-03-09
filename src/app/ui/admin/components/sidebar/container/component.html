@@ -1,12 +1,12 @@
 <aside class="sidebar" [class.sidebar-open]="sidebarService.isOpen()" [class.sidebar-closed]="!sidebarService.isOpen()">
-   <nav class="sidebar-nav bg-slate-950 min-h-full">
+   <nav class="sidebar-nav bg-black min-h-full">
       @for (item of getFilteredMenuItems(); track item.route) {
          <a
             [routerLink]="item.route"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: item.route === '/admin/home' }"
             (click)="closeSidebarOnMobile()"
-            class="sidebar-item"
+            class="sidebar-item rounded-lg"
             [matTooltip]="!sidebarService.isOpen() ? item.label : ''"
             matTooltipPosition="right"
          >

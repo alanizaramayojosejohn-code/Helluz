@@ -11,8 +11,8 @@
 
       <form [formGroup]="scheduleForm" (ngSubmit)="onSubmit()" class="space-y-6">
          <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-6 space-y-6">
-            <!-- Sucursal -->
-            <mat-form-field appearance="outline" class="w-full">
+
+          <mat-form-field appearance="outline" class="w-full">
                <mat-label>Sucursal</mat-label>
                <mat-select formControlName="branchId" required>
                   @for (branch of branches$ | async; track branch.id) {
@@ -28,16 +28,14 @@
                <mat-label>
                   {{ isEditMode() ? 'Día de la semana' : 'Días de la semana (puedes seleccionar varios)' }}
                </mat-label>
-               <mat-select formControlName="days" [multiple]="!isEditMode()" required>
+               <mat-select formControlName="days" [multiple]="true" required>
                   @for (day of days$ | async; track day.id) {
                      <mat-option [value]="day.name">{{ day.name }}</mat-option>
                   }
                </mat-select>
                <mat-hint>
                   {{
-                     isEditMode()
-                        ? 'Solo puedes cambiar un día a la vez en edición'
-                        : 'Selecciona todos los días que necesites'
+                     'selecciona los días que necesites'
                   }}
                </mat-hint>
                @if (hasFieldError('days')) {
@@ -45,7 +43,6 @@
                }
             </mat-form-field>
 
-            <!-- Horarios -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                <mat-form-field appearance="outline" class="w-full">
                   <mat-label>Hora de inicio</mat-label>
@@ -64,7 +61,6 @@
                </mat-form-field>
             </div>
 
-            <!-- ✅ Disciplina fija (informativo) -->
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                <div class="flex items-center gap-3">
                   <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
@@ -80,7 +76,6 @@
                </div>
             </div>
 
-            <!-- Instructor -->
             @if (instructors$) {
                <mat-form-field appearance="outline" class="w-full">
                   <mat-label>Instructor (Opcional)</mat-label>
@@ -103,7 +98,6 @@
             }
          </div>
 
-         <!-- Validación de tiempo -->
          @if (scheduleForm.hasError('invalidTimeRange') && scheduleForm.touched) {
             <div class="bg-red-50 border border-red-200 rounded-lg p-4">
                <div class="flex items-center gap-3">
@@ -119,7 +113,6 @@
             </div>
          }
 
-         <!-- Mensajes de error -->
          @if (errorMessage()) {
             <div class="bg-red-50 border border-red-200 rounded-lg p-4">
                <div class="flex items-center gap-3">
@@ -135,7 +128,6 @@
             </div>
          }
 
-         <!-- Botones -->
          <div class="flex gap-4">
             <button
                type="button"
