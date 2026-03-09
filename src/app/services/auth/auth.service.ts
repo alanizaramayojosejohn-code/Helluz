@@ -137,16 +137,10 @@ export class AuthService {
       }
    }
 
-   // Crear usuario (solo admin) - IMPORTANTE: Esto debe ejecutarse desde el backend
-   // Por seguridad, Firebase no permite crear usuarios con password desde el cliente
-   // Esta función es solo de referencia. Debes usar Firebase Admin SDK en Cloud Functions
    async createUserInAuth(email: string, password: string): Promise<string> {
       try {
-         // NOTA: Esta función NO debe usarse directamente desde el cliente
-         // Es solo para mostrar la lógica. Implementa esto en Cloud Functions
          const credential = await createUserWithEmailAndPassword(this.auth, email, password)
 
-         // Importante: Cerrar sesión inmediatamente para no loguear al admin como el nuevo usuario
          await signOut(this.auth)
 
          return credential.user.uid
@@ -165,7 +159,6 @@ export class AuthService {
       }
    }
 
-   // Enviar email de recuperación de contraseña
    async sendPasswordReset(email: string): Promise<void> {
       try {
          await sendPasswordResetEmail(this.auth, email)
@@ -182,7 +175,6 @@ export class AuthService {
       }
    }
 
-   // Logout
    async logout(): Promise<void> {
       try {
          await signOut(this.auth)
@@ -193,7 +185,6 @@ export class AuthService {
       }
    }
 
-   // Helpers privados
    private async getUserDataPromise(uid: string): Promise<User | null> {
       const userDoc = doc(this.firestore, `users/${uid}`)
       return new Promise((resolve) => {
@@ -224,7 +215,6 @@ export class AuthService {
          this.router.navigateByUrl('/')
       }
    }
-   // Verificar si el usuario actual es admin
    async isAdmin(): Promise<boolean> {
       return new Promise((resolve) => {
          this.currentUser$.subscribe((user) => {
@@ -233,7 +223,6 @@ export class AuthService {
       })
    }
 
-   // Verificar si el usuario está autenticado
    async isAuthenticated(): Promise<boolean> {
       return new Promise((resolve) => {
          this.currentUser$.subscribe((user) => {

@@ -16,7 +16,6 @@
          </button>
       </div>
 
-      <!-- Filtros -->
       <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-4 mb-6">
          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <mat-form-field appearance="outline" class="w-full">
@@ -58,20 +57,23 @@
          </div>
       }
 
-      <!-- Loading -->
       @if (isLoading()) {
          <div class="flex justify-center items-center py-12">
             <mat-spinner diameter="50"></mat-spinner>
          </div>
       }
 
-      <!-- Content -->
       @if (!isLoading()) {
          @if (enrollments$ | async; as enrollments) {
-            <!-- Empty State -->
-            @if (enrollments.length === 0) {
+
+          @if (enrollments.length === 0) {
                <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-12 text-center">
-                  <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                     class="w-16 h-16 text-gray-400 mx-auto mb-4"
+                     fill="none"
+                     stroke="currentColor"
+                     viewBox="0 0 24 24"
+                  >
                      <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -89,7 +91,6 @@
                   </button>
                </div>
             } @else {
-               <!-- Table -->
                <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg overflow-hidden">
                   <div class="overflow-x-auto">
                      <table mat-table [dataSource]="enrollments" class="w-full">
@@ -195,13 +196,13 @@
                         </ng-container>
 
                         <ng-container matColumnDef="user">
-   <th mat-header-cell *matHeaderCellDef class="font-semibold">Usuario</th>
-   <td mat-cell *matCellDef="let enrollment">
-      <div>
-         <p class="font-medium text-gray-800">{{ enrollment.createdByName }}</p>
-      </div>
-   </td>
-</ng-container>
+                           <th mat-header-cell *matHeaderCellDef class="font-semibold">Usuario</th>
+                           <td mat-cell *matCellDef="let enrollment">
+                              <div>
+                                 <p class="font-medium text-gray-800">{{ enrollment.createdByName }}</p>
+                              </div>
+                           </td>
+                        </ng-container>
 
                         <ng-container matColumnDef="actions">
                            <th mat-header-cell *matHeaderCellDef class="font-semibold text-right">Acciones</th>
