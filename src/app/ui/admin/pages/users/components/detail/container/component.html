@@ -1,141 +1,135 @@
-<!-- components/detail/container/component.html -->
 <div class="min-h-screen bg-white p-6">
-  <div class="max-w-4xl mx-auto">
-    <div class="flex justify-between items-center mb-8">
-      <div>
-        <h1 class="text-4xl font-bold text-red-600 mb-2">Detalle del Usuario</h1>
-        <p class="text-gray-600">Información completa del usuario</p>
+   <div class="max-w-4xl mx-auto">
+      <div class="flex items-center gap-4 mb-8">
+         <button (click)="onClose()" class="text-gray-600 hover:text-gray-800 transition">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+         </button>
+         <h1 class="text-4xl font-bold text-red-600">Detalle del Usuario</h1>
       </div>
-      <button
-        class="text-gray-500 hover:text-gray-700 p-2"
-        (click)="onClose()"
-      >
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-      </button>
-    </div>
 
-    @if (isLoading()) {
-      <div class="flex justify-center p-8">
-        <mat-spinner diameter="50"></mat-spinner>
-      </div>
-    }
+      @if (isLoading()) {
+         <div class="flex justify-center items-center py-12">
+            <mat-spinner diameter="50"></mat-spinner>
+         </div>
+      }
 
-    @if (errorMessage()) {
-      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
-        {{ errorMessage() }}
-      </div>
-    }
+      @if (errorMessage() && !isLoading()) {
+         <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div class="flex items-center gap-3">
+               <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+               </svg>
+               <p class="text-sm text-red-800">{{ errorMessage() }}</p>
+            </div>
+         </div>
+      }
 
-    @if (user(); as user) {
-      <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg overflow-hidden">
-        <!-- Header -->
-        <div class="bg-gradient-to-r from-red-500 to-red-600 px-8 py-10 text-white">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-3xl font-bold mb-2">{{ getFullName() }}</h2>
-              <p class="text-red-100 mb-3">{{ user.email }}</p>
+      @if (user() && !isLoading()) {
+         <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg overflow-hidden">
+
+        <div class="bg-red-600 text-white p-6">
+          <div class="flex items-center gap-4">
+            <div class="w-20 h-20 rounded-full bg-white text-red-600 flex items-center justify-center font-bold text-3xl shadow-inner">
+              {{ user()!.name.charAt(0) }}
+            </div>
+
+            <div class="flex-1">
+              <h2 class="text-3xl font-bold mb-1">{{ getFullName() }}</h2>
+              <div class="flex items-center gap-3">
+                <p class="text-red-100">{{ user()!.email }}</p>
+                <span class="px-2 py-0.5 bg-white/20 rounded text-xs font-semibold uppercase tracking-wider">
+                  {{ getRoleLabel() }}
+                </span>
+              </div>
+            </div>
+
+            <div class="text-right">
               <span
-                [class]="getRoleBadgeClass()"
-                class="px-4 py-2 rounded-full text-sm font-semibold"
+                class="px-6 py-2 rounded-full text-white text-sm font-bold shadow-md uppercase tracking-widest
+                {{ user()!.status === 'activo' ? 'bg-green-600' : 'bg-gray-500' }}"
               >
-                {{ getRoleLabel() }}
+                {{ user()!.status === 'activo' ? 'Activo' : 'Inactivo' }}
               </span>
             </div>
-            <span
-              [class]="user.status === 'activo'
-                ? 'bg-green-500 text-white'
-                : 'bg-gray-500 text-white'"
-              class="px-4 py-2 rounded-full text-sm font-semibold cursor-pointer"
-              (click)="onToggleStatus()"
-            >
-              {{ user.status }}
-            </span>
           </div>
         </div>
 
-        <!-- Content -->
-        <div class="p-8">
-          <!-- Información del Sistema -->
-          <div class="mb-8">
-            <h3 class="text-xl font-semibold text-gray-800 mb-4 border-b-2 border-red-500 pb-2">
-              Información del Sistema
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="border-l-4 border-purple-500 pl-4">
-                <p class="text-sm text-gray-600 mb-1">UID de Firebase</p>
-                <p class="text-sm font-mono text-gray-800 break-all">{{ user.id }}</p>
-              </div>
-              @if (user.createdBy) {
-                <div class="border-l-4 border-blue-500 pl-4">
-                  <p class="text-sm text-gray-600 mb-1">Creado Por</p>
-                  <p class="text-sm font-mono text-gray-800">{{ user.createdBy }}</p>
-                </div>
-              }
-            </div>
-          </div>
+            <div class="p-6 space-y-8">
+               <div class="space-y-4">
+                  <h3 class="text-sm font-bold text-red-600 uppercase tracking-wider mb-4">Información de Seguridad</h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                     <div>
+                        <label class="block text-sm font-semibold text-gray-600 mb-2">UID de Firebase</label>
+                        <p class="text-sm font-mono text-gray-800 break-all bg-gray-50 p-2 rounded border border-gray-100">
+                           {{ user()!.id }}
+                        </p>
+                     </div>
+                     @if (user()!.createdBy) {
+                        <div>
+                           <label class="block text-sm font-semibold text-gray-600 mb-2">Creado Por</label>
+                           <p class="text-sm text-gray-800">{{ user()!.createdBy }}</p>
+                        </div>
+                     }
+                  </div>
+               </div>
 
-          <!-- Fechas -->
-          <div class="border-t pt-6">
-            <h3 class="text-sm font-semibold text-gray-600 uppercase mb-4">Registro y Actualizaciones</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <p class="text-gray-600 mb-1">Fecha de Creación</p>
-                <p class="font-medium text-gray-800">{{ getCreatedAtDate() | date: 'dd/MM/yyyy HH:mm' }}</p>
-              </div>
-              <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <p class="text-gray-600 mb-1">Última Actualización</p>
-                <p class="font-medium text-gray-800">{{ getUpdatedAtDate() | date: 'dd/MM/yyyy HH:mm' }}</p>
-              </div>
-            </div>
-          </div>
+               <div class="pt-6 border-t border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="bg-gray-50 p-3 rounded border border-gray-200">
+                     <label class="block text-xs font-semibold text-gray-500 uppercase">Fecha de Registro</label>
+                     <p class="text-sm text-gray-800">{{ getCreatedAtDate() | date: 'dd/MM/yyyy HH:mm' }}</p>
+                  </div>
+                  <div class="bg-gray-50 p-3 rounded border border-gray-200">
+                     <label class="block text-xs font-semibold text-gray-500 uppercase">Última Actualización</label>
+                     <p class="text-sm text-gray-800">{{ getUpdatedAtDate() | date: 'dd/MM/yyyy HH:mm' }}</p>
+                  </div>
+               </div>
 
-          <!-- Nota importante -->
-          <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <div class="flex items-start gap-3">
-              <svg class="w-5 h-5 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-              <div class="text-sm text-yellow-800">
-                <p class="font-semibold mb-1">Nota sobre eliminación:</p>
-                <p>Al eliminar un usuario, debes eliminarlo también manualmente desde <strong>Firebase Console → Authentication → Users</strong></p>
-              </div>
+               <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <div class="flex items-start gap-3 text-sm text-yellow-800">
+                     <svg class="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                     </svg>
+                     <p><strong>Importante:</strong> La eliminación en este panel no elimina el usuario de Firebase Auth. Debes hacerlo manualmente en la consola de Firebase.</p>
+                  </div>
+               </div>
             </div>
-          </div>
-        </div>
 
-        <!-- Actions -->
-        <div class="bg-gray-50 px-8 py-4 flex gap-3 justify-end border-t border-gray-200">
-          <button
-            class="px-6 py-3 border-2 border-orange-300 text-orange-600 rounded-lg hover:bg-orange-50 transition font-semibold flex items-center gap-2"
-            (click)="onResetPassword()"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
-            </svg>
-            Restablecer Contraseña
-          </button>
-          <button
-            class="px-6 py-3 border-2 border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition font-semibold flex items-center gap-2"
-            (click)="onDelete()"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-            </svg>
-            Eliminar
-          </button>
-          <button
-            class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold flex items-center gap-2"
-            (click)="onEdit()"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-            </svg>
-            Editar
-          </button>
-        </div>
-      </div>
-    }
-  </div>
+            <div class="border-t border-gray-200 p-6 flex gap-4">
+               <button
+                  (click)="onEdit()"
+                  class="flex-1 bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2"
+               >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                  </svg>
+                  Editar
+               </button>
+
+               <button
+                  (click)="onDelete()"
+                  class="flex-1 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2"
+               >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Eliminar
+               </button>
+            </div>
+
+            <div class="px-6 pb-6">
+   <button
+      (click)="onResetPassword()"
+      class="w-full bg-gray-100 hover:bg-gray-200 text-black px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2 border border-black"
+   >
+      <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+      </svg>
+      Enviar enlace de recuperación de contraseña
+   </button>
+</div>
+         </div>
+      }
+   </div>
 </div>
