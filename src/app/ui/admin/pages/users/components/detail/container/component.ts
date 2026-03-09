@@ -4,12 +4,14 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { DatePipe } from '@angular/common';
 import { UserService } from '../../../../../../../services/user/user.service';
 import { User } from '../../../../../../../models/user.model';
+import { MatChipsModule } from '@angular/material/chips'
 
 @Component({
   selector: 'x-user-detail',
   imports: [
     MatProgressSpinnerModule,
     DatePipe,
+    MatChipsModule,
   ],
   templateUrl: './component.html',
 })

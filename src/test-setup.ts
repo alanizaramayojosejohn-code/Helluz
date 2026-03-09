@@ -1,13 +1,35 @@
 import 'zone.js';
 import 'zone.js/testing';
-
-import { TestBed } from '@angular/core/testing';
+import { getTestBed } from '@angular/core/testing';
 import {
   BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting
+  platformBrowserDynamicTesting,
 } from '@angular/platform-browser-dynamic/testing';
 
-TestBed.initTestEnvironment(
+// Inicializar el entorno de testing de Angular
+getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting()
+  platformBrowserDynamicTesting(),
 );
+
+// Configuración global de Vitest para Angular
+Object.defineProperty(window, 'CSS', { value: null });
+Object.defineProperty(window, 'getComputedStyle', {
+  value: () => ({
+    display: 'none',
+    appearance: ['-webkit-appearance']
+  })
+});
+
+Object.defineProperty(document, 'doctype', {
+  value: '<!DOCTYPE html>'
+});
+
+Object.defineProperty(document.body.style, 'transform', {
+  value: () => {
+    return {
+      enumerable: true,
+      configurable: true
+    };
+  },
+});

@@ -23,7 +23,6 @@ export const authGuard: CanActivateFn = (route, state) => {
    )
 }
 
-// Guard para prevenir acceso a login/register si ya está autenticado
 export const noAuthGuard: CanActivateFn = (route, state) => {
    const authService = inject(AuthService)
    const router = inject(Router)
@@ -62,7 +61,6 @@ export const adminGuard: CanActivateFn = (route, state) => {
    )
 }
 
-// Guard para verificar que sea instructor
 export const instructorGuard: CanActivateFn = (route, state) => {
    const authService = inject(AuthService)
    const router = inject(Router)
@@ -81,7 +79,6 @@ export const instructorGuard: CanActivateFn = (route, state) => {
       })
    )
 }
-// guards/auth.guard.ts
 export const adminOrInstructorGuard: CanActivateFn = (route, state) => {
    const authService = inject(AuthService)
    const router = inject(Router)

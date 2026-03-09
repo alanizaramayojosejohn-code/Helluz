@@ -24,6 +24,12 @@ export const appConfig: ApplicationConfig = {
       provideAuth(() => getAuth()),
       provideFirestore(() => getFirestore()),
       provideStorage(() => getStorage()),
+      provideAppCheck(() => {
+        return initializeAppCheck(undefined, {
+          provider: new ReCaptchaV3Provider('6LcvWoQsAAAAAERr-0AIzKw85Q7LXnWzM3vK0lT8'),
+          isTokenAutoRefreshEnabled: true,
+        })
+      } ),
 
       provideNativeDateAdapter(),
       { provide: LOCALE_ID, useValue: 'es-ES' },

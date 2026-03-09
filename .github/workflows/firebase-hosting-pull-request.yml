@@ -32,6 +32,9 @@ jobs:
               > src/environments/environment.prod.ts
 
          - run: bun install
+         
+         - name: Correr tests unitarios
+           run: bun run test
 
          - run: bun run build -- --configuration production --project=frontend
 

@@ -36,19 +36,24 @@
       <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg overflow-hidden">
         <!-- Header del detalle -->
         <div class="bg-red-600 text-white p-6">
-          <div class="flex items-center gap-4">
-            <div class="w-20 h-20 rounded-full bg-white text-red-600 flex items-center justify-center font-bold text-3xl">
+          <div class="flex items-center gap-6">
+            <div class="w-20 h-20 rounded-full bg-white text-red-600 flex items-center justify-center font-bold text-3xl shadow-inner">
               {{ getInitials(instructor()!) }}
             </div>
+
             <div class="flex-1">
-              <h2 class="text-3xl font-bold mb-1">{{ getFullName(instructor()!) }}</h2>
-              <p class="text-red-100">{{ instructor()!.branchName }}</p>
+              <h2 class="text-3xl font-bold mb-1 tracking-tight">{{ getFullName(instructor()!) }}</h2>
+              <p class="text-red-100 text-lg opacity-90">{{ instructor()!.branchName }}</p>
             </div>
-            @if (instructor()!.status == 'activo') {
-              <mat-chip class="bg-green-100 text-green-800 font-semibold">Activo</mat-chip>
-            } @else {
-              <mat-chip class="bg-red-100 text-red-800 font-semibold">Inactivo</mat-chip>
-            }
+
+            <div class="text-right">
+              <span
+                class="px-6 py-2 rounded-full text-white text-sm font-bold shadow-md uppercase tracking-widest
+                {{ instructor()!.status === 'activo' ? 'bg-green-600' : 'bg-gray-500' }}"
+              >
+                {{ instructor()!.status === 'activo' ? 'Activo' : 'Inactivo' }}
+              </span>
+            </div>
           </div>
         </div>
 
