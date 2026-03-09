@@ -3,10 +3,11 @@ import { provideRouter } from '@angular/router'
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'
 
 // Firebase (AngularFire modular)
-import { provideFirebaseApp, initializeApp } from '@angular/fire/app'
+import { provideFirebaseApp, initializeApp, getApp } from '@angular/fire/app'
 import { provideAuth, getAuth } from '@angular/fire/auth'
 import { provideFirestore, getFirestore } from '@angular/fire/firestore'
 import { provideStorage, getStorage } from '@angular/fire/storage'
+import { provideAppCheck, initializeAppCheck, ReCaptchaV3Provider } from '@angular/fire/app-check'
 
 import { routes } from './app.routes'
 import { environment } from '../environments/environment'
@@ -24,9 +25,9 @@ export const appConfig: ApplicationConfig = {
       provideFirestore(() => getFirestore()),
       provideStorage(() => getStorage()),
 
-  provideNativeDateAdapter(),
-  { provide: LOCALE_ID,       useValue: 'es-ES' },
-  { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
-  { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
+      provideNativeDateAdapter(),
+      { provide: LOCALE_ID, useValue: 'es-ES' },
+      { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
+      { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
    ],
 }

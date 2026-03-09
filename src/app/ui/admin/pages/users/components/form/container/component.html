@@ -1,154 +1,152 @@
-<!-- components/form/container/component.html -->
-<div class="min-h-screen bg-white text-white p-6">
-  <div class="max-w-3xl mx-auto">
-    <div class="mb-8">
-      <h1 class="text-4xl font-bold text-red-600 mb-2">
-        {{ getFormTitle() }}
-      </h1>
-      <p class="text-gray-400">Completa la información del usuario</p>
-    </div>
-
-    @if (!isEditMode()) {
-      <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-        <div class="flex items-start gap-3">
-          <svg class="w-5 h-5 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-          </svg>
-          <div>
-            <p class="font-semibold text-yellow-900 mb-2">Pasos previos requeridos:</p>
-            <ol class="text-sm text-yellow-800 space-y-2 list-decimal list-inside">
-              <li><strong>Ir a Firebase Console:</strong> Authentication → Users</li>
-              <li><strong>Hacer clic en "Add User"</strong></li>
-              <li><strong>Ingresar email y contraseña</strong> del nuevo usuario</li>
-              <li><strong>Copiar el UID</strong> que aparece en la lista de usuarios</li>
-              <li><strong>Pegar el UID</strong> en el campo de abajo y completar los datos</li>
-            </ol>
-            <p class="text-xs text-yellow-700 mt-2">
-              💡 El UID es un identificador único como: <code class="bg-yellow-100 px-1 rounded">abc123xyz456...</code>
-            </p>
-          </div>
-        </div>
-      </div>
-    }
-
-    @if (isLoading()) {
-      <div class="flex justify-center p-8">
-        <mat-spinner diameter="50"></mat-spinner>
-      </div>
-    }
-
-    @if (errorMessage()) {
-      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
-        {{ errorMessage() }}
-      </div>
-    }
-
-    <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="space-y-6">
-      <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-6 space-y-6">
-
-        @if (!isEditMode()) {
-          <!-- UID (solo en modo creación) -->
-          <div class="border-b border-gray-200 pb-4">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">Datos de Firebase Authentication</h2>
-
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>UID de Firebase Authentication</mat-label>
-              <input matInput formControlName="uid" placeholder="Pega aquí el UID copiado de Firebase Console" />
-              <mat-hint>Copia el UID desde Firebase Console → Authentication → Users</mat-hint>
-              @if (hasError('uid')) {
-                <mat-error>{{ getErrorMessage('uid') }}</mat-error>
-              }
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Email</mat-label>
-              <input matInput type="email" formControlName="email" placeholder="Debe coincidir con el email en Firebase Auth" />
-              <mat-hint>Debe ser el mismo email usado en Firebase Authentication</mat-hint>
-              @if (hasError('email')) {
-                <mat-error>{{ getErrorMessage('email') }}</mat-error>
-              }
-            </mat-form-field>
-          </div>
-        }
-
-        <!-- Datos Personales -->
-        <div class="border-b border-gray-200 pb-4">
-          <h2 class="text-xl font-semibold text-gray-800 mb-4">Datos Personales</h2>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Nombre -->
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Nombre</mat-label>
-              <input matInput formControlName="name" placeholder="Ingrese el nombre" />
-              @if (hasError('name')) {
-                <mat-error>{{ getErrorMessage('name') }}</mat-error>
-              }
-            </mat-form-field>
-
-            <!-- Apellido -->
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Apellido</mat-label>
-              <input matInput formControlName="lastname" placeholder="Ingrese el apellido" />
-              @if (hasError('lastname')) {
-                <mat-error>{{ getErrorMessage('lastname') }}</mat-error>
-              }
-            </mat-form-field>
-          </div>
-        </div>
-
-        <!-- Rol y Estado -->
-        <div>
-          <h2 class="text-xl font-semibold text-gray-800 mb-4">Configuración del Sistema</h2>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Rol -->
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Rol</mat-label>
-              <mat-select formControlName="role">
-                <mat-option value="admin">Administrador</mat-option>
-                <mat-option value="instructor">Instructor</mat-option>
-              </mat-select>
-              @if (hasError('role')) {
-                <mat-error>{{ getErrorMessage('role') }}</mat-error>
-              }
-            </mat-form-field>
-
-            <!-- Estado -->
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Estado</mat-label>
-              <mat-select formControlName="status">
-                <mat-option value="activo">Activo</mat-option>
-                <mat-option value="inactivo">Inactivo</mat-option>
-              </mat-select>
-              @if (hasError('status')) {
-                <mat-error>{{ getErrorMessage('status') }}</mat-error>
-              }
-            </mat-form-field>
-          </div>
-        </div>
+<div class="min-h-screen bg-white p-6">
+   <div class="max-w-3xl mx-auto">
+      <div class="mb-8">
+         <h1 class="text-4xl font-bold text-red-600 mb-2">
+            {{ isEditMode() ? 'Editar Usuario' : 'Registrar Usuario' }}
+         </h1>
+         <p class="text-gray-400">
+            {{ isEditMode() ? 'Modifica la información y permisos del usuario' : 'Completa la información para el nuevo registro en el sistema' }}
+         </p>
       </div>
 
-      <!-- Botones -->
-      <div class="flex gap-4 justify-end">
-        <button
-          type="button"
-          class="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-semibold disabled:opacity-50"
-          (click)="onCancel()"
-          [disabled]="isSubmitting()"
-        >
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold disabled:opacity-50 flex items-center gap-2"
-          [disabled]="isSubmitting()"
-        >
-          @if (isSubmitting()) {
-            <mat-spinner diameter="20" class="inline-block"></mat-spinner>
-          }
-          {{ isEditMode() ? 'Actualizar' : 'Registrar' }}
-        </button>
-      </div>
-    </form>
-  </div>
+      @if (!isEditMode()) {
+         <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+            <div class="flex items-start gap-3">
+               <svg class="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+               </svg>
+               <div>
+                  <p class="font-bold text-yellow-900 mb-1">Pasos previos requeridos:</p>
+                  <ol class="text-sm text-yellow-800 space-y-1 list-decimal list-inside">
+                     <li>En Firebase Console: <strong>Authentication → Add User</strong></li>
+                     <li>Ingresa email y contraseña, luego <strong>Copia el UID</strong></li>
+                     <li>Pega el UID en el formulario inferior</li>
+                  </ol>
+               </div>
+            </div>
+         </div>
+      }
+
+      @if (isLoading()) {
+         <div class="flex justify-center items-center py-12">
+            <mat-spinner diameter="50"></mat-spinner>
+         </div>
+      }
+
+      <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="space-y-6">
+         <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-6 space-y-6">
+
+            @if (!isEditMode()) {
+               <div class="space-y-4">
+                  <h2 class="text-sm font-bold text-red-600 uppercase tracking-wider mb-2">Autenticación (Firebase)</h2>
+
+                  <mat-form-field appearance="outline" class="w-full">
+                     <mat-label>UID de Firebase</mat-label>
+                     <input matInput formControlName="uid" placeholder="abc123xyz..." required autocomplete="off" />
+                     <mat-hint>Copia el UID desde Firebase Console</mat-hint>
+                     @if (hasError('uid')) {
+                        <mat-error>{{ getErrorMessage('uid') }}</mat-error>
+                     }
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="w-full">
+                     <mat-label>Email</mat-label>
+                     <input matInput type="email" formControlName="email" placeholder="ejemplo@correo.com" required autocomplete="off" />
+                     <mat-hint>Debe coincidir con el email creado en Firebase</mat-hint>
+                     @if (hasError('email')) {
+                        <mat-error>{{ getErrorMessage('email') }}</mat-error>
+                     }
+                  </mat-form-field>
+               </div>
+               <div class="border-t border-gray-100 pt-4"></div>
+            }
+
+            <div class="space-y-4">
+               <h2 class="text-sm font-bold text-red-600 uppercase tracking-wider mb-2">Datos Personales</h2>
+               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <mat-form-field appearance="outline" class="w-full">
+                     <mat-label>Nombre</mat-label>
+                     <input matInput formControlName="name" placeholder="Ej. Juan" required />
+                     @if (hasError('name')) {
+                        <mat-error>{{ getErrorMessage('name') }}</mat-error>
+                     }
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="w-full">
+                     <mat-label>Apellido</mat-label>
+                     <input matInput formControlName="lastname" placeholder="Ej. Pérez" required />
+                     @if (hasError('lastname')) {
+                        <mat-error>{{ getErrorMessage('lastname') }}</mat-error>
+                     }
+                  </mat-form-field>
+               </div>
+            </div>
+
+            <div class="pt-4 space-y-4">
+               <h2 class="text-sm font-bold text-red-600 uppercase tracking-wider mb-2">Configuración</h2>
+               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <mat-form-field appearance="outline" class="w-full">
+                     <mat-label>Rol de Usuario</mat-label>
+                     <mat-select formControlName="role" required>
+                        <mat-option value="admin">Administrador</mat-option>
+                        <mat-option value="instructor">Instructor</mat-option>
+                     </mat-select>
+                     @if (hasError('role')) {
+                        <mat-error>{{ getErrorMessage('role') }}</mat-error>
+                     }
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="w-full">
+                     <mat-label>Estado</mat-label>
+                     <mat-select formControlName="status" required>
+                        <mat-option value="activo">Activo</mat-option>
+                        <mat-option value="inactivo">Inactivo</mat-option>
+                     </mat-select>
+                     @if (hasError('status')) {
+                        <mat-error>{{ getErrorMessage('status') }}</mat-error>
+                     }
+                  </mat-form-field>
+               </div>
+            </div>
+         </div>
+
+         @if (errorMessage()) {
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+               <div class="flex items-center gap-3">
+                  <svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                  </svg>
+                  <p class="text-sm text-red-800">{{ errorMessage() }}</p>
+               </div>
+            </div>
+         }
+
+         <div class="flex gap-4">
+            <button
+               type="button"
+               (click)="onCancel()"
+               [disabled]="isSubmitting()"
+               class="flex-1 bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50"
+            >
+               Cancelar
+            </button>
+
+            <button
+               type="submit"
+               [disabled]="userForm.invalid || isSubmitting()"
+               class="flex-1 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+               @if (isSubmitting()) {
+                  <svg class="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Guardando...
+               } @else {
+                  {{ isEditMode() ? 'Actualizar Usuario' : 'Registrar Usuario' }}
+               }
+            </button>
+         </div>
+      </form>
+   </div>
 </div>

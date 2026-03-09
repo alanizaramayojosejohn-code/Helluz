@@ -1,110 +1,111 @@
-<!-- components/form/container/component.html -->
-<div class="p-6 max-w-2xl mx-auto">
-   <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold text-gray-800">{{ getFormTitle() }}</h1>
-      <button class="text-gray-500 hover:text-gray-700" (click)="onCancel()" mat-icon-button>
-         <mat-icon>close</mat-icon>
-      </button>
-   </div>
-
-   @if (isLoading()) {
-      <div class="flex justify-center p-8">
-         <mat-spinner diameter="50"></mat-spinner>
+<div class="min-h-screen bg-white p-6">
+   <div class="max-w-3xl mx-auto">
+      <div class="mb-8">
+         <h1 class="text-4xl font-bold text-red-600 mb-2">
+            {{ isEditMode() ? 'Editar Membresía' : 'Registrar Membresía' }}
+         </h1>
+         <p class="text-gray-400">
+            {{ isEditMode() ? 'Modifica los beneficios y costos del plan' : 'Configura un nuevo plan de entrenamiento para los alumnos' }}
+         </p>
       </div>
-   }
 
-   @if (errorMessage()) {
-      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
-         {{ errorMessage() }}
-      </div>
-   }
+      @if (isLoading()) {
+         <div class="flex justify-center items-center py-12">
+            <mat-spinner diameter="50"></mat-spinner>
+         </div>
+      }
 
-   <div class="bg-white rounded-lg shadow p-6">
       <form [formGroup]="membershipForm" (ngSubmit)="onSubmit()" class="space-y-6">
-         <!-- Nombre -->
-         <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Nombre de la Membresía</mat-label>
-            <input matInput formControlName="name" placeholder="Ej: Mensual Premium" />
-            @if (hasError('name')) {
-               <mat-error>{{ getErrorMessage('name') }}</mat-error>
-            }
-         </mat-form-field>
+         <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-6 space-y-6">
 
-         <div class="grid grid-cols-2 gap-4">
-            <!-- Duración en días -->
             <mat-form-field appearance="outline" class="w-full">
-               <mat-label>Duración (días)</mat-label>
-               <input matInput type="number" formControlName="durationDays" placeholder="30" />
-               <mat-hint>Días de vigencia</mat-hint>
-               @if (hasError('durationDays')) {
-                  <mat-error>{{ getErrorMessage('durationDays') }}</mat-error>
+               <mat-label>Nombre de la Membresía</mat-label>
+               <input matInput formControlName="name" placeholder="Ej: Mensual Premium" required autocomplete="off" />
+               @if (hasError('name')) {
+                  <mat-error>{{ getErrorMessage('name') }}</mat-error>
                }
             </mat-form-field>
 
-            <!-- Total de sesiones -->
-            <mat-form-field appearance="outline" class="w-full">
-               <mat-label>Total de Sesiones</mat-label>
-               <input matInput type="number" formControlName="totalSessions" placeholder="12" />
-               <mat-hint>Sesiones incluidas</mat-hint>
-               @if (hasError('totalSessions')) {
-                  <mat-error>{{ getErrorMessage('totalSessions') }}</mat-error>
-               }
-            </mat-form-field>
-         </div>
-<!--
-         <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Días Permitidos</mat-label>
-            <mat-select formControlName="allowedDays" multiple>
-               @for (day of daysOptions; track day.value) {
-                  <mat-option [value]="day.value">{{ day.label }}</mat-option>
-               }
-            </mat-select>
-            <mat-hint>Días de uso permitido</mat-hint>
-            @if (hasError('allowedDays')) {
-               <mat-error>{{ getErrorMessage('allowedDays') }}</mat-error>
-            }
-         </mat-form-field> -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Duración (días)</mat-label>
+                  <input matInput type="number" formControlName="durationDays" placeholder="30" required />
+                  <mat-hint>Días de vigencia del plan</mat-hint>
+                  @if (hasError('durationDays')) {
+                     <mat-error>{{ getErrorMessage('durationDays') }}</mat-error>
+                  }
+               </mat-form-field>
 
-         <div class="grid grid-cols-2 gap-4">
-            <mat-form-field appearance="outline" class="w-full">
-               <mat-label>Costo</mat-label>
-               <input matInput type="number" formControlName="cost" placeholder="0.00" />
-               <span matTextPrefix>$&nbsp;</span>
-               @if (hasError('cost')) {
-                  <mat-error>{{ getErrorMessage('cost') }}</mat-error>
-               }
-            </mat-form-field>
+               <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Total de Sesiones</mat-label>
+                  <input matInput type="number" formControlName="totalSessions" placeholder="12" required />
+                  <mat-hint>Cantidad de clases permitidas</mat-hint>
+                  @if (hasError('totalSessions')) {
+                     <mat-error>{{ getErrorMessage('totalSessions') }}</mat-error>
+                  }
+               </mat-form-field>
+            </div>
 
-            <mat-form-field appearance="outline" class="w-full">
-               <mat-label>Estado</mat-label>
-               <mat-select formControlName="status">
-                  <mat-option value="activo">Activo</mat-option>
-                  <mat-option value="inactivo">Inactivo</mat-option>
-               </mat-select>
-               @if (hasError('status')) {
-                  <mat-error>{{ getErrorMessage('status') }}</mat-error>
-               }
-            </mat-form-field>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Costo (BS)</mat-label>
+                  <input matInput type="number" formControlName="cost" placeholder="0.00" required />
+                  <span matTextPrefix>Bs.&nbsp;</span>
+                  @if (hasError('cost')) {
+                     <mat-error>{{ getErrorMessage('cost') }}</mat-error>
+                  }
+               </mat-form-field>
+
+               <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Estado del Plan</mat-label>
+                  <mat-select formControlName="status" required>
+                     <mat-option value="activo">Activo</mat-option>
+                     <mat-option value="inactivo">Inactivo</mat-option>
+                  </mat-select>
+                  @if (hasError('status')) {
+                     <mat-error>{{ getErrorMessage('status') }}</mat-error>
+                  }
+               </mat-form-field>
+            </div>
          </div>
 
-         <div class="flex gap-3 justify-end pt-4 border-t">
+         @if (errorMessage()) {
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+               <div class="flex items-center gap-3">
+                  <svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                  </svg>
+                  <p class="text-sm text-red-800">{{ errorMessage() }}</p>
+               </div>
+            </div>
+         }
+
+         <div class="flex gap-4">
             <button
                type="button"
-               class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
                (click)="onCancel()"
                [disabled]="isSubmitting()"
+               class="flex-1 bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
                Cancelar
             </button>
+
             <button
                type="submit"
-               class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center gap-2"
-               [disabled]="isSubmitting()"
+               [disabled]="membershipForm.invalid || isSubmitting()"
+               class="flex-1 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
                @if (isSubmitting()) {
-                  <mat-spinner diameter="20" class="inline-block"></mat-spinner>
+                  <span class="flex items-center justify-center gap-2">
+                     <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                     </svg>
+                     Guardando...
+                  </span>
+               } @else {
+                  {{ isEditMode() ? 'Actualizar Membresía' : 'Crear Membresía' }}
                }
-               {{ isEditMode() ? 'Actualizar' : 'Crear' }}
             </button>
          </div>
       </form>

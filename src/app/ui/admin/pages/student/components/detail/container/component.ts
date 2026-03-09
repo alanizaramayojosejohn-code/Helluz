@@ -5,12 +5,14 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { DatePipe } from '@angular/common';
 import { StudentService } from '../../../../../../../services/student/student.service';
 import { Student } from '../../../../../../../models/student.model';
+import { MatChipsModule } from '@angular/material/chips'
 
 @Component({
   selector: 'x-student-detail',
   imports: [
     MatProgressSpinnerModule,
     DatePipe,
+    MatChipsModule,
   ],
   templateUrl: './component.html',
 })

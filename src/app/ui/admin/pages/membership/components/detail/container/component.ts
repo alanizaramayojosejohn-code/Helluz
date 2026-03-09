@@ -10,6 +10,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { DatePipe } from '@angular/common';
 import { MembershipService } from '../../../../../../../services/membership/membership.service';
 import { Membership } from '../../../../../../../models/membership.model';
+import { TitleCasePipe } from '@angular/common'
 
 @Component({
   selector: 'x-membership-detail',
@@ -21,6 +22,7 @@ import { Membership } from '../../../../../../../models/membership.model';
     MatProgressSpinnerModule,
     MatDividerModule,
     DatePipe,
+    TitleCasePipe,
   ],
   templateUrl: './component.html',
 })
