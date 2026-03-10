@@ -2,8 +2,7 @@ import { ApplicationConfig, LOCALE_ID, provideZoneChangeDetection } from '@angul
 import { provideRouter } from '@angular/router'
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'
 
-// Firebase (AngularFire modular)
-import { provideFirebaseApp, initializeApp, getApp } from '@angular/fire/app'
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app'
 import { provideAuth, getAuth } from '@angular/fire/auth'
 import { provideFirestore, getFirestore } from '@angular/fire/firestore'
 import { provideStorage, getStorage } from '@angular/fire/storage'
@@ -21,15 +20,17 @@ export const appConfig: ApplicationConfig = {
       provideAnimationsAsync(),
 
       provideFirebaseApp(() => initializeApp(environment.firebase)),
+      ...(environment.production ? [
+        provideAppCheck(() =>
+          initializeAppCheck(undefined, {
+            provider: new ReCaptchaV3Provider(environment.recaptchaSiteKey),
+            isTokenAutoRefreshEnabled: true,
+          })
+        )
+      ] : []),
       provideAuth(() => getAuth()),
       provideFirestore(() => getFirestore()),
       provideStorage(() => getStorage()),
-      provideAppCheck(() => {
-        return initializeAppCheck(undefined, {
-          provider: new ReCaptchaV3Provider('6LcvWoQsAAAAAERr-0AIzKw85Q7LXnWzM3vK0lT8'),
-          isTokenAutoRefreshEnabled: true,
-        })
-      } ),
 
       provideNativeDateAdapter(),
       { provide: LOCALE_ID, useValue: 'es-ES' },
