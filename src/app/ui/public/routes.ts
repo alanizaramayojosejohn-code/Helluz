@@ -13,6 +13,10 @@ export const PublicRoutes: Routes = [
       path: 'asistenciaalumnos',
       loadComponent: async () => await import('./pages/markStudentAttendance/container/component'),
    },
+   {
+      path: 'registrarUsuario',
+      loadComponent: async () => await import('./pages/registerUser/container/component'),
+   },
   //  {
   //     path: 'asistenciainstructores',
   //     loadComponent: async () => await import('./pages/markInstructorAttendance/container/component'),

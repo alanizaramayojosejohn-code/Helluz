@@ -30,7 +30,7 @@
          </mat-form-field>
       </div>
 
-      <!-- Error Message -->
+      <!-- Error -->
       @if (errorMessage()) {
          <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
             <div class="flex items-center gap-3">
@@ -55,6 +55,7 @@
 
       <!-- Lista de Instructores -->
       @if (!isLoading()) {
+         <!-- Empty state -->
          @if (filteredInstructors.length === 0) {
             <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-12 text-center">
                <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,132 +76,148 @@
                </button>
             </div>
          } @else {
+            <!-- Tabla -->
             <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg overflow-x-auto">
-               <table mat-table [dataSource]="filteredInstructors" class="w-full">
-                  <!-- Nombre -->
-                  <ng-container matColumnDef="name">
-                     <th mat-header-cell *matHeaderCellDef class="font-semibold">Nombre Completo</th>
-                     <td mat-cell *matCellDef="let instructor">
-                        <div class="flex items-center gap-3">
-                           <div
-                              class="w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center font-semibold"
-                           >
-                              {{ getInitials(instructor) }}
-                           </div>
-                           <span class="font-medium text-gray-700">
-                              {{ getFullName(instructor) }}
-                           </span>
-                        </div>
-                     </td>
-                  </ng-container>
-
-                  <!-- CI -->
-                  <ng-container matColumnDef="ci">
-                     <th mat-header-cell *matHeaderCellDef class="font-semibold">CI</th>
-                     <td mat-cell *matCellDef="let instructor">
-                        {{ instructor.ci }}
-                     </td>
-                  </ng-container>
-
-                  <!-- Celular -->
-                  <ng-container matColumnDef="cellphone">
-                     <th mat-header-cell *matHeaderCellDef class="font-semibold">Celular</th>
-                     <td mat-cell *matCellDef="let instructor">
-                        <div class="flex items-center gap-2">
-                           <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path
-                                 stroke-linecap="round"
-                                 stroke-linejoin="round"
-                                 stroke-width="2"
-                                 d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                              />
-                           </svg>
-                           <span>{{ instructor.cellphone }}</span>
-                        </div>
-                     </td>
-                  </ng-container>
-
-                  <!-- Email -->
-                  <ng-container matColumnDef="email">
-                     <th mat-header-cell *matHeaderCellDef class="font-semibold">Email</th>
-                     <td mat-cell *matCellDef="let instructor">
-                        @if (instructor.email) {
-                           <div class="flex items-center gap-2">
-                              <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                 <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                                 />
-                              </svg>
-                              <span class="text-sm">{{ instructor.email }}</span>
-                           </div>
-                        } @else {
-                           <span class="text-gray-400 text-sm">No especificado</span>
-                        }
-                     </td>
-                  </ng-container>
-
-                  <!-- Sucursal -->
-                  <ng-container matColumnDef="branch">
-                     <th mat-header-cell *matHeaderCellDef class="font-semibold">Sucursal</th>
-                     <td mat-cell *matCellDef="let instructor">
-                        <mat-chip class="bg-gray-100">
-                           {{ instructor.branchName }}
-                        </mat-chip>
-                     </td>
-                  </ng-container>
-
-                  <!-- Estado -->
-                  <ng-container matColumnDef="status">
-                     <th mat-header-cell *matHeaderCellDef class="font-semibold">Estado</th>
-                     <td mat-cell *matCellDef="let instructor">
-                        @if (instructor.active) {
-                           <mat-chip class="bg-green-100 text-green-800">Activo</mat-chip>
-                        } @else {
-                           <mat-chip class="bg-red-100 text-red-800">Inactivo</mat-chip>
-                        }
-                     </td>
-                  </ng-container>
-
-                  <!-- Acciones -->
-                  <ng-container matColumnDef="actions">
-                     <th mat-header-cell *matHeaderCellDef class="font-semibold text-right">Acciones</th>
-                     <td mat-cell *matCellDef="let instructor" class="text-right">
-                        <button
-                           mat-icon-button
-                           (click)="onViewDetail(instructor)"
-                           matTooltip="Ver detalle"
-                           class="text-blue-600 hover:text-blue-800"
+               <table class="w-full min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                     <tr>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                           >Nombre Completo</th
                         >
-                           <mat-icon>visibility</mat-icon>
-                        </button>
-                        <button
-                           mat-icon-button
-                           (click)="onEditInstructor(instructor)"
-                           matTooltip="Editar"
-                           class="text-gray-600 hover:text-gray-800"
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                           >CI</th
                         >
-                           <mat-icon>edit</mat-icon>
-                        </button>
-                        <button
-                           class="text-red-500 bg-white hover:text-white hover:bg-red-500 border-none rounded-full"
-                           (click)="deleteInstructor(instructor)"
-                           mat-icon-button
-                           matTooltip="Editar"
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                           >Celular</th
                         >
-                           <mat-icon>delete</mat-icon>
-                        </button>
-                     </td>
-                  </ng-container>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                           >Email</th
+                        >
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                           >Sucursal</th
+                        >
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                           >Estado</th
+                        >
+                        <th class="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                           >Acciones</th
+                        >
+                     </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                     @for (instructor of filteredInstructors; track instructor.id) {
+                        <tr class="hover:bg-gray-50 transition-colors">
+                           <!-- Nombre -->
+                           <td class="px-6 py-4 whitespace-nowrap">
+                              <div class="flex items-center gap-3">
+                                 <div
+                                    class="w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center font-semibold text-sm"
+                                 >
+                                    {{ getInitials(instructor) }}
+                                 </div>
+                                 <span class="font-medium text-gray-700">{{ getFullName(instructor) }}</span>
+                              </div>
+                           </td>
 
-                  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                  <tr
-                     mat-row
-                     *matRowDef="let row; columns: displayedColumns"
-                     class="hover:bg-gray-50 transition-colors"
-                  ></tr>
+                           <!-- CI -->
+                           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                              {{ instructor.ci }}
+                           </td>
+
+                           <!-- Celular -->
+                           <td class="px-6 py-4 whitespace-nowrap">
+                              <div class="flex items-center gap-2">
+                                 <svg
+                                    class="w-4 h-4 text-gray-500"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                 >
+                                    <path
+                                       stroke-linecap="round"
+                                       stroke-linejoin="round"
+                                       stroke-width="2"
+                                       d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                                    />
+                                 </svg>
+                                 <span class="text-sm text-gray-700">{{ instructor.cellphone }}</span>
+                              </div>
+                           </td>
+
+                           <!-- Email -->
+                           <td class="px-6 py-4 whitespace-nowrap">
+                              @if (instructor.email) {
+                                 <div class="flex items-center gap-2">
+                                    <svg
+                                       class="w-4 h-4 text-gray-500"
+                                       fill="none"
+                                       stroke="currentColor"
+                                       viewBox="0 0 24 24"
+                                    >
+                                       <path
+                                          stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          stroke-width="2"
+                                          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                                       />
+                                    </svg>
+                                    <span class="text-sm text-gray-700">{{ instructor.email }}</span>
+                                 </div>
+                              } @else {
+                                 <span class="text-gray-400 text-sm">No especificado</span>
+                              }
+                           </td>
+
+                           <!-- Sucursal -->
+                           <td class="px-6 py-4 whitespace-nowrap">
+                              <span class="bg-gray-100 text-gray-700 px-2 py-1 text-xs font-semibold rounded-full">
+                                 {{ instructor.branchName }}
+                              </span>
+                           </td>
+
+                           <!-- Estado -->
+                           <td class="px-6 py-4 whitespace-nowrap">
+                              @if (instructor.status ==='activo') {
+                                 <span class="bg-green-100 text-green-800 px-2 py-1 text-xs font-semibold rounded-full">
+                                    Activo
+                                 </span>
+                              } @else {
+                                 <span class="bg-red-100 text-red-800 px-2 py-1 text-xs font-semibold rounded-full">
+                                    Inactivo
+                                 </span>
+                              }
+                           </td>
+
+                           <!-- Acciones -->
+                           <td class="px-6 py-4 whitespace-nowrap text-right">
+                              <button
+                                 mat-icon-button
+                                 (click)="onViewDetail(instructor)"
+                                 matTooltip="Ver detalle"
+                                 class="text-blue-600 hover:text-blue-800"
+                              >
+                                 <mat-icon>visibility</mat-icon>
+                              </button>
+                              <button
+                                 mat-icon-button
+                                 (click)="onEditInstructor(instructor)"
+                                 matTooltip="Editar"
+                                 class="text-gray-600 hover:text-gray-800"
+                              >
+                                 <mat-icon>edit</mat-icon>
+                              </button>
+                              <button
+                                 mat-icon-button
+                                 (click)="deleteInstructor(instructor)"
+                                 matTooltip="Eliminar"
+                                 class="text-red-500 hover:text-white hover:bg-red-500 rounded-full bg-white border-none"
+                              >
+                                 <mat-icon>delete</mat-icon>
+                              </button>
+                           </td>
+                        </tr>
+                     }
+                  </tbody>
                </table>
             </div>
          }

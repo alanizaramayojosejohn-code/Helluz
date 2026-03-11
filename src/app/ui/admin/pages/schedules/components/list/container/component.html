@@ -17,6 +17,7 @@
          </button>
       </div>
 
+      <!-- Filtro -->
       <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-4 mb-6">
          <mat-form-field appearance="outline" class="w-full md:w-64">
             <mat-label>Filtrar por Sucursal</mat-label>
@@ -29,6 +30,7 @@
          </mat-form-field>
       </div>
 
+      <!-- Error -->
       @if (errorMessage()) {
          <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
             <div class="flex items-center gap-3">
@@ -44,6 +46,7 @@
          </div>
       }
 
+      <!-- Loading -->
       @if (isLoading()) {
          <div class="flex justify-center items-center py-12">
             <mat-spinner diameter="50"></mat-spinner>
@@ -52,6 +55,7 @@
 
       @if (!isLoading()) {
          @if ((schedules$ | async)?.length === 0) {
+            <!-- Empty state -->
             <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-12 text-center">
                <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
@@ -71,98 +75,113 @@
                </button>
             </div>
          } @else {
+            <!-- Tabla -->
             <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg overflow-x-auto">
-               <table mat-table [dataSource]="(schedules$ | async)!" class="w-full">
-
-                <ng-container matColumnDef="days">
-                     <th mat-header-cell *matHeaderCellDef class="font-semibold">Día</th>
-                     <td mat-cell *matCellDef="let schedule">
-                        <span class="font-medium text-gray-700">
-                           {{ getDaysLabel(schedule.days) }}
-                        </span>
-                     </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="time">
-                     <th mat-header-cell *matHeaderCellDef class="font-semibold">Horario</th>
-                     <td mat-cell *matCellDef="let schedule">
-                        <div class="flex items-center gap-2">
-                           <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path
-                                 stroke-linecap="round"
-                                 stroke-linejoin="round"
-                                 stroke-width="2"
-                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                              />
-                           </svg>
-                           <span>{{ getTimeRange(schedule) }}</span>
-                        </div>
-                     </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="discipline">
-                     <th mat-header-cell *matHeaderCellDef class="font-semibold">Disciplina</th>
-                     <td mat-cell *matCellDef="let schedule">
-                        <mat-chip [class]="getDisciplineColor(schedule.discipline) + ' text-white'">
-                           {{ getDisciplineLabel(schedule.discipline) }}
-                        </mat-chip>
-                     </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="instructor">
-                     <th mat-header-cell *matHeaderCellDef class="font-semibold">Instructor</th>
-                     <td mat-cell *matCellDef="let schedule">
-                        @if (schedule.instructorName) {
-                           <span class="text-gray-700">{{ schedule.instructorName }}</span>
-                        } @else {
-                           <span class="text-gray-400 text-sm">Sin asignar</span>
-                        }
-                     </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="branch">
-                     <th mat-header-cell *matHeaderCellDef class="font-semibold">Sucursal</th>
-                     <td mat-cell *matCellDef="let schedule">
-                        {{ schedule.branchName }}
-                     </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="actions">
-                     <th mat-header-cell *matHeaderCellDef class="font-semibold text-right">Acciones</th>
-                     <td mat-cell *matCellDef="let schedule" class="text-right">
-                        <button
-                           mat-icon-button
-                           (click)="onViewDetail(schedule)"
-                           matTooltip="Ver detalle"
-                           class="text-blue-600 hover:text-blue-800"
+               <table class="w-full min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                     <tr>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                           >Día</th
                         >
-                           <mat-icon>visibility</mat-icon>
-                        </button>
-                        <button
-                           mat-icon-button
-                           (click)="onEditSchedule(schedule)"
-                           matTooltip="Editar"
-                           class="text-gray-600 hover:text-gray-800"
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                           >Horario</th
                         >
-                           <mat-icon>edit</mat-icon>
-                        </button>
-                        <button
-                           class="text-red-500 bg-white hover:text-white hover:bg-red-500 border-none rounded-full"
-                           (click)="deleteSchedule(schedule)"
-                           mat-icon-button
-                           matTooltip="Editar"
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                           >Disciplina</th
                         >
-                           <mat-icon>delete</mat-icon>
-                        </button>
-                     </td>
-                  </ng-container>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                           >Instructor</th
+                        >
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                           >Sucursal</th
+                        >
+                        <th class="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                           >Acciones</th
+                        >
+                     </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                     @for (schedule of schedules$ | async; track schedule.id) {
+                        <tr class="hover:bg-gray-50 transition-colors">
+                           <!-- Día -->
+                           <td class="px-6 py-4 whitespace-nowrap">
+                              <span class="font-medium text-gray-700">{{ getDaysLabel(schedule.days) }}</span>
+                           </td>
 
-                  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                  <tr
-                     mat-row
-                     *matRowDef="let row; columns: displayedColumns"
-                     class="hover:bg-gray-50 transition-colors"
-                  ></tr>
+                           <!-- Horario -->
+                           <td class="px-6 py-4 whitespace-nowrap">
+                              <div class="flex items-center gap-2 text-gray-700">
+                                 <svg
+                                    class="w-4 h-4 text-gray-500"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                 >
+                                    <path
+                                       stroke-linecap="round"
+                                       stroke-linejoin="round"
+                                       stroke-width="2"
+                                       d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
+                                 </svg>
+                                 <span>{{ getTimeRange(schedule) }}</span>
+                              </div>
+                           </td>
+
+                           <!-- Disciplina -->
+                           <td class="px-6 py-4 whitespace-nowrap">
+                              <span
+                                 [class]="getDisciplineColor(schedule.discipline)"
+                                 class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full text-white"
+                              >
+                                 {{ getDisciplineLabel(schedule.discipline) }}
+                              </span>
+                           </td>
+
+                           <!-- Instructor -->
+                           <td class="px-6 py-4 whitespace-nowrap">
+                              @if (schedule.instructorName) {
+                                 <span class="text-gray-700">{{ schedule.instructorName }}</span>
+                              } @else {
+                                 <span class="text-gray-400 text-sm">Sin asignar</span>
+                              }
+                           </td>
+
+                           <!-- Sucursal -->
+                           <td class="px-6 py-4 whitespace-nowrap text-gray-700">
+                              {{ schedule.branchName }}
+                           </td>
+
+                           <!-- Acciones -->
+                           <td class="px-6 py-4 whitespace-nowrap text-right">
+                              <button
+                                 mat-icon-button
+                                 (click)="onViewDetail(schedule)"
+                                 matTooltip="Ver detalle"
+                                 class="text-blue-600 hover:text-blue-800"
+                              >
+                                 <mat-icon>visibility</mat-icon>
+                              </button>
+                              <button
+                                 mat-icon-button
+                                 (click)="onEditSchedule(schedule)"
+                                 matTooltip="Editar"
+                                 class="text-gray-600 hover:text-gray-800"
+                              >
+                                 <mat-icon>edit</mat-icon>
+                              </button>
+                              <button
+                                 mat-icon-button
+                                 (click)="deleteSchedule(schedule)"
+                                 matTooltip="Eliminar"
+                                 class="text-red-500 hover:text-white hover:bg-red-500 rounded-full"
+                              >
+                                 <mat-icon>delete</mat-icon>
+                              </button>
+                           </td>
+                        </tr>
+                     }
+                  </tbody>
                </table>
             </div>
          }

@@ -8,7 +8,7 @@ import { MatSelectModule } from '@angular/material/select'
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { UserService } from '../../../../../../../services/user/user.service'
 import { AuthService } from '../../../../../../../services/auth/auth.service'
-import { take } from 'rxjs/operators'
+
 @Component({
    selector: 'x-user-form',
    imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatProgressSpinnerModule],
@@ -49,7 +49,6 @@ export class UserForm implements OnInit {
 
    private initForm(): void {
       this.userForm = this.fb.group({
-         uid: [{ value: '', disabled: this.isEditMode() }, [Validators.required]],
          email: [{ value: '', disabled: this.isEditMode() }, [Validators.required, Validators.email]],
          name: ['', [Validators.required, Validators.minLength(2)]],
          lastname: ['', [Validators.required, Validators.minLength(2)]],
@@ -57,15 +56,15 @@ export class UserForm implements OnInit {
          status: ['activo', Validators.required],
       })
    }
-private loadCurrentUser(): void {
-  this.authService.currentUser$
-    .pipe(takeUntilDestroyed(this.destroyRef))
-    .subscribe((user) => {
-      if (user?.uid) {
-        this.currentUserId.set(user.uid);
-      }
-    });
-}
+
+   private loadCurrentUser(): void {
+      this.authService.currentUser$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((user) => {
+         if (user?.uid) {
+            this.currentUserId.set(user.uid)
+         }
+      })
+   }
+
    private loadUser(id: string): void {
       this.isLoading.set(true)
       this.errorMessage.set(null)
@@ -77,7 +76,6 @@ private loadCurrentUser(): void {
             next: (user) => {
                if (user) {
                   this.userForm.patchValue({
-                     uid: user.id,
                      email: user.email,
                      name: user.name,
                      lastname: user.lastname,
@@ -95,18 +93,17 @@ private loadCurrentUser(): void {
    }
 
    async onSubmit(): Promise<void> {
-      if (!this.validateForm()) {
-         return
-      }
+      if (!this.validateForm()) return
 
-      this.resetErrors()
+      this.errorMessage.set(null)
       this.isSubmitting.set(true)
 
       try {
          await this.saveUser()
          this.saved.emit()
       } catch (error) {
-         this.handleSaveError(error)
+         const message = error instanceof Error ? error.message : 'Error al guardar usuario'
+         this.errorMessage.set(message)
       } finally {
          this.isSubmitting.set(false)
       }
@@ -120,10 +117,12 @@ private loadCurrentUser(): void {
       }
       return true
    }
+
    private async saveUser(): Promise<void> {
       const formValue = this.userForm.getRawValue()
 
       if (this.isEditMode() && this.userId()) {
+         // Edición: actualiza el doc existente en Firestore
          await this.userService.updateUser(this.userId()!, {
             name: formValue.name,
             lastname: formValue.lastname,
@@ -131,40 +130,26 @@ private loadCurrentUser(): void {
             status: formValue.status,
          })
       } else {
+         // Creación: pre-registra al usuario en `usuariosPendientes`
          const currentUserId = this.currentUserId()
-         if (!currentUserId) {
-            throw new Error('No se pudo obtener el usuario actual')
-         }
+         if (!currentUserId) throw new Error('No se pudo obtener el usuario actual')
 
-         await this.userService.createUserInFirestore(
+         await this.userService.preRegistrarUsuario(
             {
-               uid: formValue.uid,
                email: formValue.email,
                name: formValue.name,
                lastname: formValue.lastname,
                role: formValue.role,
                status: formValue.status,
+               createdBy: currentUserId,
             },
             currentUserId
          )
       }
    }
-   private resetErrors(): void {
-      this.errorMessage.set(null)
-   }
-
-   private handleSaveError(error: unknown): void {
-      const message = error instanceof Error ? error.message : 'Error al guardar usuario'
-      this.errorMessage.set(message)
-      console.error('Error al guardar usuario:', error)
-   }
 
    onCancel(): void {
       this.cancelled.emit()
-   }
-
-   getFormTitle(): string {
-      return this.isEditMode() ? 'Editar Usuario' : 'Registrar Usuario'
    }
 
    hasError(field: string): boolean {
@@ -175,16 +160,9 @@ private loadCurrentUser(): void {
    getErrorMessage(field: string): string {
       const control = this.userForm.get(field)
       if (!control) return ''
-
-      if (control.hasError('required')) {
-         return 'Este campo es requerido'
-      }
-      if (control.hasError('minLength')) {
-         return `Mínimo ${control.getError('minLength').requiredLength} caracteres`
-      }
-      if (control.hasError('email')) {
-         return 'Email no válido'
-      }
+      if (control.hasError('required')) return 'Este campo es requerido'
+      if (control.hasError('minlength')) return `Mínimo ${control.getError('minlength').requiredLength} caracteres`
+      if (control.hasError('email')) return 'Email no válido'
       return ''
    }
 }

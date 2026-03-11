@@ -9,5 +9,5 @@ export const environment = {
       appId: '1:681774842889:web:ec876a1f122b042d1524d8',
       measurementId: 'G-YZ1TNDTHRM',
    },
-   recaptchaSiteKey: '6LcvWoQsAAAAAERr-0AIzKw85Q7LXnWzM3vK0lT8',
+  //  recaptchaSiteKey: '6LcvWoQsAAAAAERr-0AIzKw85Q7LXnWzM3vK0lT8',
 }

@@ -20,14 +20,14 @@ export const appConfig: ApplicationConfig = {
       provideAnimationsAsync(),
 
       provideFirebaseApp(() => initializeApp(environment.firebase)),
-      ...(environment.production ? [
-        provideAppCheck(() =>
-          initializeAppCheck(undefined, {
-            provider: new ReCaptchaV3Provider(environment.recaptchaSiteKey),
-            isTokenAutoRefreshEnabled: true,
-          })
-        )
-      ] : []),
+      // ...(environment.production ? [
+      //   provideAppCheck(() =>
+      //     initializeAppCheck(undefined, {
+      //       provider: new ReCaptchaV3Provider(environment.recaptchaSiteKey),
+      //       isTokenAutoRefreshEnabled: true,
+      //     })
+      //   )
+      // ] : []),
       provideAuth(() => getAuth()),
       provideFirestore(() => getFirestore()),
       provideStorage(() => getStorage()),

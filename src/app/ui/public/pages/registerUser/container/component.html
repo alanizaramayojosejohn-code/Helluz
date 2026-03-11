@@ -1,0 +1,138 @@
+<div class="min-h-screen bg-white flex items-center justify-center p-6">
+  <div class="w-full max-w-md">
+
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold text-red-600 mb-2">Crear cuenta</h1>
+      <p class="text-gray-400">Ingresa tu email y crea una contraseña para registrarte</p>
+    </div>
+
+    <!-- Mensaje de éxito (cuenta inactiva / pendiente de activación) -->
+    @if (successMessage()) {
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div class="flex items-start gap-3">
+          <svg class="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          <p class="text-sm text-blue-800">{{ successMessage() }}</p>
+        </div>
+      </div>
+    }
+
+    @if (!successMessage()) {
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-6 space-y-5">
+
+          <!-- Email -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" formControlName="email" placeholder="ejemplo@correo.com" autocomplete="email" />
+            <mat-hint>Usa el email con el que fuiste pre-registrado</mat-hint>
+            @if (hasError('email')) {
+              <mat-error>{{ getErrorMessage('email') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Contraseña -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Contraseña</mat-label>
+            <input
+              matInput
+              [type]="showPassword() ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Mínimo 6 caracteres"
+              autocomplete="new-password"
+            />
+            <button type="button" matSuffix (click)="togglePassword()" class="text-gray-400 hover:text-gray-600 transition">
+              @if (showPassword()) {
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                </svg>
+              } @else {
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              }
+            </button>
+            @if (hasError('password')) {
+              <mat-error>{{ getErrorMessage('password') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Confirmar contraseña -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Confirmar contraseña</mat-label>
+            <input
+              matInput
+              [type]="showConfirm() ? 'text' : 'password'"
+              formControlName="confirmPassword"
+              placeholder="Repite tu contraseña"
+              autocomplete="new-password"
+            />
+            <button type="button" matSuffix (click)="toggleConfirm()" class="text-gray-400 hover:text-gray-600 transition">
+              @if (showConfirm()) {
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                </svg>
+              } @else {
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              }
+            </button>
+            @if (hasFormError('passwordMismatch')) {
+              <mat-error>Las contraseñas no coinciden</mat-error>
+            }
+          </mat-form-field>
+
+        </div>
+
+        <!-- Error -->
+        @if (errorMessage()) {
+          <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              </svg>
+              <p class="text-sm text-red-800">{{ errorMessage() }}</p>
+            </div>
+          </div>
+        }
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          [disabled]="registerForm.invalid || isSubmitting()"
+          class="w-full bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50 flex items-center justify-center gap-2"
+        >
+          @if (isSubmitting()) {
+            <svg class="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Creando cuenta...
+          } @else {
+            Crear cuenta
+          }
+        </button>
+
+        <!-- Link a login -->
+        <p class="text-center text-sm text-gray-500">
+          ¿Ya tienes cuenta?
+          <a routerLink="/log-in" class="text-red-600 font-semibold hover:underline">Inicia sesión</a>
+        </p>
+
+      </form>
+    }
+
+    <!-- Volver al login desde mensaje de éxito -->
+    @if (successMessage()) {
+      <a routerLink="/log-in" class="block w-full text-center bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition">
+        Volver al inicio de sesión
+      </a>
+    }
+
+  </div>
+</div>
