@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core'
-import { from, Observable, catchError, throwError, map, combineLatest, firstValueFrom } from 'rxjs'
+import { from, Observable, catchError, throwError, map, combineLatest, firstValueFrom, switchMap } from 'rxjs'
 import { Enrollment, CreateEnrollmentDto, UpdateEnrollmentDto, EnrollmentPage } from '../../models/enrollment.model'
 import { EnrollmentQueryService } from './enrollment-query.service'
 import { v7 as uuidv7 } from 'uuid'
@@ -10,7 +10,7 @@ export class EnrollmentService {
    private query = inject(EnrollmentQueryService)
 
    getEnrollments(): Observable<Enrollment[]> {
-      return this.query.getAll()
+      return from(this.checkExpiredEnrollments()).pipe(switchMap(() => this.query.getAll()))
    }
 
    getEnrollmentById(id: string): Observable<Enrollment | undefined> {
@@ -33,12 +33,15 @@ export class EnrollmentService {
       return this.query.getExpiring(days)
    }
 
-   // Filtrar por fechas
-    getEnrollmentsByBranchAndDateRange( scheduleId: string, startDate: Date, endDate: Date): Observable<Enrollment[]> {
-      return this.query.getByBranchAndDateRange( scheduleId, startDate, endDate);
-    }
+   getEnrollmentsByBranchAndDateRange(scheduleId: string, startDate: Date, endDate: Date): Observable<Enrollment[]> {
+      return this.query.getByBranchAndDateRange(scheduleId, startDate, endDate)
+   }
 
-   async addEnrollment(enrollment: CreateEnrollmentDto, currentUserId:string, currentUserName: string): Promise<string> {
+   async addEnrollment(
+      enrollment: CreateEnrollmentDto,
+      currentUserId: string,
+      currentUserName: string
+   ): Promise<string> {
       try {
          const id = uuidv7()
 
@@ -66,7 +69,12 @@ export class EnrollmentService {
       }
    }
 
-   async updateEnrollment(id: string, enrollment: UpdateEnrollmentDto, currentUserId:string, currentUserName: string): Promise<void> {
+   async updateEnrollment(
+      id: string,
+      enrollment: UpdateEnrollmentDto,
+      currentUserId: string,
+      currentUserName: string
+   ): Promise<void> {
       try {
          await this.query.update(id, {
             ...enrollment,
@@ -113,28 +121,20 @@ export class EnrollmentService {
             status: newRemainingSessions === 0 ? 'completada' : enrollment.status,
          })
 
-         console.log('✅ Sesiones incrementadas correctamente') // Debug
       } catch (error) {
          console.error('❌ Error al incrementar sesiones usadas:', error)
          throw error
       }
    }
-   async checkExpiredEnrollments(): Promise<void> {
-      const allEnrollments = await this.query.getAll().toPromise()
-      const today = new Date()
 
-      for (const enrollment of allEnrollments || []) {
-         if (enrollment.status === 'activa') {
-            const endDate = enrollment.endDate.toDate()
+  async checkExpiredEnrollments(): Promise<void> {
+   const today = new Date()
+   const expired = await firstValueFrom(this.query.getExpiredActive(today))
 
-            if (endDate < today) {
-               await this.query.update(enrollment.id, {
-                  status: 'vencida',
-               })
-            }
-         }
-      }
-   }
+   await Promise.all(
+      (expired || []).map(e => this.query.update(e.id, { status: 'vencida' }))
+   )
+}
 
    calculateEndDate(startDate: Date, durationDays: number): Date {
       const endDate = new Date(startDate)
@@ -213,4 +213,10 @@ export class EnrollmentService {
          return 0
       }
    }
+
+
+
+
+
+
 }

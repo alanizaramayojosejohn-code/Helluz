@@ -79,7 +79,6 @@ export class EnrollmentDetail implements OnInit {
             next: (enrollment) => {
                if (enrollment) {
                   this.enrollment.set(enrollment)
-                  this.loadAttendances(enrollment.id)
                } else {
                   this.errorMessage.set('Inscripción no encontrada')
                }
@@ -92,15 +91,7 @@ export class EnrollmentDetail implements OnInit {
          })
    }
 
-   private loadAttendances(enrollmentId: string): void {
-      this.attendanceService
-         .getAttendancesByEnrollment(enrollmentId)
-         .pipe(takeUntilDestroyed(this.destroyRef))
-         .subscribe({
-            next: (attendances) => this.attendances.set(attendances),
-            error: () => console.error('Error al cargar asistencias'),
-         })
-   }
+
 
    onEdit(): void {
       this.edit.emit(this.enrollmentId())
@@ -153,15 +144,6 @@ export class EnrollmentDetail implements OnInit {
       return classes[status] || 'bg-gray-100 text-gray-800'
    }
 
-   getAttendanceStatusClass(status: string): string {
-      const classes: Record<string, string> = {
-         presente: 'bg-green-100 text-green-800',
-         retrasado: 'bg-yellow-100 text-yellow-800',
-         falta: 'bg-red-100 text-red-800',
-         permiso: 'bg-blue-100 text-blue-800',
-      }
-      return classes[status] || 'bg-gray-100 text-gray-800'
-   }
 
    getAllowedDaysText(days: number[]): string {
       const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']

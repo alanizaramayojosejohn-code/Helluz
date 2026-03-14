@@ -85,10 +85,11 @@ export class StudentAttendanceQueryService {
    async create(id: string, data: StudentAttendance): Promise<void> {
       const docRef = doc(this.firestore, this.collectionName, id)
       const { id: _, ...dataWithoutId } = data
-      await setDoc(docRef, {
+      const finalData = {
          ...dataWithoutId,
          createdAt: Timestamp.now(),
-      })
+      }
+      await setDoc(docRef, finalData)
    }
 
    async update(id: string, data: Partial<StudentAttendance>): Promise<void> {

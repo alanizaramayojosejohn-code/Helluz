@@ -121,7 +121,7 @@ async markAttendance(request: StudentAttendanceMarkRequest): Promise<{
     };
 
   } catch (error) {
-    console.error('❌ Error al marcar asistencia:', error); // ✅ Mejor log
+    console.error('❌ Error al marcar asistencia:', error); 
     throw error;
   }
 }

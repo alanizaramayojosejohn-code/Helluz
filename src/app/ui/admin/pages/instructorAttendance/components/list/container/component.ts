@@ -42,7 +42,7 @@ export default class InstructorAttendanceListComponent implements OnInit {
 
    backToMark = output<void>()
 
-   displayedColumns: string[] = ['createdAt', 'instructorName', 'schedule', 'punctuality', 'hours', 'status', 'actions']
+   displayedColumns: string[] = ['createdAt', 'instructorName', 'schedule', 'punctuality', 'hours', 'status']
 
    private selectedBranchId$ = new BehaviorSubject<string>('')
    private selectedDate$ = new BehaviorSubject<Date>(new Date())

@@ -10,7 +10,8 @@ import { MatTooltipModule } from '@angular/material/tooltip'
 import { UserService } from '../../../../../../../services/user/user.service'
 import { User } from '../../../../../../../models/user.model'
 import { ConfirmDialogService } from '../../../../../../../../shared/services/confirm-dialog.service'
-import { MatIcon } from "@angular/material/icon";
+import { MatIcon } from '@angular/material/icon'
+import { UserPending } from '../../../../../../../models/userPending'
 
 @Component({
    selector: 'x-user-list',
@@ -26,7 +27,7 @@ export class UserList implements OnInit {
    readonly viewDetail = output<string>()
 
    users$!: Observable<User[]>
-
+   usersPending$!: Observable<UserPending[]>
    readonly isLoading = signal(false)
    readonly errorMessage = signal<string | null>(null)
    readonly roleFilter = signal<'all' | 'admin' | 'instructor'>('all')
@@ -48,6 +49,15 @@ export class UserList implements OnInit {
             this.isLoading.set(false)
          },
       })
+
+      this.usersPending$ = this.userService.getPendientes()
+      this.usersPending$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+         next: () => this.isLoading.set(false),
+         error: () => {
+            this.errorMessage.set('Error al cargar usuarios')
+            this.isLoading.set(false)
+         },
+      })
    }
 
    onCreateUser(): void {
@@ -63,6 +73,15 @@ export class UserList implements OnInit {
    onViewDetail(user: User): void {
       if (user.id) {
          this.viewDetail.emit(user.id)
+      }
+   }
+
+   async onDeletePending(email: string): Promise<void> {
+      try {
+         await this.userService.cancelarPreRegistro(email)
+      } catch (error) {
+         const message = error instanceof Error ? error.message : 'Error al cancelar el preregistro'
+         this.errorMessage.set(message)
       }
    }
 
@@ -107,16 +126,16 @@ export class UserList implements OnInit {
    }
    private readonly confirmDialog = inject(ConfirmDialogService)
 
-      async deleteUser(user: User): Promise<void> {
-         this.confirmDialog.confirmDelete(user.name, 'el usuario').subscribe(async (confirmed) => {
-            if (confirmed) {
-               try {
-                  await this.userService.deleteUser(user.id!)
-                  this.loadData()
-               } catch (error) {
-                  console.error('Error al eliminar:', error)
-               }
+   async deleteUser(user: User): Promise<void> {
+      this.confirmDialog.confirmDelete(user.name, 'el usuario').subscribe(async (confirmed) => {
+         if (confirmed) {
+            try {
+               await this.userService.deleteUser(user.id!)
+               this.loadData()
+            } catch (error) {
+               console.error('Error al eliminar:', error)
             }
-         })
-      }
+         }
+      })
+   }
 }
