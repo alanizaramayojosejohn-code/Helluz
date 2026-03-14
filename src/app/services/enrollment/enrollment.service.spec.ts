@@ -169,7 +169,7 @@
 //          studentName: 'Juan Pérez',
 //          membershipId: 'membership1',
 //          membershipName: 'Mensual',
-//          branchId: 'branch1',
+//          branchId: 'branch1',b
 //          branchName: 'Centro',
 //          startDate: Timestamp.now(),
 //          endDate: Timestamp.now(),
