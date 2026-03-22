@@ -1,109 +1,421 @@
-<div class="bg-black font-body text-white flex flex-col min-h-screen relative">
-   <div class="absolute inset-0 bg-black/70 z-[1]"></div>
-
-   <section class="relative z-[2] flex-1 flex items-center justify-center text-center px-6">
-      <div class="max-w-3xl mx-auto">
-         <h1
-            class="font-display text-4xl md:text-5xl text-white text-glow tracking-wide mb-4 transition-all hover:text-5xl hover:md:text-6xl duration-500"
-         >
-            Control de Asistencia Academia HELLUZ
-         </h1>
+<div class="bg-[#0C0C0C] text-white min-h-screen flex flex-col">
+   <!-- Navbar -->
+   <nav class="flex items-center justify-between h-[72px] px-6 lg:px-[80px]">
+      <a href="/" class="flex items-center gap-[10px]">
          <img
             src="/images/Logo.webp"
-            alt="Logo Helluz"
-            class="w-3/12 mt-10 rounded-full shadow-md shadow-red-700 transition-all hover:shadow-lg hover:shadow-red-500 hover:w-4/12 duration-500"
+            alt="Helluz"
+            class="w-9 h-9 rounded-md object-cover"
          />
+         <span class="font-sora text-[22px] font-bold text-white tracking-[-0.5px]">
+            Helluz
+         </span>
+      </a>
 
-         <div class="flex flex-wrap m-10 justify-center gap-4">
-            <a href="/log-in"
-               ><button
-                  class="bg-black py-2 px-4 border-solid border-gray-950 text-lg hover:text-xl shadow-sm shadow-red-700 rounded-full hover:shadow-md hover:shadow-red-500 text-white transition-all hover:px-6 hover:py-3 duration-500"
-               >
-                  Ingresar al Sistema
-               </button>
-            </a>
-         </div>
+      <div class="hidden md:flex items-center gap-8">
+         <a href="#caracteristicas" class="font-inter text-[14px] font-medium text-[#8A8A8A] hover:text-white transition-colors">
+            Características
+         </a>
+         <a href="#como-funciona" class="font-inter text-[14px] font-medium text-[#8A8A8A] hover:text-white transition-colors">
+            Cómo Funciona
+         </a>
+         <a href="#contacto" class="font-inter text-[14px] font-medium text-[#8A8A8A] hover:text-white transition-colors">
+            Contacto
+         </a>
+      </div>
 
-         <div class="mt-12">
-            <p class="text-xl text-gray-300 transition-all hover:text-2xl duration-500">
-               Registra tu Asistencia aquí
+      <div class="flex items-center gap-4">
+         <a
+            href="/log-in"
+            class="hidden sm:flex items-center px-5 py-[10px] rounded-md border border-[#2A2A2A] hover:border-[#3A3A3A] transition-colors"
+         >
+            <span class="font-inter text-[13px] font-medium text-white">Iniciar Sesión</span>
+         </a>
+         <a
+            href="/registrarUsuario"
+            class="flex items-center px-5 py-[10px] rounded-md bg-[#E42313] hover:bg-[#c91f10] transition-colors"
+         >
+            <span class="font-inter text-[13px] font-semibold text-white">Prueba Gratis</span>
+         </a>
+      </div>
+   </nav>
+
+   <!-- Hero Section -->
+   <section class="flex flex-col items-center px-6 lg:px-[80px] pt-16 lg:pt-[100px] pb-[80px] gap-10">
+      <!-- Badge -->
+      <div
+         class="flex items-center gap-2 px-4 py-[6px] rounded-full border border-[#2A2A2A] bg-[#1A1A1A]"
+      >
+         <span class="w-[6px] h-[6px] rounded-full bg-[#32D74B]"></span>
+         <span class="font-inter text-[12px] font-medium text-[#8A8A8A]">
+            Plataforma #1 en gestión de gimnasios
+         </span>
+      </div>
+
+      <!-- Headline -->
+      <div class="flex flex-col items-center gap-6 max-w-[900px]">
+         <h1
+            class="font-sora text-[36px] md:text-[50px] lg:text-[64px] font-bold text-white text-center leading-[1.05] tracking-[-2px]"
+         >
+            Gestiona tu gimnasio con total control
+         </h1>
+         <p
+            class="font-inter text-[16px] md:text-[18px] text-[#8A8A8A] text-center leading-[1.6] max-w-[680px]"
+         >
+            Membresías, asistencias, horarios y finanzas en un solo lugar. Automatiza tu
+            operación y enfócate en lo que importa: tus alumnos.
+         </p>
+      </div>
+
+      <!-- CTAs -->
+      <div class="flex flex-col sm:flex-row items-center gap-4">
+         <a
+            href="/log-in"
+            class="flex items-center gap-2 px-8 py-4 rounded-lg bg-[#E42313] hover:bg-[#c91f10] transition-colors"
+         >
+            <mat-icon class="text-white text-[18px]">arrow_forward</mat-icon>
+            <span class="font-sora text-[16px] font-semibold text-white">Comenzar Ahora</span>
+         </a>
+         <a
+            href="/asistenciaalumnos"
+            class="flex items-center gap-2 px-8 py-4 rounded-lg border border-[#2A2A2A] hover:border-[#3A3A3A] transition-colors"
+         >
+            <mat-icon class="text-white text-[18px]">fingerprint</mat-icon>
+            <span class="font-sora text-[16px] font-medium text-white">Marcar Asistencia</span>
+         </a>
+      </div>
+
+      <!-- Trust -->
+      <div class="flex items-center gap-6 flex-wrap justify-center">
+         <span class="font-inter text-[13px] font-medium text-[#525252]">+500 gimnasios</span>
+         <span class="w-1 h-1 rounded-full bg-[#525252]"></span>
+         <span class="font-inter text-[13px] font-medium text-[#525252]">+50,000 alumnos</span>
+         <span class="w-1 h-1 rounded-full bg-[#525252]"></span>
+         <span class="font-inter text-[13px] font-medium text-[#525252]">99.9% uptime</span>
+      </div>
+
+      <!-- Product Preview -->
+      <div
+         class="w-full max-w-[1000px] h-[300px] md:h-[450px] lg:h-[560px] rounded-xl border border-[#2A2A2A] overflow-hidden"
+      >
+         <img
+            src="/images/Logo.webp"
+            alt="Dashboard Preview"
+            class="w-full h-full object-cover opacity-30"
+         />
+      </div>
+   </section>
+
+   <!-- Features Section -->
+   <section
+      id="caracteristicas"
+      class="flex flex-col items-center px-6 lg:px-[80px] py-[80px] gap-12"
+   >
+      <!-- Header -->
+      <div class="flex flex-col items-center gap-4 max-w-[700px]">
+         <div class="w-10 h-[3px] bg-[#E42313]"></div>
+         <span class="font-inter text-[11px] font-bold text-[#E42313] tracking-[2px] uppercase">
+            Características
+         </span>
+         <h2
+            class="font-sora text-[28px] md:text-[38px] font-bold text-white text-center leading-[1.1] tracking-[-1.5px]"
+         >
+            Todo lo que necesitas para tu gimnasio
+         </h2>
+         <p class="font-inter text-[16px] text-[#8A8A8A] text-center leading-[1.6] max-w-[600px]">
+            Herramientas potentes diseñadas para simplificar cada aspecto de la gestión de tu
+            negocio fitness.
+         </p>
+      </div>
+
+      <!-- Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 w-full max-w-[1280px]">
+         <!-- Feature 1 -->
+         <div
+            class="flex flex-col gap-4 p-7 bg-[#1A1A1A] rounded-xl border border-[#2A2A2A]"
+         >
+            <div
+               class="flex items-center justify-center w-[44px] h-[44px] bg-[#E4231320] rounded-[10px]"
+            >
+               <mat-icon class="text-[#E42313]">groups</mat-icon>
+            </div>
+            <h3 class="font-sora text-[18px] font-bold text-white tracking-[-0.5px]">
+               Gestión de Alumnos
+            </h3>
+            <p class="font-inter text-[14px] text-[#8A8A8A] leading-[1.5]">
+               Registra, organiza y da seguimiento a todos tus alumnos. Historial completo de
+               membresías y asistencias.
             </p>
          </div>
-         <div class="flex flex-wrap justify-center gap-4 mt-4">
-            <a href="/asistenciaalumnos"
-               ><button
-                  class="bg-black py-2 px-8 m-4 border-solid border-gray-950 text-lg hover:text-xl shadow-sm shadow-red-900 rounded-full hover:shadow-md hover:shadow-red-500 text-white transition-all hover:px-12 hover:py-3 duration-500"
-               >
+
+         <!-- Feature 2 -->
+         <div
+            class="flex flex-col gap-4 p-7 bg-[#1A1A1A] rounded-xl border border-[#2A2A2A]"
+         >
+            <div
+               class="flex items-center justify-center w-[44px] h-[44px] bg-[#E4231320] rounded-[10px]"
+            >
+               <mat-icon class="text-[#E42313]">credit_card</mat-icon>
+            </div>
+            <h3 class="font-sora text-[18px] font-bold text-white tracking-[-0.5px]">
+               Membresías Inteligentes
+            </h3>
+            <p class="font-inter text-[14px] text-[#8A8A8A] leading-[1.5]">
+               Crea planes flexibles, controla vencimientos y automatiza renovaciones. Sin perder
+               un solo pago.
+            </p>
+         </div>
+
+         <!-- Feature 3 -->
+         <div
+            class="flex flex-col gap-4 p-7 bg-[#1A1A1A] rounded-xl border border-[#2A2A2A]"
+         >
+            <div
+               class="flex items-center justify-center w-[44px] h-[44px] bg-[#E4231320] rounded-[10px]"
+            >
+               <mat-icon class="text-[#E42313]">calendar_month</mat-icon>
+            </div>
+            <h3 class="font-sora text-[18px] font-bold text-white tracking-[-0.5px]">
+               Horarios y Clases
+            </h3>
+            <p class="font-inter text-[14px] text-[#8A8A8A] leading-[1.5]">
+               Programa clases, asigna instructores y permite a tus alumnos consultar horarios en
+               tiempo real.
+            </p>
+         </div>
+
+         <!-- Feature 4 -->
+         <div
+            class="flex flex-col gap-4 p-7 bg-[#1A1A1A] rounded-xl border border-[#2A2A2A]"
+         >
+            <div
+               class="flex items-center justify-center w-[44px] h-[44px] bg-[#E4231320] rounded-[10px]"
+            >
+               <mat-icon class="text-[#E42313]">trending_up</mat-icon>
+            </div>
+            <h3 class="font-sora text-[18px] font-bold text-white tracking-[-0.5px]">
+               Finanzas y Reportes
+            </h3>
+            <p class="font-inter text-[14px] text-[#8A8A8A] leading-[1.5]">
+               Visualiza ingresos, controla pagos pendientes y genera reportes detallados para
+               tomar mejores decisiones.
+            </p>
+         </div>
+      </div>
+   </section>
+
+   <!-- How It Works Section -->
+   <section
+      id="como-funciona"
+      class="flex flex-col items-center px-6 lg:px-[80px] py-[80px] gap-12 bg-[#111111]"
+   >
+      <!-- Header -->
+      <div class="flex flex-col items-center gap-4 max-w-[600px]">
+         <div class="w-10 h-[3px] bg-[#E42313]"></div>
+         <span class="font-inter text-[11px] font-bold text-[#E42313] tracking-[2px] uppercase">
+            Cómo Funciona
+         </span>
+         <h2
+            class="font-sora text-[28px] md:text-[38px] font-bold text-white text-center leading-[1.1] tracking-[-1.5px]"
+         >
+            Empieza en 3 simples pasos
+         </h2>
+      </div>
+
+      <!-- Steps -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-[1280px]">
+         <!-- Step 1 -->
+         <div
+            class="flex flex-col items-center gap-5 p-8 bg-[#1A1A1A] rounded-xl border border-[#2A2A2A]"
+         >
+            <div
+               class="flex items-center justify-center w-12 h-12 bg-[#E42313] rounded-full"
+            >
+               <span class="font-sora text-[20px] font-bold text-white">1</span>
+            </div>
+            <h3 class="font-sora text-[20px] font-bold text-white text-center">
+               Crea tu cuenta
+            </h3>
+            <p class="font-inter text-[14px] text-[#8A8A8A] text-center leading-[1.5]">
+               Regístrate gratis y configura tu gimnasio en minutos. Sin tarjeta de crédito.
+            </p>
+         </div>
+
+         <!-- Step 2 -->
+         <div
+            class="flex flex-col items-center gap-5 p-8 bg-[#1A1A1A] rounded-xl border border-[#2A2A2A]"
+         >
+            <div
+               class="flex items-center justify-center w-12 h-12 bg-[#E42313] rounded-full"
+            >
+               <span class="font-sora text-[20px] font-bold text-white">2</span>
+            </div>
+            <h3 class="font-sora text-[20px] font-bold text-white text-center">
+               Agrega tu equipo
+            </h3>
+            <p class="font-inter text-[14px] text-[#8A8A8A] text-center leading-[1.5]">
+               Invita instructores, registra alumnos y configura tus membresías y horarios.
+            </p>
+         </div>
+
+         <!-- Step 3 -->
+         <div
+            class="flex flex-col items-center gap-5 p-8 bg-[#1A1A1A] rounded-xl border border-[#2A2A2A]"
+         >
+            <div
+               class="flex items-center justify-center w-12 h-12 bg-[#E42313] rounded-full"
+            >
+               <span class="font-sora text-[20px] font-bold text-white">3</span>
+            </div>
+            <h3 class="font-sora text-[20px] font-bold text-white text-center">
+               Gestiona y crece
+            </h3>
+            <p class="font-inter text-[14px] text-[#8A8A8A] text-center leading-[1.5]">
+               Controla asistencias, cobra membresías y analiza el rendimiento de tu negocio.
+            </p>
+         </div>
+      </div>
+   </section>
+
+   <!-- Final CTA Section -->
+   <section
+      class="flex flex-col items-center px-6 lg:px-[80px] py-[100px] gap-8"
+      style="background: linear-gradient(180deg, #E42313 0%, #0C0C0C 100%)"
+   >
+      <h2
+         class="font-sora text-[32px] md:text-[44px] font-bold text-white text-center leading-[1.1] tracking-[-1.5px] max-w-[800px]"
+      >
+         Transforma la gestión de tu gimnasio hoy
+      </h2>
+      <p
+         class="font-inter text-[16px] md:text-[18px] text-white/80 text-center leading-[1.6] max-w-[600px]"
+      >
+         Únete a más de 500 gimnasios que ya confían en Helluz. Prueba gratis por 14 días, sin
+         compromiso.
+      </p>
+
+      <div class="flex flex-col sm:flex-row items-center gap-4">
+         <a
+            href="/registrarUsuario"
+            class="flex items-center gap-2 px-10 py-[18px] rounded-lg bg-white hover:bg-gray-100 transition-colors"
+         >
+            <span class="font-sora text-[16px] font-bold text-[#0C0C0C]">Comenzar Gratis</span>
+            <mat-icon class="text-[#0C0C0C] text-[18px]">arrow_forward</mat-icon>
+         </a>
+         <a
+            href="https://wa.me/59160422094?text=Hola,%20quiero%20más%20información"
+            target="_blank"
+            class="flex items-center px-10 py-[18px] rounded-lg border border-white/30 hover:border-white/50 transition-colors"
+         >
+            <span class="font-sora text-[16px] font-medium text-white">Contactar Ventas</span>
+         </a>
+      </div>
+
+      <div class="flex items-center gap-2">
+         <mat-icon class="text-white/50 text-[14px]">shield</mat-icon>
+         <span class="font-inter text-[13px] text-white/50">
+            Sin tarjeta de crédito requerida · Cancela cuando quieras
+         </span>
+      </div>
+   </section>
+
+   <!-- Footer -->
+   <footer
+      id="contacto"
+      class="flex flex-col gap-10 px-6 lg:px-[80px] py-12 border-t border-[#2A2A2A]"
+   >
+      <div class="flex flex-col lg:flex-row justify-between gap-10">
+         <!-- Brand -->
+         <div class="flex flex-col gap-3 max-w-[280px]">
+            <div class="flex items-center gap-[10px]">
+               <img
+                  src="/images/Logo.webp"
+                  alt="Helluz"
+                  class="w-10 h-10 rounded-md object-cover"
+               />
+               <span class="font-sora text-[18px] font-bold text-white">Helluz</span>
+            </div>
+            <p class="font-inter text-[13px] text-[#525252] leading-[1.5]">
+               La plataforma integral para la gestión de gimnasios y centros fitness.
+            </p>
+         </div>
+
+         <!-- Link Columns -->
+         <div class="flex flex-wrap gap-16">
+            <div class="flex flex-col gap-3">
+               <span class="font-inter text-[11px] font-bold text-[#8A8A8A] tracking-[2px] uppercase">
+                  Producto
+               </span>
+               <a href="#caracteristicas" class="font-inter text-[13px] text-[#525252] hover:text-white transition-colors">
+                  Características
+               </a>
+               <a href="/log-in" class="font-inter text-[13px] text-[#525252] hover:text-white transition-colors">
+                  Ingresar
+               </a>
+               <a href="/asistenciaalumnos" class="font-inter text-[13px] text-[#525252] hover:text-white transition-colors">
                   Marcar Asistencia
-               </button>
+               </a>
+            </div>
+
+            <div class="flex flex-col gap-3">
+               <span class="font-inter text-[11px] font-bold text-[#8A8A8A] tracking-[2px] uppercase">
+                  Empresa
+               </span>
+               <a href="https://wa.me/59160422094?text=Hola,%20quiero%20más%20información" target="_blank" class="font-inter text-[13px] text-[#525252] hover:text-white transition-colors">
+                  Contacto
+               </a>
+               <a href="/registrarUsuario" class="font-inter text-[13px] text-[#525252] hover:text-white transition-colors">
+                  Registrarse
+               </a>
+            </div>
+
+            <div class="flex flex-col gap-3">
+               <span class="font-inter text-[11px] font-bold text-[#8A8A8A] tracking-[2px] uppercase">
+                  Legal
+               </span>
+               <span class="font-inter text-[13px] text-[#525252]">Privacidad</span>
+               <span class="font-inter text-[13px] text-[#525252]">Términos</span>
+            </div>
+         </div>
+      </div>
+
+      <!-- Copyright Bar -->
+      <div
+         class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-[#2A2A2A]"
+      >
+         <span class="font-inter text-[12px] text-[#525252]">
+            © 2026 Helluz. Todos los derechos reservados.
+         </span>
+         <div class="flex items-center gap-4">
+            <a
+               href="https://www.instagram.com/helluzteam_or/"
+               target="_blank"
+               class="text-[#525252] hover:text-white transition-colors"
+            >
+               <i class="fab fa-instagram text-[16px]"></i>
+            </a>
+            <a
+               href="https://www.facebook.com/AsociacionDepartamentalDeArtesMarcialesMixtasOruro"
+               target="_blank"
+               class="text-[#525252] hover:text-white transition-colors"
+            >
+               <i class="fab fa-facebook text-[16px]"></i>
+            </a>
+            <a
+               href="https://www.tiktok.com/@teamhelluzmma"
+               target="_blank"
+               class="text-[#525252] hover:text-white transition-colors"
+            >
+               <i class="fab fa-tiktok text-[16px]"></i>
+            </a>
+            <a
+               href="https://wa.me/59160422094?text=Hola,%20quiero%20más%20información"
+               target="_blank"
+               class="text-[#525252] hover:text-white transition-colors"
+            >
+               <i class="fab fa-whatsapp text-[16px]"></i>
             </a>
          </div>
       </div>
-   </section>
-
-   <section class="relative z-[2] bg-black/80 px-6 py-16">
-      <div class="max-w-5xl mx-auto">
-         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div class="flex flex-col items-center">
-               <h4 class="font-display text-2xl tracking-wider mb-2">Gestión de Alumnos</h4>
-               <p class="text-gray-400 text-sm leading-relaxed">
-                  Administra la asistencia y el rendimiento de tus luchadores fácilmente.
-               </p>
-            </div>
-
-            <div class="flex flex-col items-center">
-               <h4 class="font-display text-2xl tracking-wider mb-2">Registro Automático</h4>
-               <p class="text-gray-400 text-sm leading-relaxed">
-                  Control de asistencia mediante lector, código o registro manual.
-               </p>
-            </div>
-
-            <div class="flex flex-col items-center">
-               <h4 class="font-display text-2xl tracking-wider mb-2">Estadísticas en Tiempo Real</h4>
-               <p class="text-gray-400 text-sm leading-relaxed">
-                  Visualiza el progreso de tus alumnos y el desempeño de tus clases.
-               </p>
-            </div>
-         </div>
-      </div>
-   </section>
-
-   <footer
-      class="relative z-[2] bg-[#111] border-t border-white/10 py-5 px-4 flex flex-wrap justify-center items-center gap-3 text-center"
-   >
-      <small class="basis-full text-gray-400 mb-1 block text-xs">
-         © 2026 Academia HELLUZ | Sistema de Control de Asistencia
-      </small>
-      <a
-         href="https://www.facebook.com/AsociacionDepartamentalDeArtesMarcialesMixtasOruro"
-         target="_blank"
-         class="text-white hover:text-blue-500 transition-colors text-2xl"
-      >
-         <i class="fab fa-facebook"></i>
-      </a>
-
-      <a
-         href="https://www.instagram.com/helluzteam_or/"
-         target="_blank"
-         class="text-white hover:text-pink-500 transition-colors text-2xl"
-      >
-         <i class="fab fa-instagram"></i>
-      </a>
-
-      <a
-         href="https://www.tiktok.com/@teamhelluzmma"
-         target="_blank"
-         class="text-white hover:text-gray-500 transition-colors text-2xl"
-      >
-         <i class="fab fa-tiktok"></i>
-      </a>
-
-      <a
-         href="https://wa.me/59160422094?text=Hola,%20quiero%20más%20información"
-         target="_blank"
-         class="text-white hover:text-green-500 transition-colors text-2xl"
-      >
-         <i class="fab fa-whatsapp"></i>
-      </a>
    </footer>
 </div>

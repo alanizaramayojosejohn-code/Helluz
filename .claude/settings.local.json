@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /c/Users/moral -name *.pen -maxdepth 6)",
+      "Bash(git checkout:*)",
+      "Bash(find C:UsersmoralOneDriveEscritorioxProviderHelluz -type f -name *login*)",
+      "Bash(find C:UsersmoralOneDriveEscritorioxProviderHelluz -type f \\\\\\(-name *.component.ts -o -name *routing*.ts \\\\\\))",
+      "Bash(find C:UsersmoralOneDriveEscritorioxProviderHelluz/src/app -type f \\\\\\(-name *.routing.ts -o -name *app*.module.ts \\\\\\))",
+      "Bash(npx ng:*)"
+    ]
+  }
+}

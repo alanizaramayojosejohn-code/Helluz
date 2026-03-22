@@ -1,12 +1,8 @@
 import { Component, signal } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms'
-import { MatFormFieldModule } from '@angular/material/form-field'
-import { MatInputModule } from '@angular/material/input'
-import { MatButtonModule } from '@angular/material/button'
 import { MatIconModule } from '@angular/material/icon'
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
-import { MatDividerModule } from '@angular/material/divider'
 import { AuthService } from '../../../../services/auth/auth.service'
 
 @Component({
@@ -15,12 +11,8 @@ import { AuthService } from '../../../../services/auth/auth.service'
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    MatDividerModule,
   ],
   templateUrl: './log-in.component.html',
 })
@@ -52,9 +44,8 @@ export default class LogInComponent {
       const { email, password } = this.loginForm.value
 
       try {
-        // AuthService ya redirige según el rol internamente
         await this.authService.loginWithEmail(email, password)
-      } catch (error: any) {
+      } catch (error: unknown) {
         this.errorMessage.set(error instanceof Error ? error.message : 'Error al iniciar sesión')
       } finally {
         this.loading.set(false)
@@ -69,9 +60,8 @@ export default class LogInComponent {
     this.errorMessage.set('')
 
     try {
-      // AuthService ya redirige según el rol internamente
       await this.authService.loginWithGoogle()
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.errorMessage.set(error instanceof Error ? error.message : 'Error al iniciar sesión con Google')
     } finally {
       this.loading.set(false)
