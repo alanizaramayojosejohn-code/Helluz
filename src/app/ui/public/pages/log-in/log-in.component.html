@@ -1,126 +1,149 @@
-<div class="justify-between bg-black">
-   <a href="/">
-      <button
-         class="m-6 px-8 py-2 bg-black rounded-s-full text-white text-sm border-none shadow-sm hover:shadow-lg shadow-red-500 hover:shadow-red-500 hover:border-none transition-all duration-700"
-      >
-         Regresar
-      </button>
-   </a>
-   <a href="/registrarUsuario">
-      <button
-         class="m-6 px-8 py-2 bg-black rounded-s-full text-white text-sm border-none shadow-sm hover:shadow-lg shadow-red-500 hover:shadow-red-500 hover:border-none transition-all duration-700"
-      >
-         Registrar
-      </button>
-   </a>
-</div>
-<div class="min-h-screen flex items-center justify-center bg-black p-4">
-   <div class="w-full max-w-md">
-      <div class="bg-gray-300 rounded-2xl shadow-lg shadow-red-500 p-8 backdrop-blur-sm">
-         <div class="text-center mb-8">
-            <div class="mb-4">
-               <div class="w-3/12 bg-gradient-to-br rounded-full mx-auto flex items-center justify-center">
-                  <img src="/images/Logo.webp" alt="Logo" class="w-full rounded-full shadow-md shadow-gray-500" />
-               </div>
+<div class="min-h-screen flex flex-col lg:flex-row font-body">
+   <!-- ───── Left · dark visual panel ───────────────────────────────────── -->
+   <aside class="bg-ink text-bg-base p-12 lg:p-16 flex flex-col gap-16 lg:w-[560px] lg:shrink-0">
+      <a routerLink="/" class="flex items-center gap-3">
+         <img src="/images/Logo.webp" alt="Helluz" class="w-10 h-10 rounded-md object-contain" />
+         <span class="text-body-lg text-white no-underline font-extrabold tracking-[0.25em]">HELLUZ</span>
+      </a>
+
+      <div class="flex flex-col gap-6 flex-1 justify-center">
+         <span class="text-label font-extrabold tracking-[0.25em] text-brand-500 uppercase">Desde 2018 · Oruro</span>
+         <h1 class="text-[clamp(2.5rem,5vw,3.5rem)] font-extrabold leading-[0.95] tracking-[-0.04em] m-0">
+            Cada combate empieza con disciplina.
+         </h1>
+         <p class="text-body-lg text-white/70 leading-relaxed max-w-md m-0">
+            Tu academia. Tus alumnos. Un solo lugar para gestionarlo todo.
+         </p>
+      </div>
+
+      <div class="flex flex-col gap-5">
+         <div class="flex gap-6">
+            <div>
+               <p class="text-h3 font-extrabold leading-none tracking-tighter font-mono m-0">+200</p>
+               <p class="text-caption text-white/50 mt-1 m-0">Alumnos</p>
             </div>
-            <h1 class="text-3xl font-bold text-gray-500 mb-2">Bienvenido</h1>
-            <p class="text-gray-600">Inicia sesión para continuar</p>
+            <div class="pl-6 border-l border-hairline border-white/10">
+               <p class="text-h3 font-extrabold leading-none tracking-tighter font-mono m-0">98%</p>
+               <p class="text-caption text-white/50 mt-1 m-0">Asistencia</p>
+            </div>
+            <div class="pl-6 border-l border-hairline border-white/10">
+               <p class="text-h3 font-extrabold leading-none tracking-tighter font-mono m-0">24/7</p>
+               <p class="text-caption text-white/50 mt-1 m-0">Acceso</p>
+            </div>
          </div>
 
-         @if (errorMessage()) {
-            <div class="mb-6 p-4 bg-gray-200 border-l-4 border-red-500 rounded-xl rounded-r-lg animate-shake">
-               <div class="flex items-start gap-3">
-                  <mat-icon class="text-red-600 mt-0.5">error_outline</mat-icon>
-                  <div>
-                     <p class="text-red-800 text-sm font-medium">Error de autenticación</p>
-                     <p class="text-red-600 text-sm mt-1">{{ errorMessage() }}</p>
-                  </div>
+         <div class="flex flex-col gap-3 pt-6 border-t border-hairline border-white/10">
+            <span class="text-label font-extrabold tracking-[0.2em] text-white/50 uppercase">Fighters activos · esta
+               semana</span>
+            <div class="flex items-center gap-3">
+               <div class="relative h-9 w-[160px]">
+                  <div
+                     class="absolute inset-y-0 left-0 w-9 rounded-full bg-brand-500 border-thick border-ink flex items-center justify-center text-on-brand text-caption font-extrabold">
+                     DQ</div>
+                  <div
+                     class="absolute inset-y-0 left-6 w-9 rounded-full bg-[#665a4a] border-thick border-ink flex items-center justify-center text-white text-caption font-extrabold">
+                     AC</div>
+                  <div
+                     class="absolute inset-y-0 left-12 w-9 rounded-full bg-info border-thick border-ink flex items-center justify-center text-white text-caption font-extrabold">
+                     LM</div>
+                  <div
+                     class="absolute inset-y-0 left-[72px] w-9 rounded-full bg-warning border-thick border-ink flex items-center justify-center text-ink text-caption font-extrabold">
+                     MR</div>
+                  <div
+                     class="absolute inset-y-0 left-24 w-9 rounded-full bg-brand-500 border-thick border-ink flex items-center justify-center text-on-brand text-[10px] font-extrabold font-mono">
+                     +196</div>
+               </div>
+               <p class="text-body-sm text-white/70 m-0">Únete a la academia</p>
+            </div>
+         </div>
+      </div>
+   </aside>
+
+   <!-- ───── Right · form panel ─────────────────────────────────────────── -->
+   <main class="flex-1 bg-bg-base flex flex-col p-8 lg:p-16 relative">
+      <a routerLink="/"
+         class="inline-flex no-underline items-center gap-2 self-start text-body-sm font-semibold text-muted hover:text-ink transition-colors duration-fast mb-8">
+         <span class=" material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none">arrow_back</span>
+         Volver al inicio
+      </a>
+
+      <div class="flex-1 flex items-center justify-center">
+         <div class="w-full max-w-md bg-bg-elevated rounded-2xl shadow-xl p-10 flex flex-col gap-6">
+
+            <div class="flex flex-col gap-2">
+               <span class="text-label font-extrabold tracking-[0.25em] text-text-brand uppercase">Inicio de
+                  sesión</span>
+               <h2 class="text-h2 font-extrabold tracking-[-0.03em] leading-[1.05] text-ink m-0">Bienvenido de vuelta
+               </h2>
+               <p class="text-body-sm text-muted m-0">Ingresa con tu cuenta para continuar al panel.</p>
+            </div>
+
+            @if (errorMessage()) {
+            <div class="flex items-start gap-3 p-3 bg-bg-brand-soft rounded-md">
+               <span
+                  class="material-symbols-rounded !text-[20px] !w-[20px] !h-[20px] leading-none text-error mt-0.5">error</span>
+               <div class="flex flex-col gap-0.5 flex-1">
+                  <p class="text-body-sm font-bold text-text-brand m-0">Error de autenticación</p>
+                  <p class="text-caption text-muted m-0">{{ errorMessage() }}</p>
                </div>
             </div>
-         }
+            }
 
-         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
-            <div class="relative">
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
                <mat-form-field appearance="outline" class="w-full">
                   <mat-label>Correo electrónico</mat-label>
-                  <input
-                     matInput
-                     type="email"
-                     formControlName="email"
-                     placeholder="tu@email.com"
-                     autocomplete="email"
-                  />
-                  <mat-icon matPrefix class="text-gray-400 mr-2">email</mat-icon>
+                  <input matInput type="email" formControlName="email" placeholder="tu@email.com"
+                     autocomplete="email" />
+                  <mat-icon matPrefix class="text-faint mr-2">mail</mat-icon>
                   @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
-                     <mat-error>{{ getEmailErrorMessage() }}</mat-error>
+                  <mat-error>{{ getEmailErrorMessage() }}</mat-error>
                   }
                </mat-form-field>
-            </div>
 
-            <div class="relative">
                <mat-form-field appearance="outline" class="w-full">
                   <mat-label>Contraseña</mat-label>
-                  <input
-                     matInput
-                     [type]="hidePassword() ? 'password' : 'text'"
-                     formControlName="password"
-                     placeholder="••••••••"
-                     autocomplete="current-password"
-                  />
-                  <mat-icon matPrefix class="text-gray-400 mr-2">lock</mat-icon>
-                  <button
-                     mat-icon-button
-                     matSuffix
-                     type="button"
-                     (click)="togglePasswordVisibility()"
-                     [attr.aria-label]="hidePassword() ? 'Mostrar contraseña' : 'Ocultar contraseña'"
-                     class="hover:bg-gray-100 rounded-full"
-                  >
+                  <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password"
+                     placeholder="••••••••" autocomplete="current-password" />
+                  <mat-icon matPrefix class="text-faint mr-2">lock</mat-icon>
+                  <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()"
+                     [attr.aria-label]="hidePassword() ? 'Mostrar contraseña' : 'Ocultar contraseña'">
                      <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
                   </button>
                   @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
-                     <mat-error>{{ getPasswordErrorMessage() }}</mat-error>
+                  <mat-error>{{ getPasswordErrorMessage() }}</mat-error>
                   }
                </mat-form-field>
+
+               <button type="submit" [disabled]="loading()"
+                  class="inline-flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-600 disabled:opacity-disabled text-on-brand font-extrabold text-body py-4 rounded-full shadow-brand transition-colors duration-fast">
+                  @if (loading()) {
+                  <mat-spinner diameter="20" class="inline-block"></mat-spinner>
+                  Iniciando sesión…
+                  } @else {
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none">login</span>
+                  Iniciar sesión
+                  }
+               </button>
+            </form>
+
+            <div class="flex items-center gap-3 py-1">
+               <div class="flex-1 h-px bg-border-default"></div>
+               <span class="text-caption font-semibold text-faint">o continúa con</span>
+               <div class="flex-1 h-px bg-border-default"></div>
             </div>
 
-            <button
-               mat-raised-button
-               color="primary"
-               type="submit"
-               class="w-full !h-12 !text-base !font-semibold !rounded-lg !shadow-lg hover:!shadow-xl !transition-all !duration-300"
-               [disabled]="loading()"
-            >
-               @if (loading()) {
-                  <div class="flex items-center justify-center gap-2">
-                     <mat-spinner diameter="20" class="inline-block"></mat-spinner>
-                     <span>Iniciando sesión...</span>
-                  </div>
-               } @else {
-                  <div class="flex items-center justify-center gap-2">
-                     <mat-icon>login</mat-icon>
-                     <span>Iniciar Sesión</span>
-                  </div>
-               }
+            <button type="button" (click)="loginWithGoogle()" [disabled]="loading()"
+               class="inline-flex items-center justify-center gap-3 border-standard border-border-strong hover:bg-bg-inset disabled:opacity-disabled text-ink font-bold text-body-sm py-3.5 rounded-full transition-colors duration-fast">
+               <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google"
+                  class="w-5 h-5" />
+               Continuar con Google
             </button>
-         </form>
 
-         <!-- <button
-            mat-stroked-button
-            type="button"
-            class="w-full !h-12 !text-base !font-medium !border-2 !rounded-lg hover:!bg-gray-50 !transition-all !duration-300"
-            (click)="loginWithGoogle()"
-            [disabled]="loading()"
-         >
-            <div class="flex items-center justify-center gap-3">
-               <img
-                  src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                  alt="Google"
-                  class="w-5 h-5"
-               />
-               <span class="text-gray-700">Continuar con Google</span>
-            </div>
-         </button> -->
+            <p class="text-center text-caption text-muted m-0">
+               ¿No tienes cuenta? <a class="font-extrabold text-text-brand hover:underline cursor-pointer">Habla con tu
+                  instructor</a>
+            </p>
+         </div>
       </div>
-   </div>
+   </main>
 </div>

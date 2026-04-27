@@ -1,57 +1,308 @@
-<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-   <div class="container mx-auto p-4 md:p-6 max-w-7xl">
-      <h1 class="text-center text-5xl animated-combo">Bienvenido</h1>
+<div class="min-h-screen bg-bg-base font-body text-ink">
+   <div class="max-w-[1400px] mx-auto px-6 lg:px-8 py-8">
+      <!-- ───── Page header ─────────────────────────────────────────────── -->
+      <header class="flex flex-col gap-4 pb-7 mb-7 border-b border-hairline border-border-default">
+         <nav class="flex items-center gap-2 text-body-sm" aria-label="Breadcrumb">
+            <span class="material-symbols-rounded !text-[14px] !w-[14px] !h-[14px] leading-none text-faint">home</span>
+            <a
+               class="font-semibold text-muted hover:text-ink transition-colors duration-fast cursor-pointer no-underline">Inicio</a>
+            <span class="text-faint" aria-hidden="true">›</span>
+            <span class="font-extrabold text-ink">Dashboard</span>
+         </nav>
 
-      <h2 class="text-center text-gray-300 text-4xl sm:text-5xl md:text-7xl shadow-gray-200 p-6 rounded-full shadow-lg">
-         Panel de Administrador
-      </h2>
+         <div class="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
+            <div class="flex-1 flex flex-col gap-1.5">
+               <h1 class="text-h1 font-extrabold tracking-[-0.04em] text-ink leading-[1.05] m-0">
+                  Buen día, {{ getUserDisplayName() }}
+               </h1>
+               <p class="text-body-sm text-muted m-0">
+                  {{ classesToday().length }} clases programadas hoy · {{ totalActiveStudents() }} fighters activos
+               </p>
+            </div>
 
-      <div class="flex grid-cols-2 mt-20">
-         <div class="border-gray-200 shadow-lg shadow-gray-400 m-4 rounded-lg p-4">
-            <p class="text-lg font-sans font-bold text-center text-gray-600">
-               Lleva el registro de las membresías y asistencias de tus alumnos
+            <div class="flex items-center gap-2 flex-wrap">
+               <label
+                  class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-bg-elevated border border-hairline border-border-strong text-caption font-extrabold tracking-wide hover:bg-bg-inset transition-colors duration-fast cursor-pointer">
+                  <span class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none">storefront</span>
+                  <select [ngModel]="selectedBranchId()" (ngModelChange)="onBranchChange($event)"
+                     class="bg-transparent border-0 focus:outline-none text-caption font-extrabold tracking-wide pr-1 appearance-none cursor-pointer text-ink"
+                     aria-label="Seleccionar sucursal">
+                     @if (branches().length === 0) {
+                     <option value="">Sin sucursales</option>
+                     }
+                     @for (b of branches(); track b.id) {
+                     <option [value]="b.id">{{ b.name | titlecase }}</option>
+                     }
+                  </select>
+                  <span
+                     class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none text-faint">keyboard_arrow_down</span>
+               </label>
+               <a routerLink="/admin/usuarios"
+                  class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-brand-500 hover:bg-brand-600 text-on-brand text-caption font-extrabold tracking-wide shadow-brand transition-colors duration-fast no-underline">
+                  <span class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none">add</span>
+                  Nuevo alumno
+               </a>
+            </div>
+         </div>
+      </header>
+
+      <!-- ───── KPIs ────────────────────────────────────────────────────── -->
+      <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+         <!-- KPI 1 · alumnos activos -->
+         <div class="bg-bg-elevated border border-hairline border-border-default rounded-lg p-5 flex flex-col gap-3">
+            <div class="flex items-center gap-2">
+               <div class="w-8 h-8 rounded-md bg-bg-brand-soft flex items-center justify-center">
+                  <span
+                     class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-text-brand">groups</span>
+               </div>
+               <span class="text-caption font-extrabold tracking-wide text-muted flex-1">Alumnos activos</span>
+            </div>
+            <p class="text-[2.25rem] font-extrabold leading-none tracking-tight font-mono m-0">{{ totalActiveStudents()
+               }}</p>
+            <div class="flex items-center gap-1">
+               <span
+                  class="material-symbols-rounded !text-[14px] !w-[14px] !h-[14px] leading-none text-success">trending_up</span>
+               <span class="text-caption font-extrabold text-success">+{{ newStudentsThisWeek() }} esta semana</span>
+            </div>
+         </div>
+
+         <!-- KPI 2 · asistencia hoy con ring -->
+         <div
+            class="bg-bg-elevated border border-hairline border-border-default rounded-lg p-5 flex items-center gap-4">
+            <div class="flex-1 flex flex-col gap-1.5">
+               <span class="text-caption font-extrabold tracking-wide text-muted">Asistencia hoy</span>
+               <p class="text-[1.375rem] font-extrabold leading-none tracking-tight font-mono m-0">
+                  {{ presentToday() }} / {{ activeBranchEnrollmentsCount() }}
+               </p>
+               <span class="text-caption text-faint">Inscripciones activas</span>
+            </div>
+            <div class="relative w-20 h-20 rounded-full flex items-center justify-center"
+               [style.background]="attendanceRingStyle()">
+               <div class="absolute inset-[6px] rounded-full bg-bg-elevated flex items-center justify-center">
+                  <span class="text-[1.125rem] font-extrabold leading-none tracking-tight font-mono">{{ attendanceRate()
+                     }}%</span>
+               </div>
+            </div>
+         </div>
+
+         <!-- KPI 3 · recaudado (dark hero) -->
+         <div class="bg-ink text-bg-base rounded-lg p-5 flex flex-col gap-3 shadow-lg">
+            <div class="flex items-center gap-2">
+               <div class="w-8 h-8 rounded-md bg-brand-500 flex items-center justify-center">
+                  <span
+                     class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-on-brand">payments</span>
+               </div>
+               <span class="text-caption font-extrabold tracking-wide text-bg-base/70 flex-1">Recaudado del mes</span>
+            </div>
+            <p class="text-[2rem] font-extrabold leading-none tracking-tight font-mono m-0">
+               Bs {{ monthlyRevenue() | number:'1.0-0':'es-BO' }}
             </p>
+            @if (revenueDeltaPct() === null) {
+            <span class="text-caption font-bold text-bg-base/60">Sin datos del mes anterior</span>
+            } @else {
+            <span class="text-caption font-bold"
+               [ngClass]="revenueDeltaPct()! >= 0 ? 'text-success' : 'text-[#fca5a5]'">
+               {{ revenueDeltaPct()! >= 0 ? '+' : '' }}{{ revenueDeltaPct()! | number:'1.1-1' }}% vs mes anterior
+            </span>
+            }
          </div>
-         <div class="border-gray-200 shadow-lg shadow-gray-400 m-4 rounded-lg p-4">
-            <p class="text-lg font-sans font-bold text-center text-gray-600">
-               Lleva seguimiento a los horarios de tus instructores</p
-            >
+
+         <!-- KPI 4 · por vencer (accent) -->
+         <div class="bg-bg-brand-soft border border-hairline border-border-brand rounded-lg p-5 flex flex-col gap-3">
+            <div class="flex items-center gap-2">
+               <div class="w-8 h-8 rounded-md bg-brand-500 flex items-center justify-center">
+                  <span
+                     class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-on-brand">warning</span>
+               </div>
+               <span class="text-caption font-extrabold tracking-wide text-text-brand flex-1">Por vencer</span>
+            </div>
+            <p class="text-[2.25rem] font-extrabold leading-none tracking-tight font-mono m-0">
+               {{ expiringEnrollments().length | number:'2.0-0' }}
+            </p>
+            <span class="text-caption font-bold text-muted">Membresías esta semana · acción urgente</span>
          </div>
-      </div>
+      </section>
+
+      <!-- ───── Charts row ───────────────────────────────────────────────── -->
+      <section class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 mb-6">
+         <!-- Chart 1 · asistencia diaria -->
+         <article class="bg-bg-elevated border border-hairline border-border-default rounded-lg flex flex-col">
+            <header class="flex items-end justify-between px-5 pt-4 pb-3 border-b border-hairline border-border-subtle">
+               <div class="flex flex-col gap-1">
+                  <span class="text-label font-extrabold tracking-[0.2em] text-muted uppercase">Semana en curso</span>
+                  <h3 class="text-h4 font-extrabold tracking-tight leading-none m-0">Asistencia diaria</h3>
+               </div>
+            </header>
+
+            <div class="px-5 py-5">
+               <div class="flex items-end gap-2 h-40 mb-2">
+                  @for (b of weekBars(); track b.label) {
+                  <div class="flex-1 flex flex-col items-center justify-end gap-1">
+                     <span class="text-caption font-extrabold font-mono"
+                        [ngClass]="b.isToday ? 'text-ink' : (b.count > 0 ? 'text-muted' : 'text-faint')">{{ b.count
+                        }}</span>
+                     <div class="w-full rounded-sm" [ngClass]="b.isToday ? 'bg-brand-500' : 'bg-bg-inset'"
+                        [style.height.px]="b.heightPx"></div>
+                  </div>
+                  }
+               </div>
+               <div class="flex gap-2">
+                  @for (b of weekBars(); track b.label) {
+                  <span class="flex-1 text-center text-caption font-extrabold"
+                     [ngClass]="b.isToday ? 'text-ink' : 'text-faint'">{{ b.label }}</span>
+                  }
+               </div>
+            </div>
+         </article>
+
+         <!-- Chart 2 · métodos de pago donut -->
+         <article class="bg-bg-elevated border border-hairline border-border-default rounded-lg flex flex-col">
+            <header class="px-5 pt-4 pb-3 border-b border-hairline border-border-subtle flex flex-col gap-1">
+               <span class="text-label font-extrabold tracking-[0.2em] text-muted uppercase">Métodos de pago</span>
+               <h3 class="text-h4 font-extrabold tracking-tight leading-none m-0">Por método</h3>
+            </header>
+
+            <div class="px-5 py-5 flex flex-col items-center gap-5">
+               <div class="relative w-[170px] h-[170px] rounded-full flex items-center justify-center"
+                  [style.background]="donutGradient()">
+                  <div
+                     class="absolute inset-[24px] rounded-full bg-bg-elevated flex flex-col items-center justify-center">
+                     <span class="text-[1.375rem] font-extrabold leading-none tracking-tight font-mono">
+                        Bs {{ paymentBreakdown().total | number:'1.0-0':'es-BO' }}
+                     </span>
+                     <span class="text-[10px] font-extrabold tracking-[0.2em] text-faint mt-1">RECAUDADO</span>
+                  </div>
+               </div>
+
+               <div class="w-full flex flex-col gap-2">
+                  <div class="flex items-center gap-2.5">
+                     <span class="w-2.5 h-2.5 rounded-sm bg-brand-500"></span>
+                     <span class="text-caption font-extrabold flex-1">Pago QR</span>
+                     <span class="text-caption font-extrabold font-mono">
+                        {{ paymentBreakdown().qrPct }}% · Bs {{ paymentBreakdown().qr | number:'1.0-0':'es-BO' }}
+                     </span>
+                  </div>
+                  <div class="flex items-center gap-2.5">
+                     <span class="w-2.5 h-2.5 rounded-sm bg-ink"></span>
+                     <span class="text-caption font-extrabold flex-1">Efectivo</span>
+                     <span class="text-caption font-extrabold font-mono">
+                        {{ paymentBreakdown().cashPct }}% · Bs {{ paymentBreakdown().cash | number:'1.0-0':'es-BO' }}
+                     </span>
+                  </div>
+               </div>
+            </div>
+         </article>
+      </section>
+
+      <!-- ───── Lower row · table + side panel ───────────────────────────── -->
+      <section class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-4">
+         <!-- Recent attendance table -->
+         <article
+            class="bg-bg-elevated border border-hairline border-border-default rounded-lg flex flex-col overflow-hidden">
+            <header class="flex items-end justify-between px-5 pt-4 pb-3 border-b border-hairline border-border-subtle">
+               <div class="flex flex-col gap-1">
+                  <span class="text-label font-extrabold tracking-[0.2em] text-muted uppercase">Hoy</span>
+                  <h3 class="text-h4 font-extrabold tracking-tight leading-none m-0">Asistencias recientes</h3>
+               </div>
+               <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-success/10">
+                  <span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+                  <span class="text-[10px] font-extrabold tracking-[0.15em] text-success">LIVE</span>
+               </div>
+            </header>
+
+            <div class="grid grid-cols-[1fr_140px_100px_60px_28px] items-center gap-3 px-5 py-2.5 bg-ink/5">
+               <span class="text-[10px] font-extrabold tracking-[0.15em] text-faint uppercase">Fighter</span>
+               <span class="text-[10px] font-extrabold tracking-[0.15em] text-faint uppercase">Sesión</span>
+               <span class="text-[10px] font-extrabold tracking-[0.15em] text-faint uppercase">Sucursal</span>
+               <span class="text-[10px] font-extrabold tracking-[0.15em] text-faint uppercase text-right">Hora</span>
+               <span></span>
+            </div>
+
+            @for (row of recentAttendances(); track row.id; let isOdd = $odd) {
+            <div
+               class="grid grid-cols-[1fr_140px_100px_60px_28px] items-center gap-3 px-5 py-3 border-t border-hairline border-border-subtle"
+               [ngClass]="isOdd ? 'bg-ink/[0.03]' : ''">
+               <div class="flex items-center gap-3">
+                  <div
+                     class="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center text-on-brand text-caption font-extrabold">
+                     {{ initials(row.studentName) }}
+                  </div>
+                  <span class="text-body-sm font-extrabold tracking-tight">{{ row.studentName }}</span>
+               </div>
+               <span
+                  class="inline-flex w-fit px-2 py-0.5 rounded-sm bg-bg-brand-soft text-text-brand text-[10px] font-extrabold tracking-wide">
+                  Sesión {{ row.sessionNumber }} · resta {{ row.remainingSessionsAfter }}
+               </span>
+               <span class="text-body-sm font-semibold text-muted">{{ row.branchName | titlecase }}</span>
+               <span class="text-body-sm font-extrabold text-right font-mono">{{ row.timeLabel }}</span>
+               <span
+                  class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint cursor-pointer">more_vert</span>
+            </div>
+            } @empty {
+            <div class="px-5 py-10 flex flex-col items-center gap-2 border-t border-hairline border-border-subtle">
+               <span
+                  class="material-symbols-rounded !text-[32px] !w-[32px] !h-[32px] leading-none text-faint">inbox</span>
+               <span class="text-body-sm text-muted">Sin asistencias hoy</span>
+            </div>
+            }
+
+            <!-- footer -->
+            <footer class="flex items-center gap-2.5 px-5 py-3.5 border-t border-hairline border-border-default">
+               <span class="text-caption font-semibold text-muted flex-1">
+                  {{ recentAttendances().length }} de {{ todayAttendances().length }}
+               </span>
+               <a routerLink="/admin/asistenciasi"
+                  class="inline-flex items-center gap-1 text-caption font-extrabold text-text-brand no-underline hover:opacity-80 transition-opacity duration-fast">
+                  Ver todo
+                  <span
+                     class="material-symbols-rounded !text-[14px] !w-[14px] !h-[14px] leading-none">arrow_forward</span>
+               </a>
+            </footer>
+         </article>
+
+         <!-- Side panel · alert + toast -->
+         <aside class="flex flex-col gap-4">
+            <div class="flex items-start gap-3 p-4 bg-warning/15 rounded-lg">
+               <div class="w-8 h-8 rounded-full bg-warning flex items-center justify-center shrink-0">
+                  <span
+                     class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-ink">warning</span>
+               </div>
+               <div class="flex-1 flex flex-col gap-1">
+                  <p class="text-body-sm font-extrabold text-[#78350f] m-0">
+                     {{ expiringEnrollments().length }} membresías por vencer
+                  </p>
+                  <p class="text-caption text-[#78350f]/80 leading-snug m-0">
+                     Esta semana. Notificar a los alumnos para renovar.
+                  </p>
+                  <a routerLink="/admin/finanzas"
+                     class="inline-flex items-center gap-1 text-[10px] font-extrabold tracking-[0.15em] text-[#78350f] mt-1 cursor-pointer no-underline">
+                     VER LISTA
+                     <span
+                        class="material-symbols-rounded !text-[12px] !w-[12px] !h-[12px] leading-none">arrow_forward</span>
+                  </a>
+               </div>
+            </div>
+
+            @if (lastEnrollment(); as enrollment) {
+            <div class="flex items-center gap-3 p-3 bg-ink rounded-md shadow-lg">
+               <div class="w-6 h-6 rounded-full bg-success flex items-center justify-center shrink-0">
+                  <span
+                     class="material-symbols-rounded !text-[14px] !w-[14px] !h-[14px] leading-none text-on-brand font-bold">check</span>
+               </div>
+               <div class="flex-1 flex flex-col gap-0">
+                  <p class="text-caption font-extrabold text-bg-base m-0">
+                     Cobro registrado · Bs {{ enrollment.cost | number:'1.0-0':'es-BO' }}
+                  </p>
+                  <p class="text-[10px] text-bg-base/60 m-0">
+                     {{ enrollment.studentName }} · {{ lastEnrollmentTime() }}
+                  </p>
+               </div>
+               <button class="text-[10px] font-extrabold tracking-[0.15em] text-brand-500">DESHACER</button>
+               <span
+                  class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none text-bg-base/60 cursor-pointer">close</span>
+            </div>
+            }
+         </aside>
+      </section>
    </div>
 </div>
-
-<style style>
-   @keyframes gradientMove {
-      0% {
-         background-position: 0% 50%;
-      }
-      50% {
-         background-position: 100% 50%;
-      }
-      100% {
-         background-position: 0% 50%;
-      }
-   }
-
-   @keyframes pulseScale {
-      0%,
-      100% {
-         transform: scale(1);
-      }
-      50% {
-         transform: scale(1.06);
-      }
-   }
-
-   .animated-combo {
-      background: linear-gradient(90deg, #888, #004, #bbb);
-      background-size: 300% 300%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation:
-         gradientMove 4s ease infinite,
-         pulseScale 3s ease-in-out infinite;
-   }
-</style>

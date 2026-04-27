@@ -1,39 +1,47 @@
 @use '@angular/material' as mat;
 
+/* Material 3 base — generamos la red palette para tener todos los slots */
 html {
    height: 100%;
    @include mat.theme(
       (
          color: (
-            primary: mat.$rose-palette,
+            primary: mat.$red-palette,
             tertiary: mat.$red-palette,
          ),
-         typography: Roboto,
+         typography: Inter,
          density: 0,
       )
    );
+
+   /* ─── Override de Material system tokens con nuestros tokens del DS ─── */
+   /* Esto hace que cualquier mat-form-field, mat-button, mat-datepicker, etc.
+      use el rojo brand y la tipografía Inter del design system. */
+   --mat-sys-primary: var(--color-brand-500);
+   --mat-sys-on-primary: var(--color-text-on-brand);
+   --mat-sys-primary-container: var(--color-bg-brand-soft);
+   --mat-sys-on-primary-container: var(--color-text-brand);
+
+   --mat-sys-surface: var(--color-bg-base);
+   --mat-sys-on-surface: var(--color-text-primary);
+   --mat-sys-surface-container: var(--color-bg-surface);
+   --mat-sys-surface-container-high: var(--color-bg-elevated);
+   --mat-sys-surface-container-highest: var(--color-bg-elevated);
+
+   --mat-sys-outline: var(--color-border-strong);
+   --mat-sys-outline-variant: var(--color-border-default);
+
+   --mat-sys-error: var(--color-error);
+   --mat-sys-on-error: var(--color-text-on-brand);
 }
 
 body {
    color-scheme: light;
-
-   background-color: var(--mat-sys-surface);
-   color: var(--mat-sys-on-surface);
-   font: var(--mat-sys-body-medium);
-
+   background-color: var(--color-bg-base);
+   color: var(--color-text-primary);
+   font-family: var(--font-family-body);
+   font-size: var(--font-body);
+   line-height: 1.5;
    margin: 0;
    height: 100%;
 }
-
-// html {
-//    @include mat.theme(
-//       (
-//          color: (
-//             primary: mat.$azure-palette,
-//             tertiary: mat.$blue-palette,
-//          ),
-//          typography: Roboto,
-//          density: 0,
-//       )
-//    );
-// }
