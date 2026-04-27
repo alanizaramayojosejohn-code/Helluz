@@ -1,8 +1,10 @@
-import { ApplicationConfig, LOCALE_ID, provideZoneChangeDetection } from '@angular/core'
+import { ApplicationConfig, LOCALE_ID, isDevMode, provideZoneChangeDetection } from '@angular/core'
 import { provideRouter } from '@angular/router'
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'
+import { provideServiceWorker } from '@angular/service-worker'
 
-import { provideFirebaseApp, initializeApp } from '@angular/fire/app'
+// Firebase (AngularFire modular)
+import { provideFirebaseApp, initializeApp, getApp } from '@angular/fire/app'
 import { provideAuth, getAuth } from '@angular/fire/auth'
 import { provideFirestore, getFirestore } from '@angular/fire/firestore'
 import { provideStorage, getStorage } from '@angular/fire/storage'
@@ -20,21 +22,24 @@ export const appConfig: ApplicationConfig = {
       provideAnimationsAsync(),
 
       provideFirebaseApp(() => initializeApp(environment.firebase)),
-      // ...(environment.production ? [
-      //   provideAppCheck(() =>
-      //     initializeAppCheck(undefined, {
-      //       provider: new ReCaptchaV3Provider(environment.recaptchaSiteKey),
-      //       isTokenAutoRefreshEnabled: true,
-      //     })
-      //   )
-      // ] : []),
       provideAuth(() => getAuth()),
       provideFirestore(() => getFirestore()),
       provideStorage(() => getStorage()),
+      provideAppCheck(() => {
+        return initializeAppCheck(undefined, {
+          provider: new ReCaptchaV3Provider('6LcvWoQsAAAAAERr-0AIzKw85Q7LXnWzM3vK0lT8'),
+          isTokenAutoRefreshEnabled: true,
+        })
+      } ),
 
       provideNativeDateAdapter(),
       { provide: LOCALE_ID, useValue: 'es-ES' },
       { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
       { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
+
+      provideServiceWorker('ngsw-worker.js', {
+         enabled: !isDevMode(),
+         registrationStrategy: 'registerWhenStable:30000',
+      }),
    ],
 }

@@ -1,104 +1,124 @@
-import { inject, Injectable } from '@angular/core'
+import { inject, Injectable } from '@angular/core';
 import {
-   Firestore,
-   collection,
-   collectionData,
-   doc,
-   docData,
-   query,
-   where,
-   orderBy,
-   Timestamp,
-   deleteDoc,
-   setDoc,
-   getDocs,
-   limit,
-   updateDoc,
-} from '@angular/fire/firestore'
-import { Observable } from 'rxjs'
-import { StudentAttendance } from '../../models/studentattendance.model'
+  Firestore,
+  collection,
+  collectionData,
+  doc,
+  docData,
+  query,
+  where,
+  orderBy,
+  Timestamp,
+  deleteDoc,
+  setDoc,
+  getDocs,
+  limit,
+  updateDoc
+} from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
+import { StudentAttendance } from '../../models/studentattendance.model';
 
 @Injectable()
 export class StudentAttendanceQueryService {
-   private readonly firestore = inject(Firestore)
-   private readonly collectionName = 'studentAttendances'
+  private readonly firestore = inject(Firestore);
+  private readonly collectionName = 'studentAttendances';
 
-   getById(id: string): Observable<StudentAttendance | undefined> {
-      const docRef = doc(this.firestore, this.collectionName, id)
-      return docData(docRef, { idField: 'id' }) as Observable<StudentAttendance | undefined>
-   }
+  getById(id: string): Observable<StudentAttendance | undefined> {
+    const docRef = doc(this.firestore, this.collectionName, id);
+    return docData(docRef, { idField: 'id' }) as Observable<StudentAttendance | undefined>;
+  }
 
-   getByBranchAndDate(
-      branchId: string,
-      date: Date,
-      status?: 'presente' | 'falta' | 'permiso'
-   ): Observable<StudentAttendance[]> {
-      const startOfDay = new Date(date)
-      startOfDay.setHours(0, 0, 0, 0)
-      const endOfDay = new Date(date)
-      endOfDay.setHours(23, 59, 59, 999)
+  getByBranchAndDateRange(
+    branchId: string,
+    startDate: Date,
+    endDate: Date
+  ): Observable<StudentAttendance[]> {
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
 
-      const col = collection(this.firestore, this.collectionName)
+    const col = collection(this.firestore, this.collectionName);
+    const q = query(
+      col,
+      where('branchId', '==', branchId),
+      where('createdAt', '>=', Timestamp.fromDate(start)),
+      where('createdAt', '<=', Timestamp.fromDate(end)),
+      orderBy('createdAt', 'desc')
+    );
 
-      let q
-      if (status) {
-         q = query(
-            col,
-            where('branchId', '==', branchId),
-            where('createdAt', '>=', Timestamp.fromDate(startOfDay)),
-            where('createdAt', '<=', Timestamp.fromDate(endOfDay)),
-            where('status', '==', status),
-            orderBy('createdAt', 'desc')
-         )
-      } else {
-         q = query(
-            col,
-            where('branchId', '==', branchId),
-            where('createdAt', '>=', Timestamp.fromDate(startOfDay)),
-            where('createdAt', '<=', Timestamp.fromDate(endOfDay)),
-            orderBy('createdAt', 'desc')
-         )
-      }
+    return collectionData(q, { idField: 'id' }) as Observable<StudentAttendance[]>;
+  }
 
-      return collectionData(q, { idField: 'id' }) as Observable<StudentAttendance[]>
-   }
+  getByBranchAndDate(
+    branchId: string,
+    date: Date,
+    status?: 'presente' | 'falta' | 'permiso'
+  ): Observable<StudentAttendance[]> {
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
 
-   async checkAlreadyMarkedToday(studentId: string, date: Date): Promise<boolean> {
-      const startOfDay = new Date(date)
-      startOfDay.setHours(0, 0, 0, 0)
-      const endOfDay = new Date(date)
-      endOfDay.setHours(23, 59, 59, 999)
+    const col = collection(this.firestore, this.collectionName);
 
-      const col = collection(this.firestore, this.collectionName)
-      const q = query(
-         col,
-         where('studentId', '==', studentId),
-         where('createdAt', '>=', Timestamp.fromDate(startOfDay)),
-         where('createdAt', '<=', Timestamp.fromDate(endOfDay)),
-         limit(1)
-      )
+    let q;
+    if (status) {
+      q = query(
+        col,
+        where('branchId', '==', branchId),
+        where('createdAt', '>=', Timestamp.fromDate(startOfDay)),
+        where('createdAt', '<=', Timestamp.fromDate(endOfDay)),
+        where('status', '==', status),
+        orderBy('createdAt', 'desc')
+      );
+    } else {
+      q = query(
+        col,
+        where('branchId', '==', branchId),
+        where('createdAt', '>=', Timestamp.fromDate(startOfDay)),
+        where('createdAt', '<=', Timestamp.fromDate(endOfDay)),
+        orderBy('createdAt', 'desc')
+      );
+    }
 
-      const snapshot = await getDocs(q)
-      return !snapshot.empty
-   }
+    return collectionData(q, { idField: 'id' }) as Observable<StudentAttendance[]>;
+  }
 
-   async create(id: string, data: StudentAttendance): Promise<void> {
-      const docRef = doc(this.firestore, this.collectionName, id)
-      const { id: _, ...dataWithoutId } = data
-      const finalData = {
-         ...dataWithoutId,
-         createdAt: Timestamp.now(),
-      }
-      await setDoc(docRef, finalData)
-   }
+  async checkAlreadyMarkedToday(studentId: string, date: Date): Promise<boolean> {
+  const startOfDay = new Date(date);
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(date);
+  endOfDay.setHours(23, 59, 59, 999);
 
-   async update(id: string, data: Partial<StudentAttendance>): Promise<void> {
-      const docRef = doc(this.firestore, this.collectionName, id)
-      await updateDoc(docRef, data)
-   }
+  const col = collection(this.firestore, this.collectionName);
+  const q = query(
+    col,
+    where('studentId', '==', studentId),
+    where('createdAt', '>=', Timestamp.fromDate(startOfDay)),
+    where('createdAt', '<=', Timestamp.fromDate(endOfDay)),
+    limit(1)
+  );
 
-   async delete(id: string): Promise<void> {
-      const docRef = doc(this.firestore, this.collectionName, id)
-      await deleteDoc(docRef)
-   }
+  const snapshot = await getDocs(q);
+  return !snapshot.empty;
+}
+
+  async create(id: string, data: StudentAttendance): Promise<void> {
+    const docRef = doc(this.firestore, this.collectionName, id);
+    await setDoc(docRef, {
+      ...data,
+      createdAt: Timestamp.now()
+    });
+  }
+
+  async update(id: string, data: Partial<StudentAttendance>): Promise<void> {
+    const docRef = doc(this.firestore, this.collectionName, id);
+    await updateDoc(docRef, data);
+  }
+
+  async delete(id: string): Promise<void> {
+    const docRef = doc(this.firestore, this.collectionName, id);
+    await deleteDoc(docRef);
+  }
 }
