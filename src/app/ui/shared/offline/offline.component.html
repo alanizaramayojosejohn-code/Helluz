@@ -1,0 +1,38 @@
+@if (isOffline()) {
+   <div
+      class="fixed inset-0 z-[9999] bg-[#0a0a0a] text-white flex items-center justify-center px-6"
+      role="alertdialog"
+      aria-live="assertive"
+      aria-labelledby="offline-title"
+      aria-describedby="offline-desc">
+      <div class="max-w-md w-full flex flex-col items-center gap-7 text-center">
+         <div class="relative w-28 h-28 flex items-center justify-center">
+            <div class="absolute inset-0 rounded-full bg-red-600/30 blur-2xl" aria-hidden="true"></div>
+            <div class="absolute inset-2 rounded-full border border-red-600/30" aria-hidden="true"></div>
+            <div
+               class="relative w-20 h-20 rounded-full bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center shadow-[0_0_40px_rgba(220,38,38,0.5)]">
+               <i class="fas fa-wifi text-white text-3xl opacity-30"></i>
+               <i class="fas fa-slash text-white text-3xl absolute"></i>
+            </div>
+         </div>
+
+         <div class="flex flex-col gap-3">
+            <span class="text-red-500 text-[11px] font-bold tracking-[0.25em]">SIN CONEXIÓN</span>
+            <h1 id="offline-title" class="font-display text-3xl md:text-4xl font-black leading-tight tracking-tight">
+               Conéctate a internet
+            </h1>
+            <p id="offline-desc" class="text-sm md:text-base text-gray-400 leading-relaxed">
+               Helluz necesita conexión para funcionar. Revisa tu red Wi-Fi o tus datos móviles e intenta de nuevo.
+            </p>
+         </div>
+
+         <button
+            type="button"
+            (click)="reload()"
+            class="inline-flex items-center justify-center gap-2 bg-red-600 hover:bg-red-500 text-white font-bold px-7 py-3.5 rounded-full shadow-[0_8px_24px_-4px_rgba(220,38,38,0.6)] transition-all hover:-translate-y-0.5">
+            <i class="fas fa-rotate-right text-sm"></i>
+            Reintentar
+         </button>
+      </div>
+   </div>
+}

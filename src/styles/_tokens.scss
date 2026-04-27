@@ -1,0 +1,201 @@
+/* ============================================================================
+   Helluz Design Tokens · sincronizado con home-redesign.pen
+   - Default: tema "soft" (cream cálido)
+   - Switch via [data-theme="dark|light|soft|dim"] en <html>
+   ============================================================================ */
+
+:root {
+   /* Color · brand */
+   --color-brand-500: #b91c1c;
+   --color-brand-600: #991b1b;
+   --color-brand-700: #7f1d1d;
+   --color-brand-900: #7f1d1d;
+
+   /* Color · status (no temáticos) */
+   --color-success: #16a34a;
+   --color-warning: #f59e0b;
+   --color-info: #3b82f6;
+   --color-error: #dc2626;
+
+   /* Color · superficies (default = soft) */
+   --color-bg-base: #faf6ee;
+   --color-bg-surface: #fffdf7;
+   --color-bg-elevated: #ffffff;
+   --color-bg-inset: #f0e9da;
+   --color-bg-brand-soft: #fdece6;
+
+   /* Color · bordes (default = soft) */
+   --color-border-default: #e8dfca;
+   --color-border-strong: #bfb29a;
+   --color-border-subtle: #f4ede2;
+   --color-border-brand: #dc262666;
+
+   /* Color · texto (default = soft) */
+   --color-text-primary: #1a1410;
+   --color-text-secondary: #665a4a;
+   --color-text-tertiary: #9c8d76;
+   --color-text-brand: #dc2626;
+   --color-text-on-brand: #ffffff;
+   --color-text-inverse: #ffffff;
+
+   /* Tipografía · familias */
+   --font-family-display: 'Archivo Black', 'Inter', system-ui, sans-serif;
+   --font-family-body: 'Inter', system-ui, -apple-system, sans-serif;
+   --font-family-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+
+   /* Tipografía · tamaños */
+   --font-display: 3.375rem;   /* 54 */
+   --font-h1: 2.5rem;          /* 40 */
+   --font-h2: 2rem;            /* 32 */
+   --font-h3: 1.5rem;          /* 24 */
+   --font-h4: 1.125rem;        /* 18 */
+   --font-body-lg: 1rem;       /* 16 */
+   --font-body: 0.875rem;      /* 14 */
+   --font-body-sm: 0.8125rem;  /* 13 */
+   --font-caption: 0.75rem;    /* 12 */
+   --font-label: 0.6875rem;    /* 11 */
+
+   /* Tipografía · pesos */
+   --weight-regular: 400;
+   --weight-medium: 500;
+   --weight-semibold: 600;
+   --weight-bold: 700;
+   --weight-extrabold: 800;
+
+   /* Spacing · escala 4px */
+   --space-1: 0.25rem;   /* 4 */
+   --space-2: 0.5rem;    /* 8 */
+   --space-3: 0.75rem;   /* 12 */
+   --space-4: 1rem;      /* 16 */
+   --space-5: 1.25rem;   /* 20 */
+   --space-6: 1.5rem;    /* 24 */
+   --space-8: 2rem;      /* 32 */
+   --space-10: 2.5rem;   /* 40 */
+   --space-12: 3rem;     /* 48 */
+   --space-16: 4rem;     /* 64 */
+   --space-20: 5rem;     /* 80 */
+
+   /* Radii */
+   --radius-sm: 4px;
+   --radius-md: 8px;
+   --radius-lg: 12px;
+   --radius-xl: 16px;
+   --radius-2xl: 24px;
+   --radius-full: 999px;
+
+   /* Sombras (papel cálido) */
+   --shadow-sm: 0 1px 2px 0 #1a141014;
+   --shadow-md: 0 6px 16px -4px #1a14101f;
+   --shadow-lg: 0 14px 32px -8px #1a14102e;
+   --shadow-xl: 0 24px 60px -12px #1a141040;
+   --shadow-brand: 0 8px 20px -6px #dc262666;
+
+   /* Border widths */
+   --border-hairline: 1px;
+   --border-standard: 1.5px;
+   --border-thick: 2px;
+   --border-heavy: 3px;
+
+   /* Icon sizes */
+   --icon-xs: 14px;
+   --icon-sm: 16px;
+   --icon-md: 20px;
+   --icon-lg: 24px;
+   --icon-xl: 32px;
+
+   /* Opacidades */
+   --opacity-disabled: 0.4;
+   --opacity-muted: 0.6;
+   --opacity-scrim: 0.5;
+   --opacity-hover: 0.08;
+   --opacity-pressed: 0.12;
+
+   /* Z-index */
+   --z-base: 0;
+   --z-dropdown: 1000;
+   --z-sticky: 1100;
+   --z-drawer: 1200;
+   --z-modal: 1300;
+   --z-popover: 1400;
+   --z-toast: 1500;
+   --z-tooltip: 1600;
+
+   /* Animación · duración */
+   --duration-instant: 80ms;
+   --duration-fast: 160ms;
+   --duration-normal: 240ms;
+   --duration-slow: 400ms;
+   --duration-slower: 600ms;
+
+   /* Animación · easing */
+   --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+   --easing-decelerate: cubic-bezier(0, 0, 0, 1);
+   --easing-accelerate: cubic-bezier(0.3, 0, 1, 1);
+   --easing-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ─── Theme · light (panel claro estándar) ──────────────────────────────── */
+[data-theme='light'] {
+   --color-bg-base: #ffffff;
+   --color-bg-surface: #f9fafb;
+   --color-bg-elevated: #ffffff;
+   --color-bg-inset: #f3f4f6;
+   --color-bg-brand-soft: #fef2f2;
+
+   --color-border-default: #e5e7eb;
+   --color-border-strong: #d1d5db;
+   --color-border-subtle: #f3f4f6;
+
+   --color-text-primary: #0a0a0a;
+   --color-text-secondary: #4b5563;
+   --color-text-tertiary: #9ca3af;
+   --color-text-inverse: #ffffff;
+
+   --color-brand-500: #dc2626;
+   --color-brand-600: #b91c1c;
+   --color-brand-700: #991b1b;
+}
+
+/* ─── Theme · dark (landing oscura) ─────────────────────────────────────── */
+[data-theme='dark'] {
+   --color-bg-base: #0a0a0a;
+   --color-bg-surface: #111111;
+   --color-bg-elevated: #1a1a1a;
+   --color-bg-inset: #0a0a0a;
+   --color-bg-brand-soft: #1a0505;
+
+   --color-border-default: #1f1f1f;
+   --color-border-strong: #374151;
+   --color-border-subtle: #141414;
+
+   --color-text-primary: #ffffff;
+   --color-text-secondary: #9ca3af;
+   --color-text-tertiary: #6b7280;
+   --color-text-inverse: #0a0a0a;
+
+   --color-brand-500: #dc2626;
+   --color-brand-600: #b91c1c;
+   --color-brand-700: #991b1b;
+}
+
+/* ─── Theme · dim (panel oscuro suave) ──────────────────────────────────── */
+[data-theme='dim'] {
+   --color-bg-base: #1f2024;
+   --color-bg-surface: #262830;
+   --color-bg-elevated: #2d2f37;
+   --color-bg-inset: #1a1c20;
+   --color-bg-brand-soft: #2d1818;
+
+   --color-border-default: #393b42;
+   --color-border-strong: #4a4c54;
+   --color-border-subtle: #2d2f37;
+
+   --color-text-primary: #e5e7eb;
+   --color-text-secondary: #a8aab0;
+   --color-text-tertiary: #797b82;
+   --color-text-inverse: #1f2024;
+
+   --color-brand-500: #ef4444;
+   --color-brand-600: #dc2626;
+   --color-brand-700: #b91c1c;
+}

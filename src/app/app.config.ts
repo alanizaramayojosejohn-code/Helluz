@@ -1,6 +1,7 @@
-import { ApplicationConfig, LOCALE_ID, provideZoneChangeDetection } from '@angular/core'
+import { ApplicationConfig, LOCALE_ID, isDevMode, provideZoneChangeDetection } from '@angular/core'
 import { provideRouter } from '@angular/router'
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'
+import { provideServiceWorker } from '@angular/service-worker'
 
 // Firebase (AngularFire modular)
 import { provideFirebaseApp, initializeApp, getApp } from '@angular/fire/app'
@@ -35,5 +36,10 @@ export const appConfig: ApplicationConfig = {
       { provide: LOCALE_ID, useValue: 'es-ES' },
       { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
       { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
+
+      provideServiceWorker('ngsw-worker.js', {
+         enabled: !isDevMode(),
+         registrationStrategy: 'registerWhenStable:30000',
+      }),
    ],
 }

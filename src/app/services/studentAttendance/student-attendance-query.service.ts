@@ -28,6 +28,28 @@ export class StudentAttendanceQueryService {
     return docData(docRef, { idField: 'id' }) as Observable<StudentAttendance | undefined>;
   }
 
+  getByBranchAndDateRange(
+    branchId: string,
+    startDate: Date,
+    endDate: Date
+  ): Observable<StudentAttendance[]> {
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+
+    const col = collection(this.firestore, this.collectionName);
+    const q = query(
+      col,
+      where('branchId', '==', branchId),
+      where('createdAt', '>=', Timestamp.fromDate(start)),
+      where('createdAt', '<=', Timestamp.fromDate(end)),
+      orderBy('createdAt', 'desc')
+    );
+
+    return collectionData(q, { idField: 'id' }) as Observable<StudentAttendance[]>;
+  }
+
   getByBranchAndDate(
     branchId: string,
     date: Date,

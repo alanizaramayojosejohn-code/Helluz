@@ -1,109 +1,296 @@
-<div class="bg-black font-body text-white flex flex-col min-h-screen relative">
-   <div class="absolute inset-0 bg-black/70 z-[1]"></div>
+<div class="bg-bg-base min-h-screen flex flex-col font-body text-ink">
+   <!-- ───── Navbar ─────────────────────────────────────────────────────── -->
+   <nav
+      class="sticky top-0 z-sticky bg-bg-base/95 backdrop-blur border-b border-hairline border-border-default px-5 md:px-10 py-5 flex items-center gap-6">
+      <a routerLink="/" class="flex no-underline items-center gap-3 shrink-0">
+         <img src="/images/Logo.webp" alt="Helluz" class="w-10 h-10 rounded-md object-contain" />
+         <span class="text-body-lg  text-ink font-extrabold tracking-[0.25em] hidden sm:inline ">HELLUZ</span>
+      </a>
 
-   <section class="relative z-[2] flex-1 flex items-center justify-center text-center px-6 py-16">
-      <div class="max-w-3xl mx-auto">
-         <h1
-            class="font-display text-4xl md:text-5xl text-white text-glow tracking-wide mb-4 transition-all hover:text-5xl hover:md:text-6xl duration-500"
-         >
-            Control de Asistencia Academia HELLUZ
-         </h1>
-         <img
-            src="/images/Logo.webp"
-            alt="Logo Helluz"
-            class="w-3/12 mt-10 rounded-full shadow-md shadow-red-700 transition-all hover:shadow-lg hover:shadow-red-500 hover:w-4/12 duration-500"
-         />
+      <ul class="hidden lg:flex items-center gap-8 text-body-sm font-medium flex-1 justify-center">
+         <li><a routerLink="/"
+               class="font-bold text-ink hover:text-brand-500 transition-colors duration-fast">Inicio</a></li>
+         <li><a href="#disciplinas"
+               class="text-muted hover:text-brand-500 transition-colors duration-fast">Disciplinas</a></li>
+         <li><a href="#horarios" class="text-muted hover:text-brand-500 transition-colors duration-fast">Horarios</a>
+         </li>
+         <li>
+            <a href="https://wa.me/59160422094" target="_blank" rel="noopener"
+               class="text-muted hover:text-brand-500 transition-colors duration-fast">Contacto</a>
+         </li>
+      </ul>
 
-         <div class="flex flex-wrap m-10 justify-center gap-4">
-            <a href="/log-in"
-               ><button
-                  class="bg-black py-2 px-4 border-solid border-gray-950 text-lg hover:text-xl shadow-sm shadow-red-700 rounded-full hover:shadow-md hover:shadow-red-500 text-white transition-all hover:px-6 hover:py-3 duration-500"
-               >
-                  Ingresar al Sistema
-               </button>
-            </a>
-         </div>
+      <div class="flex items-center gap-2 ml-auto lg:ml-0">
+         <a routerLink="/asistenciaalumnos"
+            class="hidden md:inline-flex no-underline text-gray-900 items-center gap-2 text-caption font-bold tracking-wide px-4 py-2.5 rounded-full transition-colors duration-fast hover:bg-bg-inset">
+            Marcar asistencia
+         </a>
+         <a routerLink="/log-in"
+            class="inline-flex no-underline items-center gap-2 bg-brand-500 hover:bg-brand-600 text-on-brand text-caption font-extrabold tracking-wide px-5 py-2.5 rounded-full transition-colors duration-fast">
+            Ingresar
+            <span class="material-symbols-rounded !text-[14px] !w-[14px] !h-[14px] leading-none">arrow_forward</span>
+         </a>
+      </div>
+   </nav>
 
-         <div class="mt-12">
-            <p class="text-xl text-gray-300 transition-all hover:text-2xl duration-500">
-               Registra tu Asistencia aquí
+   <!-- ───── Hero ───────────────────────────────────────────────────────── -->
+   <section class="px-5 md:px-20 py-16 md:py-24 max-w-7xl mx-auto w-full">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+         <!-- Left -->
+         <div class="flex flex-col gap-7">
+            <span
+               class="inline-flex items-center gap-2 self-start px-3.5 py-1.5 rounded-full bg-bg-brand-soft border border-hairline border-border-brand text-text-brand text-label font-extrabold tracking-[0.2em] uppercase">
+               <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+               Academia de artes marciales · Oruro
+            </span>
+
+            <h1 class="text-[clamp(3rem,7vw,5rem)] font-extrabold leading-[0.95] tracking-[-0.04em] m-0">
+               Disciplina, técnica<br />y resultados.
+            </h1>
+
+            <p class="text-body-lg text-muted leading-relaxed max-w-xl m-0">
+               Sistema digital de asistencia y gestión para tu academia.
             </p>
+
+            <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
+               <a routerLink="/log-in"
+                  class="inline-flex no-underline items-center justify-center gap-2 bg-brand-500 hover:bg-brand-600 text-on-brand font-extrabold px-7 py-4 rounded-full shadow-brand transition-all duration-fast hover:-translate-y-0.5">
+                  Ingresar al sistema
+                  <span
+                     class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none">arrow_forward</span>
+               </a>
+               <a routerLink="/asistenciaalumnos"
+                  class="inline-flex no-underline items-center justify-center gap-2 bg-transparent border-standard border-ink text-ink font-extrabold px-7 py-4 rounded-full transition-colors duration-fast hover:bg-ink hover:text-on-brand">
+                  <span
+                     class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none">qr_code_scanner</span>
+                  Marcar asistencia
+               </a>
+            </div>
+
+            <!-- Social proof -->
+            <div class="flex items-center gap-3 pt-3">
+               <div class="relative h-9 w-[160px]">
+                  <div
+                     class="absolute inset-y-0 left-0 w-9 rounded-full bg-brand-500 border-thick border-bg-base flex items-center justify-center text-on-brand text-caption font-extrabold">
+                     DQ</div>
+                  <div
+                     class="absolute inset-y-0 left-6 w-9 rounded-full bg-[#665a4a] border-thick border-bg-base flex items-center justify-center text-white text-caption font-extrabold">
+                     AC</div>
+                  <div
+                     class="absolute inset-y-0 left-12 w-9 rounded-full bg-info border-thick border-bg-base flex items-center justify-center text-white text-caption font-extrabold">
+                     LM</div>
+                  <div
+                     class="absolute inset-y-0 left-[72px] w-9 rounded-full bg-warning border-thick border-bg-base flex items-center justify-center text-ink text-caption font-extrabold">
+                     MR</div>
+                  <div
+                     class="absolute inset-y-0 left-24 w-9 rounded-full bg-ink border-thick border-bg-base flex items-center justify-center text-bg-base text-[10px] font-extrabold font-mono">
+                     +196</div>
+               </div>
+               <div>
+                  <p class="text-body-sm font-extrabold m-0">+200 fighters entrenando</p>
+                  <p class="text-caption text-faint m-0">En 4 disciplinas · 3 sucursales</p>
+               </div>
+            </div>
          </div>
-         <div class="flex flex-wrap justify-center gap-4 mt-4">
-            <a href="/asistenciaalumnos"
-               ><button
-                  class="bg-black py-2 px-8 m-4 border-solid border-gray-950 text-lg hover:text-xl shadow-sm shadow-red-900 rounded-full hover:shadow-md hover:shadow-red-500 text-white transition-all hover:px-12 hover:py-3 duration-500"
-               >
-                  Marcar Asistencia
+
+         <!-- Right · visual -->
+         <div class="relative aspect-square max-w-md mx-auto w-full hidden sm:block">
+            <div class="absolute inset-[12%] rounded-full bg-brand-500/30 blur-3xl" aria-hidden="true"></div>
+            <div class="absolute inset-[6%] rounded-full border border-hairline border-border-default"
+               aria-hidden="true"></div>
+            <div class="absolute inset-[16%] rounded-full border border-hairline border-dashed border-border-brand"
+               aria-hidden="true"></div>
+            <img src="/images/Logo.webp" alt="Helluz MMA"
+               class="absolute rounded-full inset-[10%] w-[80%] h-[80%] object-contain drop-shadow-[0_24px_60px_rgba(220,38,38,0.4)]" />
+
+            <!-- floating chips -->
+            <div
+               class="absolute top-[20%] -left-2 lg:-left-6 bg-bg-elevated border border-hairline border-border-default rounded-full px-4 py-2.5 flex items-center gap-2.5 shadow-md">
+               <span
+                  class="material-symbols-rounded !text-[20px] !w-[20px] !h-[20px] leading-none text-success">check_circle</span>
+               <span class="text-body-sm font-extrabold">Asistencia registrada</span>
+            </div>
+            <div
+               class="absolute bottom-[8%] -right-2 lg:-right-4 bg-ink text-bg-base border border-hairline border-ink rounded-full px-4 py-2.5 flex items-center gap-2.5 shadow-md">
+               <span
+                  class="material-symbols-rounded !text-[20px] !w-[20px] !h-[20px] leading-none text-brand-500">bolt</span>
+               <span class="text-body-sm font-extrabold">Tiempo real</span>
+            </div>
+         </div>
+      </div>
+   </section>
+
+   <!-- ───── Stats inline ───────────────────────────────────────────────── -->
+   <section class="px-5 md:px-20 pb-16 max-w-7xl mx-auto w-full">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-0">
+         <div class="flex flex-col gap-1 pr-6">
+            <p class="text-label font-extrabold tracking-[0.2em] text-faint uppercase m-0">Alumnos activos</p>
+            <p class="text-[3rem] font-extrabold leading-none tracking-tighter font-mono m-0">+200</p>
+            <p class="text-body-sm text-muted m-0">Entrenando esta temporada</p>
+         </div>
+         <div class="flex flex-col gap-1 px-6 border-l border-hairline border-border-default">
+            <p class="text-label font-extrabold tracking-[0.2em] text-faint uppercase m-0">Asistencia</p>
+            <p class="text-[3rem] font-extrabold leading-none tracking-tighter font-mono m-0">98%</p>
+            <p class="text-body-sm text-muted m-0">Registrada en plataforma</p>
+         </div>
+         <div class="flex flex-col gap-1 px-6 border-l border-hairline border-border-default">
+            <p class="text-label font-extrabold tracking-[0.2em] text-faint uppercase m-0">Disponibilidad</p>
+            <p class="text-[3rem] font-extrabold leading-none tracking-tighter font-mono m-0">24/7</p>
+            <p class="text-body-sm text-muted m-0">Acceso al panel</p>
+         </div>
+         <div class="flex flex-col gap-1 pl-6 border-l border-hairline border-border-default">
+            <p class="text-label font-extrabold tracking-[0.2em] text-faint uppercase m-0">Instructores</p>
+            <p class="text-[3rem] font-extrabold leading-none tracking-tighter font-mono m-0">12</p>
+            <p class="text-body-sm text-muted m-0">Certificados y activos</p>
+         </div>
+      </div>
+   </section>
+
+   <!-- ───── Features ───────────────────────────────────────────────────── -->
+   <section id="disciplinas" class="bg-bg-surface px-5 md:px-20 py-20 md:py-28">
+      <div class="max-w-7xl mx-auto flex flex-col gap-10">
+         <div class="flex flex-col items-center gap-4 text-center">
+            <span class="text-label font-extrabold tracking-[0.25em] text-text-brand uppercase">Funcionalidades</span>
+            <h2 class="text-[clamp(2rem,5vw,3rem)] font-extrabold leading-[1.05] tracking-[-0.03em] max-w-2xl m-0">
+               Todo lo que necesita tu academia.
+            </h2>
+            <p class="text-body-lg text-muted max-w-xl m-0">
+               Diseñado con entrenadores y atletas de Bolivia. Pensado para el ritmo real de una academia de combate.
+            </p>
+
+            <!-- Discipline tabs -->
+            <div class="inline-flex items-center gap-0 p-0.5 bg-bg-inset rounded-full mt-4">
+               <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-bg-elevated shadow-sm">
+                  <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                  <span class="text-label font-extrabold tracking-wide">MMA</span>
                </button>
-            </a>
+               <button
+                  class="px-4 py-2 rounded-full text-label font-extrabold tracking-wide text-muted hover:text-ink transition-colors">BOXEO</button>
+               <button
+                  class="px-4 py-2 rounded-full text-label font-extrabold tracking-wide text-muted hover:text-ink transition-colors">MUAY
+                  THAI</button>
+               <button
+                  class="px-4 py-2 rounded-full text-label font-extrabold tracking-wide text-muted hover:text-ink transition-colors">BJJ</button>
+            </div>
+         </div>
+
+         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <article
+               class="bg-bg-elevated border border-hairline border-border-default rounded-2xl p-8 flex flex-col gap-4">
+               <div class="w-14 h-14 rounded-xl bg-bg-brand-soft flex items-center justify-center">
+                  <span
+                     class="material-symbols-rounded !text-[28px] !w-[28px] !h-[28px] leading-none text-text-brand">groups</span>
+               </div>
+               <h3 class="text-h3 font-extrabold m-0">Gestión de alumnos</h3>
+               <p class="text-body text-muted leading-relaxed m-0">
+                  Administra perfiles, membresías y rendimiento de cada uno de tus luchadores desde un solo lugar.
+               </p>
+               <a routerLink="/log-in"
+                  class="inline-flex no-underline text-gray-900 items-center gap-1.5 text-body-sm font-extrabold text-text-brand mt-2">
+                  Conocer más
+                  <span
+                     class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none">arrow_forward</span>
+               </a>
+            </article>
+
+            <article class="bg-ink text-bg-base rounded-2xl p-8 flex flex-col gap-4 shadow-lg">
+               <div class="w-14 h-14 rounded-xl bg-brand-500 flex items-center justify-center">
+                  <span
+                     class="material-symbols-rounded !text-[28px] !w-[28px] !h-[28px] leading-none text-on-brand">qr_code_scanner</span>
+               </div>
+               <h3 class="text-h3 font-extrabold m-0">Asistencia con CI</h3>
+               <p class="text-body text-bg-base/70 leading-relaxed m-0">
+                  credencial digital y registro manual rápido. Marca asistencia masiva en menos de
+                  un minuto.
+               </p>
+               <a routerLink="/asistenciaalumnos"
+                  class="inline-flex no-underline items-center gap-1.5 text-body-sm font-extrabold text-brand-500 mt-2">
+                  Probar el lector
+                  <span
+                     class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none">arrow_forward</span>
+               </a>
+            </article>
+
+            <article
+               class="bg-bg-elevated border border-hairline border-border-default rounded-2xl p-8 flex flex-col gap-4">
+               <div class="w-14 h-14 rounded-xl bg-bg-brand-soft flex items-center justify-center">
+                  <span
+                     class="material-symbols-rounded !text-[28px] !w-[28px] !h-[28px] leading-none text-text-brand">trending_up</span>
+               </div>
+               <h3 class="text-h3 font-extrabold m-0">Estadísticas en vivo</h3>
+               <p class="text-body text-muted leading-relaxed m-0">
+                  Visualiza progreso, asistencia y desempeño de cada clase con reportes que se actualizan en tiempo
+                  real.
+               </p>
+               <a routerLink="/log-in"
+                  class="inline-flex no-underline text-gray-900 items-center gap-1.5 text-body-sm font-extrabold text-text-brand mt-2">
+                  Ver reportes
+                  <span
+                     class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none">arrow_forward</span>
+               </a>
+            </article>
          </div>
       </div>
    </section>
 
-   <section class="relative z-[2] bg-black/80 px-6 py-16">
-      <div class="max-w-5xl mx-auto">
-         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div class="flex flex-col items-center">
-               <h4 class="font-display text-2xl tracking-wider mb-2">Gestión de Alumnos</h4>
-               <p class="text-gray-400 text-sm leading-relaxed">
-                  Administra la asistencia y el rendimiento de tus luchadores fácilmente.
-               </p>
-            </div>
-
-            <div class="flex flex-col items-center">
-               <h4 class="font-display text-2xl tracking-wider mb-2">Registro Automático</h4>
-               <p class="text-gray-400 text-sm leading-relaxed">
-                  Control de asistencia mediante lector, código o registro manual.
-               </p>
-            </div>
-
-            <div class="flex flex-col items-center">
-               <h4 class="font-display text-2xl tracking-wider mb-2">Estadísticas en Tiempo Real</h4>
-               <p class="text-gray-400 text-sm leading-relaxed">
-                  Visualiza el progreso de tus alumnos y el desempeño de tus clases.
-               </p>
-            </div>
+   <!-- ───── CTA banner ─────────────────────────────────────────────────── -->
+   <section class="px-5 md:px-20 py-16 md:py-20">
+      <div
+         class="max-w-7xl mx-auto bg-brand-500 text-on-brand rounded-3xl p-10 md:p-14 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 md:gap-12 shadow-xl">
+         <div class="flex-1 flex flex-col gap-2">
+            <span class="text-label font-extrabold tracking-[0.25em] text-white/70 uppercase">Asistencia
+               instantánea</span>
+            <h3 class="text-[clamp(1.75rem,4vw,2.5rem)] font-extrabold leading-[1.05] tracking-[-0.03em] m-0">
+               ¿Listo para registrar tu asistencia?
+            </h3>
+            <p class="text-body-lg text-white/90 m-0">Ingresa tu código y marca tu asistencia en segundos. Sin filas,
+               sin papel.</p>
          </div>
+         <a routerLink="/asistenciaalumnos"
+            class="inline-flex items-center gap-3 bg-ink hover:bg-ink/90 text-bg-base font-extrabold px-8 py-4 rounded-full transition-colors w-full md:w-auto justify-center">
+            <span class="material-symbols-rounded !text-[22px] !w-[22px] !h-[22px] leading-none">qr_code_scanner</span>
+            Marcar asistencia
+         </a>
       </div>
    </section>
 
-   <footer
-      class="relative z-[2] bg-[#111] border-t border-white/10 py-5 px-4 flex flex-wrap justify-center items-center gap-3 text-center"
-   >
-      <small class="basis-full text-gray-400 mb-1 block text-xs">
-         © 2026 Academia HELLUZ | Sistema de Control de Asistencia
-      </small>
-      <a
-         href="https://www.facebook.com/AsociacionDepartamentalDeArtesMarcialesMixtasOruro"
-         target="_blank"
-         class="text-white hover:text-blue-500 transition-colors text-2xl"
-      >
-         <i class="fab fa-facebook"></i>
-      </a>
+   <!-- ───── Footer ─────────────────────────────────────────────────────── -->
+   <footer class="mt-auto bg-ink text-bg-base px-5 md:px-20 py-10">
+      <div class="max-w-7xl mx-auto flex flex-col gap-6">
+         <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-3">
+               <img src="/images/Logo.webp" alt="Helluz" class="w-9 h-9 rounded-md object-contain" />
+               <span class="text-body-lg font-extrabold tracking-[0.25em]">HELLUZ</span>
+            </div>
 
-      <a
-         href="https://www.instagram.com/helluzteam_or/"
-         target="_blank"
-         class="text-white hover:text-pink-500 transition-colors text-2xl"
-      >
-         <i class="fab fa-instagram"></i>
-      </a>
+            <div class="flex items-center gap-3">
+               <a href="https://www.facebook.com/AsociacionDepartamentalDeArtesMarcialesMixtasOruro" target="_blank"
+                  rel="noopener" aria-label="Facebook"
+                  class="w-10 h-10 rounded-full bg-white/5 border border-hairline border-white/10 flex items-center justify-center hover:text-brand-500 hover:border-brand-500/40 transition-colors">
+                  <i class="fab fa-facebook"></i>
+               </a>
+               <a href="https://www.instagram.com/helluzteam_or/" target="_blank" rel="noopener" aria-label="Instagram"
+                  class="w-10 h-10 rounded-full bg-white/5 border border-hairline border-white/10 flex items-center justify-center hover:text-brand-500 hover:border-brand-500/40 transition-colors">
+                  <i class="fab fa-instagram"></i>
+               </a>
+               <a href="https://www.tiktok.com/@teamhelluzmma" target="_blank" rel="noopener" aria-label="TikTok"
+                  class="w-10 h-10 rounded-full bg-white/5 border border-hairline border-white/10 flex items-center justify-center hover:text-brand-500 hover:border-brand-500/40 transition-colors">
+                  <i class="fab fa-tiktok"></i>
+               </a>
+               <a href="https://wa.me/59160422094?text=Hola,%20quiero%20más%20información" target="_blank"
+                  rel="noopener" aria-label="WhatsApp"
+                  class="w-10 h-10 rounded-full bg-white/5 border border-hairline border-white/10 flex items-center justify-center hover:text-brand-500 hover:border-brand-500/40 transition-colors">
+                  <i class="fab fa-whatsapp"></i>
+               </a>
+            </div>
+         </div>
 
-      <a
-         href="https://www.tiktok.com/@teamhelluzmma"
-         target="_blank"
-         class="text-white hover:text-gray-500 transition-colors text-2xl"
-      >
-         <i class="fab fa-tiktok"></i>
-      </a>
+         <div class="h-px bg-white/10"></div>
 
-      <a
-         href="https://wa.me/59160422094?text=Hola,%20quiero%20más%20información"
-         target="_blank"
-         class="text-white hover:text-green-500 transition-colors text-2xl"
-      >
-         <i class="fab fa-whatsapp"></i>
-      </a>
+         <div class="flex flex-col md:flex-row items-center justify-between gap-3 text-caption text-white/60">
+            <span>© 2026 Academia HELLUZ · Sistema de Control de Asistencia</span>
+            <span>Oruro · Bolivia</span>
+         </div>
+      </div>
    </footer>
 </div>
