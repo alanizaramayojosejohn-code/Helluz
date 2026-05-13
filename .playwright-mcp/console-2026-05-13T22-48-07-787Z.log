@@ -1,0 +1,4 @@
+[     143ms] [LOG] Angular is running in development mode. @ http://localhost:4200/@fs/C:/Users/Jose/Desktop/Helluz/Helluz/.angular/cache/21.0.4/frontend/vite/deps/chunk-CY6J4DDH.js?v=5c8dfdd7:11150
+[     188ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://localhost:4200/admin:0
+[     205ms] [INFO] Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner. @ http://localhost:4200/admin:0
+[   54502ms] [WARNING] Calling Firebase APIs outside of an Injection context may destabilize your application leading to subtle change-detection and hydration bugs. Find more at https://github.com/angular/angularfire/blob/main/docs/zones.md @ http://localhost:4200/@fs/C:/Users/Jose/Desktop/Helluz/Helluz/.angular/cache/21.0.4/frontend/vite/deps/chunk-5LSZQGZE.js?v=5c8dfdd7:148

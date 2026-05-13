@@ -1,0 +1,212 @@
+- generic [ref=e2]:
+  - generic [ref=e110]:
+    - complementary [ref=e111]:
+      - generic [ref=e112]:
+        - img "Helluz" [ref=e113]
+        - generic [ref=e114]: HELLUZ
+        - button "Toggle sidebar" [ref=e115] [cursor=pointer]:
+          - img [ref=e116]: menu_open
+      - navigation [ref=e117]:
+        - link "Dashboard" [ref=e118] [cursor=pointer]:
+          - /url: /admin/home
+          - img [ref=e119]: dashboard
+          - generic [ref=e120]: Dashboard
+        - link "Alumnos" [ref=e121] [cursor=pointer]:
+          - /url: /admin/alumnos
+          - img [ref=e122]: school
+          - generic [ref=e123]: Alumnos
+        - link "Inscripciones" [ref=e124] [cursor=pointer]:
+          - /url: /admin/inscripciones
+          - img [ref=e125]: assignment
+          - generic [ref=e126]: Inscripciones
+        - link "Horarios" [ref=e127] [cursor=pointer]:
+          - /url: /admin/horarios
+          - img [ref=e128]: schedule
+          - generic [ref=e129]: Horarios
+        - link "Membresías" [ref=e130] [cursor=pointer]:
+          - /url: /admin/membresias
+          - img [ref=e131]: card_membership
+          - generic [ref=e132]: Membresías
+        - link "Instructores" [ref=e133] [cursor=pointer]:
+          - /url: /admin/instructores
+          - img [ref=e134]: fitness_center
+          - generic [ref=e135]: Instructores
+        - link "Usuarios" [ref=e136] [cursor=pointer]:
+          - /url: /admin/usuarios
+          - img [ref=e137]: groups
+          - generic [ref=e138]: Usuarios
+        - link "Sucursales" [ref=e139] [cursor=pointer]:
+          - /url: /admin/sucursales
+          - img [ref=e140]: storefront
+          - generic [ref=e141]: Sucursales
+        - link "Asistencias alumnos" [ref=e142] [cursor=pointer]:
+          - /url: /admin/asistenciasa
+          - img [ref=e143]: list_alt
+          - generic [ref=e144]: Asistencias alumnos
+        - link "Asistencias instructor" [ref=e145] [cursor=pointer]:
+          - /url: /admin/asistenciasi
+          - img [ref=e146]: task_alt
+          - generic [ref=e147]: Asistencias instructor
+        - link "Finanzas" [ref=e148] [cursor=pointer]:
+          - /url: /admin/finanzas
+          - img [ref=e149]: account_balance
+          - generic [ref=e150]: Finanzas
+        - link "Marcar asistencia" [ref=e151] [cursor=pointer]:
+          - /url: /admin/asistenciainstructores
+          - img [ref=e152]: qr_code_scanner
+          - generic [ref=e153]: Marcar asistencia
+      - generic [ref=e154]:
+        - generic [ref=e155]: AA
+        - generic [ref=e156]:
+          - paragraph [ref=e157]: admin admin
+          - paragraph [ref=e158]: Administrador
+        - button "Más opciones" [ref=e159] [cursor=pointer]:
+          - img [ref=e160]: more_horiz
+    - generic [ref=e161]:
+      - banner [ref=e163]:
+        - navigation "Breadcrumb" [ref=e164]:
+          - img [ref=e165]: home
+          - link "Inicio" [ref=e166] [cursor=pointer]:
+            - /url: /admin/home
+          - generic [ref=e167]: ›
+          - generic [ref=e168]: Dashboard
+        - button "Menú de usuario" [ref=e170] [cursor=pointer]:
+          - generic [ref=e171]: AA
+          - generic [ref=e172]: admin admin
+          - img [ref=e173]: keyboard_arrow_down
+      - main [ref=e174]:
+        - generic [ref=e177]:
+          - generic [ref=e178]:
+            - navigation "Breadcrumb" [ref=e179]:
+              - generic [ref=e180]: home
+              - generic [ref=e181] [cursor=pointer]: Inicio
+              - generic [ref=e182]: ›
+              - generic [ref=e183]: Dashboard
+            - generic [ref=e184]:
+              - generic [ref=e185]:
+                - heading "Buen día, admin admin" [level=1] [ref=e186]
+                - paragraph [ref=e187]: 0 clases programadas hoy · 6 fighters activos
+              - generic [ref=e188]:
+                - generic [ref=e189] [cursor=pointer]:
+                  - generic [ref=e190]: storefront
+                  - combobox "Seleccionar sucursal" [ref=e191]:
+                    - option "Helluz" [selected]
+                  - generic [ref=e192]: keyboard_arrow_down
+                - link "add Nuevo alumno" [ref=e193] [cursor=pointer]:
+                  - /url: /admin/usuarios
+                  - generic [ref=e194]: add
+                  - text: Nuevo alumno
+          - generic [ref=e195]:
+            - generic [ref=e196]:
+              - generic [ref=e197]:
+                - generic [ref=e199]: groups
+                - generic [ref=e200]: Alumnos activos
+              - paragraph [ref=e201]: "6"
+              - generic [ref=e202]:
+                - generic [ref=e203]: trending_up
+                - generic [ref=e204]: +0 esta semana
+            - generic [ref=e205]:
+              - generic [ref=e206]:
+                - generic [ref=e207]: Asistencia hoy
+                - paragraph [ref=e208]: 0 / 1
+                - generic [ref=e209]: Inscripciones activas
+              - generic [ref=e212]: 0%
+            - generic [ref=e213]:
+              - generic [ref=e214]:
+                - generic [ref=e216]: payments
+                - generic [ref=e217]: Recaudado del mes
+              - paragraph [ref=e218]: Bs 0
+              - generic [ref=e219]: "-100,0% vs mes anterior"
+            - generic [ref=e220]:
+              - generic [ref=e221]:
+                - generic [ref=e223]: warning
+                - generic [ref=e224]: Por vencer
+              - paragraph [ref=e225]: "00"
+              - generic [ref=e226]: Membresías esta semana · acción urgente
+          - generic [ref=e227]:
+            - article [ref=e228]:
+              - generic [ref=e230]:
+                - generic [ref=e231]: Semana en curso
+                - heading "Asistencia diaria" [level=3] [ref=e232]
+              - generic [ref=e233]:
+                - generic [ref=e234]:
+                  - generic [ref=e236]: "0"
+                  - generic [ref=e239]: "0"
+                  - generic [ref=e242]: "0"
+                  - generic [ref=e245]: "0"
+                  - generic [ref=e248]: "0"
+                  - generic [ref=e251]: "0"
+                  - generic [ref=e254]: "0"
+                - generic [ref=e256]:
+                  - generic [ref=e257]: L
+                  - generic [ref=e258]: M
+                  - generic [ref=e259]: X
+                  - generic [ref=e260]: J
+                  - generic [ref=e261]: V
+                  - generic [ref=e262]: S
+                  - generic [ref=e263]: D
+            - article [ref=e264]:
+              - generic [ref=e265]:
+                - generic [ref=e266]: Métodos de pago
+                - heading "Por método" [level=3] [ref=e267]
+              - generic [ref=e268]:
+                - generic [ref=e270]:
+                  - generic [ref=e271]: Bs 0
+                  - generic [ref=e272]: RECAUDADO
+                - generic [ref=e273]:
+                  - generic [ref=e274]:
+                    - generic [ref=e276]: Pago QR
+                    - generic [ref=e277]: 0% · Bs 0
+                  - generic [ref=e278]:
+                    - generic [ref=e280]: Efectivo
+                    - generic [ref=e281]: 0% · Bs 0
+          - generic [ref=e282]:
+            - article [ref=e283]:
+              - generic [ref=e284]:
+                - generic [ref=e285]:
+                  - generic [ref=e286]: Hoy
+                  - heading "Asistencias recientes" [level=3] [ref=e287]
+                - generic [ref=e290]: LIVE
+              - generic [ref=e291]:
+                - generic [ref=e292]: Fighter
+                - generic [ref=e293]: Sesión
+                - generic [ref=e294]: Sucursal
+                - generic [ref=e295]: Hora
+              - generic [ref=e296]:
+                - generic [ref=e297]: inbox
+                - generic [ref=e298]: Sin asistencias hoy
+              - generic [ref=e299]:
+                - generic [ref=e300]: 0 de 0
+                - link "Ver todo arrow_forward" [ref=e301] [cursor=pointer]:
+                  - /url: /admin/asistenciasi
+                  - text: Ver todo
+                  - generic [ref=e302]: arrow_forward
+            - complementary [ref=e303]:
+              - generic [ref=e304]:
+                - generic [ref=e306]: warning
+                - generic [ref=e307]:
+                  - paragraph [ref=e308]: 0 membresías por vencer
+                  - paragraph [ref=e309]: Esta semana. Notificar a los alumnos para renovar.
+                  - link "VER LISTA arrow_forward" [ref=e310] [cursor=pointer]:
+                    - /url: /admin/finanzas
+                    - text: VER LISTA
+                    - generic [ref=e311]: arrow_forward
+              - generic [ref=e312]:
+                - generic [ref=e314]: check
+                - generic [ref=e315]:
+                  - paragraph [ref=e316]: Cobro registrado · Bs 200
+                  - paragraph [ref=e317]: dos dos · hace 16 d
+                - button "DESHACER" [ref=e318]
+                - generic [ref=e319] [cursor=pointer]: close
+  - dialog "Instala Helluz" [ref=e79]:
+    - generic [ref=e83]:
+      - generic [ref=e84]:
+        - heading "Instala Helluz" [level=2] [ref=e85]
+        - button "Cerrar" [ref=e86]:
+          - generic [ref=e87]: 
+      - paragraph [ref=e88]: Acceso rápido desde tu pantalla de inicio, sin abrir el navegador.
+      - generic [ref=e89]:
+        - button " Instalar" [ref=e90]:
+          - generic [ref=e91]: 
+          - text: Instalar
+        - button "Ahora no" [ref=e92]

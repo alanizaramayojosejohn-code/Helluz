@@ -1,0 +1,66 @@
+- generic [ref=e194]:
+  - complementary [ref=e195]:
+    - link "Helluz HELLUZ" [ref=e196] [cursor=pointer]:
+      - /url: /
+      - img "Helluz" [ref=e197]
+      - generic [ref=e198]: HELLUZ
+    - generic [ref=e199]:
+      - generic [ref=e200]: Desde 2018 · Oruro
+      - heading "Cada combate empieza con disciplina." [level=1] [ref=e201]
+      - paragraph [ref=e202]: Tu academia. Tus alumnos. Un solo lugar para gestionarlo todo.
+    - generic [ref=e203]:
+      - generic [ref=e204]:
+        - generic [ref=e205]:
+          - paragraph [ref=e206]: "+200"
+          - paragraph [ref=e207]: Alumnos
+        - generic [ref=e208]:
+          - paragraph [ref=e209]: 98%
+          - paragraph [ref=e210]: Asistencia
+        - generic [ref=e211]:
+          - paragraph [ref=e212]: 24/7
+          - paragraph [ref=e213]: Acceso
+      - generic [ref=e214]:
+        - generic [ref=e215]: Fighters activos · esta semana
+        - generic [ref=e216]:
+          - generic [ref=e217]:
+            - generic [ref=e218]: DQ
+            - generic [ref=e219]: AC
+            - generic [ref=e220]: LM
+            - generic [ref=e221]: MR
+            - generic [ref=e222]: "+196"
+          - paragraph [ref=e223]: Únete a la academia
+  - main [ref=e224]:
+    - link "arrow_back Volver al inicio" [ref=e225] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e226]: arrow_back
+      - text: Volver al inicio
+    - generic [ref=e228]:
+      - generic [ref=e229]:
+        - generic [ref=e230]: Inicio de sesión
+        - heading "Bienvenido de vuelta" [level=2] [ref=e231]
+        - paragraph [ref=e232]: Ingresa con tu cuenta para continuar al panel.
+      - generic [ref=e233]:
+        - generic [ref=e236]:
+          - generic [ref=e237]:
+            - text: Correo electrónico
+            - generic [ref=e238]: "*"
+          - img [ref=e240]: mail
+          - textbox "Correo electrónico" [ref=e242]:
+            - /placeholder: tu@email.com
+        - generic [ref=e246]:
+          - generic [ref=e247]:
+            - text: Contraseña
+            - generic [ref=e248]: "*"
+          - img [ref=e250]: lock
+          - textbox "Contraseña" [ref=e252]:
+            - /placeholder: ••••••••
+          - button "Mostrar contraseña" [ref=e254] [cursor=pointer]:
+            - img [ref=e255]: visibility_off
+        - button "login Iniciar sesión" [ref=e259]:
+          - generic [ref=e260]: login
+          - text: Iniciar sesión
+      - generic [ref=e263]: o continúa con
+      - button "Google Continuar con Google" [ref=e265]:
+        - img "Google" [ref=e266]
+        - text: Continuar con Google
+      - paragraph [ref=e267]: ¿No tienes cuenta? Habla con tu instructor

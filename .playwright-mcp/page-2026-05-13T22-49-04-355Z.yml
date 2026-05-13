@@ -1,0 +1,86 @@
+- generic [ref=e2]:
+  - generic [ref=e5]:
+    - complementary [ref=e6]:
+      - link "Helluz HELLUZ" [ref=e7] [cursor=pointer]:
+        - /url: /
+        - img "Helluz" [ref=e8]
+        - generic [ref=e9]: HELLUZ
+      - generic [ref=e10]:
+        - generic [ref=e11]: Desde 2018 · Oruro
+        - heading "Cada combate empieza con disciplina." [level=1] [ref=e12]
+        - paragraph [ref=e13]: Tu academia. Tus alumnos. Un solo lugar para gestionarlo todo.
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - generic [ref=e16]:
+            - paragraph [ref=e17]: "+200"
+            - paragraph [ref=e18]: Alumnos
+          - generic [ref=e19]:
+            - paragraph [ref=e20]: 98%
+            - paragraph [ref=e21]: Asistencia
+          - generic [ref=e22]:
+            - paragraph [ref=e23]: 24/7
+            - paragraph [ref=e24]: Acceso
+        - generic [ref=e25]:
+          - generic [ref=e26]: Fighters activos · esta semana
+          - generic [ref=e27]:
+            - generic [ref=e28]:
+              - generic [ref=e29]: DQ
+              - generic [ref=e30]: AC
+              - generic [ref=e31]: LM
+              - generic [ref=e32]: MR
+              - generic [ref=e33]: "+196"
+            - paragraph [ref=e34]: Únete a la academia
+    - main [ref=e35]:
+      - link "arrow_back Volver al inicio" [ref=e36] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e37]: arrow_back
+        - text: Volver al inicio
+      - generic [ref=e39]:
+        - generic [ref=e40]:
+          - generic [ref=e41]: Inicio de sesión
+          - heading "Bienvenido de vuelta" [level=2] [ref=e42]
+          - paragraph [ref=e43]: Ingresa con tu cuenta para continuar al panel.
+        - generic [ref=e44]:
+          - generic [ref=e47]:
+            - generic [ref=e48]:
+              - text: Correo electrónico
+              - generic [ref=e49]: "*"
+            - img [ref=e51]: mail
+            - textbox "Correo electrónico" [ref=e53]:
+              - /placeholder: tu@email.com
+              - text: admin@gmail.com
+          - generic [ref=e57]:
+            - generic [ref=e58]:
+              - text: Contraseña
+              - generic [ref=e59]: "*"
+            - img [ref=e61]: lock
+            - textbox "Contraseña" [ref=e63]:
+              - /placeholder: ••••••••
+              - text: Admin1234.
+            - button "Mostrar contraseña" [ref=e65] [cursor=pointer]:
+              - img [ref=e66]: visibility_off
+          - button "Iniciando sesión…" [disabled] [ref=e93]:
+            - progressbar [ref=e94]:
+              - img [ref=e96]
+              - generic [ref=e99]:
+                - img [ref=e101]
+                - img [ref=e104]
+                - img [ref=e107]
+            - text: Iniciando sesión…
+        - generic [ref=e74]: o continúa con
+        - button "Google Continuar con Google" [disabled] [ref=e76]:
+          - img "Google" [ref=e77]
+          - text: Continuar con Google
+        - paragraph [ref=e78]: ¿No tienes cuenta? Habla con tu instructor
+  - dialog "Instala Helluz" [ref=e79]:
+    - generic [ref=e83]:
+      - generic [ref=e84]:
+        - heading "Instala Helluz" [level=2] [ref=e85]
+        - button "Cerrar" [ref=e86]:
+          - generic [ref=e87]: 
+      - paragraph [ref=e88]: Acceso rápido desde tu pantalla de inicio, sin abrir el navegador.
+      - generic [ref=e89]:
+        - button " Instalar" [ref=e90]:
+          - generic [ref=e91]: 
+          - text: Instalar
+        - button "Ahora no" [ref=e92]
