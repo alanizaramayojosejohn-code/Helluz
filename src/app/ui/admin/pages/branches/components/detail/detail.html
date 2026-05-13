@@ -1,75 +1,193 @@
-<div class="min-h-screen bg-white text-white p-6">
-   <div class="max-w-5xl mx-auto">
+<div class="min-h-screen bg-bg-base font-body text-ink">
+   <div class="max-w-[1400px] mx-auto px-6 lg:px-8 py-8">
       @if (branch$ | async; as branch) {
-         <!-- Header -->
-         <div class="mb-6">
-            <button
-               (click)="onGoBack()"
-               class="w-20 h-10 text-white bg-slate-600 rounded-2xl border-none hover:text-black hover:bg-slate-400 mb-4 flex items-center gap-2 transition"
-            >
-               ← Volver
-            </button>
-            <div class="flex justify-between items-start">
-               <div>
-                  <h1 class="text-4xl font-bold text-red-600 mb-2">{{ branch.name }}</h1>
-               </div>
-               <span
-                  [class.bg-green-600]="branch.status === 'activo'"
-                  [class.bg-gray-600]="branch.status === 'inactivo'"
-                  class="px-4 py-2 rounded-lg font-semibold"
+         <!-- Back link -->
+         <button
+            type="button"
+            (click)="onGoBack()"
+            class="inline-flex items-center gap-2 mb-4 px-0 py-0 bg-transparent border-0 cursor-pointer text-muted hover:text-ink transition-colors duration-fast"
+         >
+            <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none">arrow_back</span>
+            <span class="text-body-sm font-bold">Volver a Sucursales</span>
+         </button>
+
+         <!-- ───── Page header ─────────────────────────────────────────── -->
+         <header
+            class="flex flex-col md:flex-row md:items-end gap-4 md:gap-6 pb-7 mb-6 border-b border-solid border-hairline border-border-default"
+         >
+            <div class="flex-1 flex flex-col gap-1.5 min-w-0">
+               <span class="text-label font-extrabold tracking-[0.25em] text-text-brand uppercase">SUCURSAL</span>
+               <h1
+                  class="font-display text-[2.5rem] font-extrabold tracking-[-0.04em] text-ink leading-[1.05] m-0 truncate"
                >
-                  {{ branch.status }}
-               </span>
+                  {{ branch.name | titlecase }}
+               </h1>
+               <p class="text-body-sm text-muted m-0 mt-1">
+                  {{ branch.city | titlecase }} · {{ formatCoords(branch) }}
+               </p>
             </div>
-         </div>
 
-         <!-- Content Grid -->
-         <div class="mb-6">
-
-            <!-- Info -->
-            <div class="bg-gray-100 shadow-sm shadow-black border border-gray-800 rounded-lg p-6 space-y-6">
-              <h3 class="text-2xl font-bold text-black">Información de la Sucursal
-          </h3>
-              <!-- Description -->
-               <div>
-                  <p class="text-gray-800 font-bold text-sm mb-2">Ciudad</p>
-                  <p class="text-2xl text-gray-800">{{ branch.city }}</p>
-               </div>
-               <!-- Price -->
-               <div>
-                  <p class="text-gray-800 font-bold text-sm mb-1">Latitud</p>
-                  <p class="text-3xl text-gray-800">{{ branch.latitude }}</p>
-               </div>
-               <div>
-                  <p class="text-gray-800 font-bold text-sm mb-1">Longitud</p>
-                  <p class="text-3xl text-gray-800">{{ branch.longitude }}</p>
-               </div>
-
-               <!-- Recipe -->
-            </div>
-         </div>
-
-         <!-- Actions -->
-         <div class="bg-gray-100 shadow-sm shadow-black border border-gray-800 rounded-lg p-6">
-            <div class="flex gap-4">
+            <div class="flex items-center gap-2 flex-wrap">
                <button
+                  type="button"
                   (click)="onEditBranch(branch.id!)"
-                  class="flex-1 bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition"
+                  class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-brand-500 hover:bg-brand-600 text-on-brand text-caption font-extrabold tracking-wide shadow-brand transition-colors duration-fast border-0 cursor-pointer"
                >
-                  ✏️ Editar Sucursal
-               </button>
-               <button
-                  (click)="deleteBranch(branch)"
-                  class="flex-1 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition"
-               >
-                  🗑️ Eliminar Sucursal
+                  <span class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none">edit</span>
+                  Editar sucursal
                </button>
             </div>
+         </header>
+
+         <!-- ───── Hero card ───────────────────────────────────────────── -->
+         <article
+            class="flex items-center gap-5 p-6 mb-6 bg-bg-elevated border border-solid border-hairline border-border-default rounded-xl"
+         >
+            <div
+               class="w-20 h-20 rounded-full bg-brand-500 flex items-center justify-center shrink-0 shadow-brand text-on-brand"
+            >
+               <span class="text-h2 font-extrabold leading-none">{{ getInitials(branch.name) }}</span>
+            </div>
+
+            <div class="flex-1 flex flex-col gap-2 min-w-0">
+               <div class="flex items-center gap-3 flex-wrap">
+                  <h2 class="text-h3 font-extrabold tracking-[-0.02em] text-ink m-0 truncate">
+                     {{ branch.name | titlecase }}
+                  </h2>
+                  @if (branch.status === 'activo') {
+                     <span
+                        class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-success/15 shrink-0"
+                     >
+                        <span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+                        <span class="text-[9px] font-extrabold tracking-[0.15em] text-success">ACTIVA</span>
+                     </span>
+                  } @else {
+                     <span
+                        class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-bg-inset shrink-0"
+                     >
+                        <span class="w-1.5 h-1.5 rounded-full bg-faint"></span>
+                        <span class="text-[9px] font-extrabold tracking-[0.15em] text-faint">INACTIVA</span>
+                     </span>
+                  }
+               </div>
+
+               <div class="flex items-center gap-4 flex-wrap text-caption text-muted">
+                  <span class="inline-flex items-center gap-1.5">
+                     <span
+                        class="material-symbols-rounded !text-[14px] !w-[14px] !h-[14px] leading-none text-faint"
+                        >location_on</span
+                     >
+                     <span class="font-medium">{{ branch.city | titlecase }}</span>
+                  </span>
+                  <span class="inline-flex items-center gap-1.5">
+                     <span
+                        class="material-symbols-rounded !text-[14px] !w-[14px] !h-[14px] leading-none text-faint"
+                        >my_location</span
+                     >
+                     <span class="font-bold font-mono">{{ formatCoords(branch) }}</span>
+                  </span>
+               </div>
+            </div>
+         </article>
+
+         <!-- ───── Two-column layout ──────────────────────────────────── -->
+         <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
+            <!-- Main · información -->
+            <section
+               class="bg-bg-elevated border border-solid border-hairline border-border-default rounded-lg p-6 flex flex-col gap-5"
+            >
+               <header class="flex items-center justify-between gap-4 pb-4 border-b border-solid border-hairline border-border-subtle">
+                  <div class="flex flex-col gap-1">
+                     <span class="text-label font-extrabold tracking-[0.2em] text-muted uppercase">Información</span>
+                     <h3 class="text-h4 font-extrabold tracking-tight leading-none m-0">Datos de la sucursal</h3>
+                  </div>
+               </header>
+
+               <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+                  <div class="flex flex-col gap-1">
+                     <span class="text-label font-extrabold tracking-[0.2em] text-faint uppercase">Nombre</span>
+                     <span class="text-body-sm font-extrabold text-ink">{{ branch.name | titlecase }}</span>
+                  </div>
+
+                  <div class="flex flex-col gap-1">
+                     <span class="text-label font-extrabold tracking-[0.2em] text-faint uppercase">Ciudad</span>
+                     <span class="text-body-sm font-extrabold text-ink">{{ branch.city | titlecase }}</span>
+                  </div>
+
+                  <div class="flex flex-col gap-1">
+                     <span class="text-label font-extrabold tracking-[0.2em] text-faint uppercase">Latitud</span>
+                     <span class="text-body-sm font-bold font-mono text-ink">{{ branch.latitude || '—' }}</span>
+                  </div>
+
+                  <div class="flex flex-col gap-1">
+                     <span class="text-label font-extrabold tracking-[0.2em] text-faint uppercase">Longitud</span>
+                     <span class="text-body-sm font-bold font-mono text-ink">{{ branch.longitude || '—' }}</span>
+                  </div>
+
+                  <div class="flex flex-col gap-1">
+                     <span class="text-label font-extrabold tracking-[0.2em] text-faint uppercase">Estado</span>
+                     <span
+                        class="text-body-sm font-extrabold"
+                        [class.text-success]="branch.status === 'activo'"
+                        [class.text-faint]="branch.status !== 'activo'"
+                     >
+                        {{ branch.status | titlecase }}
+                     </span>
+                  </div>
+               </div>
+            </section>
+
+            <!-- Side panel · metadata + danger zone -->
+            <aside class="flex flex-col gap-4">
+               <!-- Metadata -->
+               <div
+                  class="bg-bg-elevated border border-solid border-hairline border-border-default rounded-lg p-6 flex flex-col gap-3.5"
+               >
+                  <span class="text-label font-extrabold tracking-[0.2em] text-faint uppercase">Metadata</span>
+
+                  <div class="flex flex-col gap-1">
+                     <div class="flex items-center justify-between gap-3">
+                        <span class="text-caption font-bold text-faint">Registrado</span>
+                        <span class="text-caption font-extrabold text-ink">{{ formatDate(branch.createdAt) }}</span>
+                     </div>
+                  </div>
+
+                  <div class="h-px bg-border-subtle"></div>
+
+                  <div class="flex flex-col gap-1">
+                     <div class="flex items-center justify-between gap-3">
+                        <span class="text-caption font-bold text-faint">Última edición</span>
+                        <span class="text-caption font-extrabold text-ink">{{ formatDate(branch.updatedAt) }}</span>
+                     </div>
+                  </div>
+               </div>
+
+               <!-- Danger zone -->
+               <div
+                  class="bg-error/[0.05] border border-solid border-hairline border-error/20 rounded-lg p-5 flex flex-col gap-3"
+               >
+                  <span class="text-label font-extrabold tracking-[0.2em] text-error uppercase">Zona de peligro</span>
+                  <p class="text-caption text-muted leading-relaxed m-0">
+                     Eliminar esta sucursal es permanente. Las inscripciones, asistencias y horarios asociados no se borrarán pero quedarán huérfanos.
+                  </p>
+                  <button
+                     type="button"
+                     (click)="deleteBranch(branch)"
+                     class="self-start inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-transparent border border-solid border-hairline border-error text-error text-caption font-extrabold cursor-pointer transition-colors duration-fast hover:bg-error/10"
+                  >
+                     <span class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none">delete</span>
+                     Eliminar sucursal
+                  </button>
+               </div>
+            </aside>
          </div>
       } @else {
-         <!-- Loading State -->
-         <div class="text-center py-20">
-            <p class="text-gray-500 text-xl">Cargando sucursal...</p>
+         <!-- Loading -->
+         <div class="flex flex-col items-center justify-center py-20 gap-3">
+            <span
+               class="w-8 h-8 rounded-full border-2 border-solid border-bg-inset border-t-text-brand animate-spin"
+            ></span>
+            <p class="text-body-sm text-muted m-0">Cargando sucursal…</p>
          </div>
       }
    </div>

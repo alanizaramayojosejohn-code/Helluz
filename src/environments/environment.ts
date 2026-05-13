@@ -7,6 +7,5 @@ export const environment = {
       storageBucket: 'helluz-dev.firebasestorage.app',
       messagingSenderId: '120448904557',
       appId: '1:120448904557:web:4d5e7f54fc26cdaaacfe64',
-    },
-  //  recaptchaSiteKey: '',
+   },
 }

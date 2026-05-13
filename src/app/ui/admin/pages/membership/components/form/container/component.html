@@ -1,113 +1,208 @@
-<div class="min-h-screen bg-white p-6">
-   <div class="max-w-3xl mx-auto">
-      <div class="mb-8">
-         <h1 class="text-4xl font-bold text-red-600 mb-2">
-            {{ isEditMode() ? 'Editar Membresía' : 'Registrar Membresía' }}
-         </h1>
-         <p class="text-gray-400">
-            {{ isEditMode() ? 'Modifica los beneficios y costos del plan' : 'Configura un nuevo plan de entrenamiento para los alumnos' }}
-         </p>
-      </div>
-
-      @if (isLoading()) {
-         <div class="flex justify-center items-center py-12">
-            <mat-spinner diameter="50"></mat-spinner>
-         </div>
-      }
-
-      <form [formGroup]="membershipForm" (ngSubmit)="onSubmit()" class="space-y-6">
-         <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-6 space-y-6">
-
-            <mat-form-field appearance="outline" class="w-full">
-               <mat-label>Nombre de la Membresía</mat-label>
-               <input matInput formControlName="name" placeholder="Ej: Mensual Premium" required autocomplete="off" />
-               @if (hasError('name')) {
-                  <mat-error>{{ getErrorMessage('name') }}</mat-error>
-               }
-            </mat-form-field>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Duración (días)</mat-label>
-                  <input matInput type="number" formControlName="durationDays" placeholder="30" required />
-                  <mat-hint>Días de vigencia del plan</mat-hint>
-                  @if (hasError('durationDays')) {
-                     <mat-error>{{ getErrorMessage('durationDays') }}</mat-error>
-                  }
-               </mat-form-field>
-
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Total de Sesiones</mat-label>
-                  <input matInput type="number" formControlName="totalSessions" placeholder="12" required />
-                  <mat-hint>Cantidad de clases permitidas</mat-hint>
-                  @if (hasError('totalSessions')) {
-                     <mat-error>{{ getErrorMessage('totalSessions') }}</mat-error>
-                  }
-               </mat-form-field>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Costo (BS)</mat-label>
-                  <input matInput type="number" formControlName="cost" placeholder="0.00" required />
-                  <span matTextPrefix>Bs.&nbsp;</span>
-                  @if (hasError('cost')) {
-                     <mat-error>{{ getErrorMessage('cost') }}</mat-error>
-                  }
-               </mat-form-field>
-
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Estado del Plan</mat-label>
-                  <mat-select formControlName="status" required>
-                     <mat-option value="activo">Activo</mat-option>
-                     <mat-option value="inactivo">Inactivo</mat-option>
-                  </mat-select>
-                  @if (hasError('status')) {
-                     <mat-error>{{ getErrorMessage('status') }}</mat-error>
-                  }
-               </mat-form-field>
-            </div>
+<div class="min-h-screen bg-bg-base font-body text-ink py-10 px-4">
+   <form
+      [formGroup]="membershipForm"
+      (ngSubmit)="onSubmit()"
+      class="max-w-[480px] mx-auto bg-bg-elevated border border-solid border-hairline border-border-default rounded-2xl shadow-lg flex flex-col overflow-hidden"
+   >
+      <!-- Header -->
+      <header class="flex items-start gap-4 px-7 py-6 border-b border-solid border-hairline border-border-default">
+         <div class="flex-1 flex flex-col gap-1.5">
+            <span class="text-label font-extrabold tracking-[0.25em] text-text-brand uppercase">
+               {{ isEditMode() ? 'EDITAR MEMBRESÍA' : 'NUEVA MEMBRESÍA' }}
+            </span>
+            <h1 class="font-display text-[2rem] font-extrabold tracking-[-0.03em] text-ink leading-[1.05] m-0">
+               {{ isEditMode() ? 'Editar membresía' : 'Crear membresía' }}
+            </h1>
+            <p class="text-body-sm text-muted leading-relaxed m-0 mt-1">
+               Define el plan de entrenamiento y sus condiciones.
+            </p>
          </div>
 
-         @if (errorMessage()) {
-            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-               <div class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                  </svg>
-                  <p class="text-sm text-red-800">{{ errorMessage() }}</p>
+         <button
+            type="button"
+            (click)="onCancel()"
+            [disabled]="isSubmitting()"
+            class="w-9 h-9 shrink-0 rounded-full bg-bg-inset hover:bg-border-default flex items-center justify-center text-muted border-0 cursor-pointer transition-colors duration-fast disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Cerrar"
+         >
+            <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none">close</span>
+         </button>
+      </header>
+
+      <!-- Body -->
+      <div class="flex flex-col gap-7 px-7 py-7">
+         <!-- Sec 1 · Identidad -->
+         <section class="flex flex-col gap-4">
+            <header class="flex items-center gap-2">
+               <div class="w-6 h-6 rounded-full bg-bg-brand-soft flex items-center justify-center shrink-0">
+                  <span class="text-[11px] font-extrabold font-mono text-text-brand leading-none">1</span>
                </div>
+               <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Identidad del plan</h2>
+            </header>
+
+            <label class="flex flex-col gap-1.5">
+               <span class="text-caption font-bold text-muted">Nombre</span>
+               <span
+                  class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                  [class.border-border-strong]="!hasError('name')"
+                  [class.border-error]="hasError('name')"
+                  [class.border-thick]="hasError('name')"
+               >
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">card_membership</span>
+                  <input
+                     type="text"
+                     formControlName="name"
+                     placeholder="Ej. Mensual Premium"
+                     autocomplete="off"
+                     class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink placeholder:text-faint min-w-0"
+                  />
+               </span>
+               @if (hasError('name')) {
+                  <span class="text-caption font-medium text-error">{{ getErrorMessage('name') }}</span>
+               }
+            </label>
+         </section>
+
+         <!-- Sec 2 · Beneficios -->
+         <section class="flex flex-col gap-4">
+            <header class="flex items-center gap-2">
+               <div class="w-6 h-6 rounded-full bg-bg-inset flex items-center justify-center shrink-0">
+                  <span class="text-[11px] font-extrabold font-mono text-faint leading-none">2</span>
+               </div>
+               <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Beneficios</h2>
+            </header>
+
+            <div class="grid grid-cols-2 gap-3">
+               <label class="flex flex-col gap-1.5">
+                  <span class="text-caption font-bold text-muted">Duración (días)</span>
+                  <span
+                     class="flex items-center gap-2 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                     [class.border-border-strong]="!hasError('durationDays')"
+                     [class.border-error]="hasError('durationDays')"
+                     [class.border-thick]="hasError('durationDays')"
+                  >
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">date_range</span>
+                     <input
+                        type="number"
+                        formControlName="durationDays"
+                        placeholder="30"
+                        min="1"
+                        class="bg-transparent border-0 outline-none flex-1 text-body-sm font-bold font-mono text-ink placeholder:text-faint placeholder:font-medium min-w-0"
+                     />
+                  </span>
+                  @if (hasError('durationDays')) {
+                     <span class="text-caption font-medium text-error">{{ getErrorMessage('durationDays') }}</span>
+                  }
+               </label>
+
+               <label class="flex flex-col gap-1.5">
+                  <span class="text-caption font-bold text-muted">Sesiones</span>
+                  <span
+                     class="flex items-center gap-2 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                     [class.border-border-strong]="!hasError('totalSessions')"
+                     [class.border-error]="hasError('totalSessions')"
+                     [class.border-thick]="hasError('totalSessions')"
+                  >
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">repeat</span>
+                     <input
+                        type="number"
+                        formControlName="totalSessions"
+                        placeholder="12"
+                        min="1"
+                        class="bg-transparent border-0 outline-none flex-1 text-body-sm font-bold font-mono text-ink placeholder:text-faint placeholder:font-medium min-w-0"
+                     />
+                  </span>
+                  @if (hasError('totalSessions')) {
+                     <span class="text-caption font-medium text-error">{{ getErrorMessage('totalSessions') }}</span>
+                  }
+               </label>
+            </div>
+         </section>
+
+         <!-- Sec 3 · Costo y estado -->
+         <section class="flex flex-col gap-4">
+            <header class="flex items-center gap-2">
+               <div class="w-6 h-6 rounded-full bg-bg-inset flex items-center justify-center shrink-0">
+                  <span class="text-[11px] font-extrabold font-mono text-faint leading-none">3</span>
+               </div>
+               <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Costo y estado</h2>
+            </header>
+
+            <div class="grid grid-cols-2 gap-3">
+               <label class="flex flex-col gap-1.5">
+                  <span class="text-caption font-bold text-muted">Costo (Bs)</span>
+                  <span
+                     class="flex items-center gap-2 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                     [class.border-border-strong]="!hasError('cost')"
+                     [class.border-error]="hasError('cost')"
+                     [class.border-thick]="hasError('cost')"
+                  >
+                     <span class="text-body-sm font-bold font-mono text-faint shrink-0">Bs</span>
+                     <input
+                        type="number"
+                        formControlName="cost"
+                        placeholder="0.00"
+                        min="0"
+                        step="0.01"
+                        class="bg-transparent border-0 outline-none flex-1 text-body-sm font-bold font-mono text-ink placeholder:text-faint placeholder:font-medium min-w-0"
+                     />
+                  </span>
+                  @if (hasError('cost')) {
+                     <span class="text-caption font-medium text-error">{{ getErrorMessage('cost') }}</span>
+                  }
+               </label>
+
+               <label class="flex flex-col gap-1.5">
+                  <span class="text-caption font-bold text-muted">Estado</span>
+                  <span
+                     class="flex items-center gap-2 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline border-border-strong transition-colors duration-fast"
+                  >
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">flag</span>
+                     <select
+                        formControlName="status"
+                        class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink min-w-0 cursor-pointer appearance-none"
+                     >
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                     </select>
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">expand_more</span>
+                  </span>
+               </label>
+            </div>
+         </section>
+
+         <!-- Error message -->
+         @if (errorMessage()) {
+            <div class="flex items-start gap-3 px-4 py-3 rounded-md bg-error/10 border border-solid border-hairline border-error/30">
+               <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-error shrink-0 mt-0.5">error</span>
+               <p class="text-caption font-medium text-error m-0 leading-relaxed">{{ errorMessage() }}</p>
             </div>
          }
+      </div>
 
-         <div class="flex gap-4">
-            <button
-               type="button"
-               (click)="onCancel()"
-               [disabled]="isSubmitting()"
-               class="flex-1 bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-               Cancelar
-            </button>
-
-            <button
-               type="submit"
-               [disabled]="membershipForm.invalid || isSubmitting()"
-               class="flex-1 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-               @if (isSubmitting()) {
-                  <span class="flex items-center justify-center gap-2">
-                     <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                     </svg>
-                     Guardando...
-                  </span>
-               } @else {
-                  {{ isEditMode() ? 'Actualizar Membresía' : 'Crear Membresía' }}
-               }
-            </button>
-         </div>
-      </form>
-   </div>
+      <!-- Footer -->
+      <footer class="flex items-stretch gap-3 px-7 py-5 bg-bg-elevated border-t border-solid border-hairline border-border-default">
+         <button
+            type="button"
+            (click)="onCancel()"
+            [disabled]="isSubmitting()"
+            class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-transparent border border-solid border-standard border-border-strong text-ink text-body-sm font-bold cursor-pointer transition-colors duration-fast hover:bg-bg-inset disabled:opacity-50 disabled:cursor-not-allowed"
+         >
+            Cancelar
+         </button>
+         <button
+            type="submit"
+            [disabled]="membershipForm.invalid || isSubmitting()"
+            class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-brand-500 hover:bg-brand-600 text-on-brand text-body-sm font-extrabold border-0 shadow-brand cursor-pointer transition-colors duration-fast disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+         >
+            @if (isSubmitting()) {
+               <span class="w-4 h-4 rounded-full border-2 border-solid border-on-brand/30 border-t-on-brand animate-spin"></span>
+               Guardando…
+            } @else {
+               <span class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none">check</span>
+               {{ isEditMode() ? 'Actualizar membresía' : 'Crear membresía' }}
+            }
+         </button>
+      </footer>
+   </form>
 </div>

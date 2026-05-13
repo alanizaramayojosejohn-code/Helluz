@@ -8,8 +8,6 @@ import { provideFirebaseApp, initializeApp, getApp } from '@angular/fire/app'
 import { provideAuth, getAuth } from '@angular/fire/auth'
 import { provideFirestore, getFirestore } from '@angular/fire/firestore'
 import { provideStorage, getStorage } from '@angular/fire/storage'
-import { provideAppCheck, initializeAppCheck, ReCaptchaV3Provider } from '@angular/fire/app-check'
-
 import { routes } from './app.routes'
 import { environment } from '../environments/environment'
 import { MAT_DATE_FORMATS, MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core'
@@ -25,12 +23,6 @@ export const appConfig: ApplicationConfig = {
       provideAuth(() => getAuth()),
       provideFirestore(() => getFirestore()),
       provideStorage(() => getStorage()),
-      provideAppCheck(() => {
-        return initializeAppCheck(undefined, {
-          provider: new ReCaptchaV3Provider('6LcvWoQsAAAAAERr-0AIzKw85Q7LXnWzM3vK0lT8'),
-          isTokenAutoRefreshEnabled: true,
-        })
-      } ),
 
       provideNativeDateAdapter(),
       { provide: LOCALE_ID, useValue: 'es-ES' },

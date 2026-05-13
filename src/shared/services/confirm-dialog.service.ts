@@ -12,10 +12,11 @@ export class ConfirmDialogService {
 
   confirm(data: ConfirmDialogData): Observable<boolean> {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '400px',
+      width: '440px',
       data,
       disableClose: true,
       autoFocus: true,
+      panelClass: 'helluz-dialog-panel',
     });
 
     return dialogRef.afterClosed();
@@ -23,8 +24,8 @@ export class ConfirmDialogService {
 
   confirmDelete(itemName: string, itemType: string = 'este elemento'): Observable<boolean> {
     return this.confirm({
-      title: 'Confirmar eliminación',
-      message: `¿Estás seguro de eliminar ${itemType} "${itemName}"? Esta acción no se puede deshacer.`,
+      title: `¿Eliminar ${itemType}?`,
+      message: `Esta acción no se puede deshacer. Se eliminará "${itemName}" de manera permanente.`,
       confirmText: 'Eliminar',
       cancelText: 'Cancelar',
       confirmColor: 'warn'

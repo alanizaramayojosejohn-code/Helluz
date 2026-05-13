@@ -1,0 +1,336 @@
+- generic [ref=e4]:
+  - complementary [ref=e5]:
+    - generic [ref=e6]:
+      - img "Helluz" [ref=e7]
+      - generic [ref=e8]: HELLUZ
+      - button "Toggle sidebar" [ref=e9] [cursor=pointer]:
+        - img [ref=e10]: menu_open
+    - navigation [ref=e11]:
+      - link "Dashboard" [ref=e12] [cursor=pointer]:
+        - /url: /admin/home
+        - img [ref=e13]: dashboard
+        - generic [ref=e14]: Dashboard
+      - link "Alumnos" [ref=e15] [cursor=pointer]:
+        - /url: /admin/alumnos
+        - img [ref=e16]: school
+        - generic [ref=e17]: Alumnos
+      - link "Inscripciones" [ref=e18] [cursor=pointer]:
+        - /url: /admin/inscripciones
+        - img [ref=e19]: assignment
+        - generic [ref=e20]: Inscripciones
+      - link "Horarios" [ref=e21] [cursor=pointer]:
+        - /url: /admin/horarios
+        - img [ref=e22]: schedule
+        - generic [ref=e23]: Horarios
+      - link "Membresías" [ref=e24] [cursor=pointer]:
+        - /url: /admin/membresias
+        - img [ref=e25]: card_membership
+        - generic [ref=e26]: Membresías
+      - link "Instructores" [ref=e27] [cursor=pointer]:
+        - /url: /admin/instructores
+        - img [ref=e28]: fitness_center
+        - generic [ref=e29]: Instructores
+      - link "Usuarios" [ref=e30] [cursor=pointer]:
+        - /url: /admin/usuarios
+        - img [ref=e31]: groups
+        - generic [ref=e32]: Usuarios
+      - link "Sucursales" [ref=e33] [cursor=pointer]:
+        - /url: /admin/sucursales
+        - img [ref=e34]: storefront
+        - generic [ref=e35]: Sucursales
+      - link "Asistencias alumnos" [ref=e36] [cursor=pointer]:
+        - /url: /admin/asistenciasa
+        - img [ref=e37]: list_alt
+        - generic [ref=e38]: Asistencias alumnos
+      - link "Asistencias instructor" [ref=e39] [cursor=pointer]:
+        - /url: /admin/asistenciasi
+        - img [ref=e40]: task_alt
+        - generic [ref=e41]: Asistencias instructor
+      - link "Finanzas" [ref=e42] [cursor=pointer]:
+        - /url: /admin/finanzas
+        - img [ref=e43]: account_balance
+        - generic [ref=e44]: Finanzas
+      - link "Marcar asistencia" [ref=e45] [cursor=pointer]:
+        - /url: /admin/asistenciainstructores
+        - img [ref=e46]: qr_code_scanner
+        - generic [ref=e47]: Marcar asistencia
+    - generic [ref=e48]:
+      - generic [ref=e49]: AA
+      - generic [ref=e50]:
+        - paragraph [ref=e51]: admin admin
+        - paragraph [ref=e52]: Administrador
+      - button "Más opciones" [ref=e53] [cursor=pointer]:
+        - img [ref=e54]: more_horiz
+  - generic [ref=e55]:
+    - banner [ref=e57]:
+      - navigation "Breadcrumb" [ref=e58]:
+        - img [ref=e59]: home
+        - link "Inicio" [ref=e60] [cursor=pointer]:
+          - /url: /admin/home
+        - generic [ref=e61]: ›
+        - generic [ref=e62]: Inscripciones
+      - button "Menú de usuario" [ref=e64] [cursor=pointer]:
+        - generic [ref=e65]: AA
+        - generic [ref=e66]: admin admin
+        - img [ref=e67]: keyboard_arrow_down
+    - main [ref=e68]:
+      - generic [ref=e72]:
+        - generic [ref=e73]:
+          - generic [ref=e74]:
+            - generic [ref=e75]: GESTIÓN
+            - heading "Inscripciones" [level=1] [ref=e76]
+          - button "Nueva inscripción" [ref=e77] [cursor=pointer]:
+            - img [ref=e78]: add
+            - text: Nueva inscripción
+        - generic [ref=e79]:
+          - generic [ref=e80]:
+            - button "Todas" [ref=e81] [cursor=pointer]
+            - button "Activas" [ref=e82] [cursor=pointer]
+            - button "Vencidas" [ref=e83] [cursor=pointer]
+            - button "Completadas" [ref=e84] [cursor=pointer]
+            - button "Canceladas" [ref=e85] [cursor=pointer]
+          - generic [ref=e86]:
+            - img [ref=e87]: storefront
+            - combobox [ref=e88] [cursor=pointer]:
+              - option "Todas las sucursales" [selected]
+              - option "helluz"
+          - generic [ref=e89]:
+            - img [ref=e90]: search
+            - generic [ref=e91]: Buscar alumno o membresía…
+        - generic [ref=e92]:
+          - generic [ref=e109]:
+            - generic: ALUMNO
+            - generic [ref=e110]: ESTADO
+            - generic [ref=e111]: MEMBRESÍA
+            - generic [ref=e112]: SUCURSAL
+            - generic [ref=e113]: VIGENCIA
+            - generic [ref=e114]: SESIONES
+            - generic [ref=e115]: PAGO
+            - generic [ref=e116]: REGISTRADO POR
+          - generic [ref=e117]:
+            - generic:
+              - generic [ref=e118]: d
+              - generic: dos dos
+            - generic [ref=e119]: Activa
+            - generic [ref=e120]:
+              - generic [ref=e121]: Completo
+              - generic [ref=e122]: Bs. 200
+            - generic [ref=e123]: helluz
+            - generic [ref=e124]:
+              - generic [ref=e125]: 27/04/2026
+              - generic [ref=e126]: hasta 27/05/2026
+            - generic [ref=e128]:
+              - generic [ref=e129]: 0/20
+              - generic [ref=e130]: 20 rest.
+            - generic [ref=e132]: Efectivo
+            - generic [ref=e133]: admin admin
+            - generic [ref=e134]:
+              - button [ref=e135] [cursor=pointer]:
+                - img [ref=e136]: visibility
+              - button [ref=e137] [cursor=pointer]:
+                - img [ref=e138]: edit
+          - generic [ref=e139]:
+            - generic:
+              - generic [ref=e140]: t
+              - generic: tres tres
+            - generic [ref=e141]: Vencida
+            - generic [ref=e142]:
+              - generic [ref=e143]: Completo
+              - generic [ref=e144]: Bs. 200
+            - generic [ref=e145]: helluz
+            - generic [ref=e146]:
+              - generic [ref=e147]: 14/03/2026
+              - generic [ref=e148]: hasta 13/04/2026
+            - generic [ref=e150]:
+              - generic [ref=e151]: 0/20
+              - generic [ref=e152]: 20 rest.
+            - generic [ref=e154]: Efectivo
+            - generic [ref=e155]: admin admin
+            - generic [ref=e156]:
+              - button [ref=e157] [cursor=pointer]:
+                - img [ref=e158]: visibility
+              - button [ref=e159] [cursor=pointer]:
+                - img [ref=e160]: edit
+          - generic [ref=e161]:
+            - generic:
+              - generic [ref=e162]: d
+              - generic: dos dos
+            - generic [ref=e163]: Vencida
+            - generic [ref=e164]:
+              - generic [ref=e165]: Completo
+              - generic [ref=e166]: Bs. 200
+            - generic [ref=e167]: helluz
+            - generic [ref=e168]:
+              - generic [ref=e169]: 14/03/2026
+              - generic [ref=e170]: hasta 13/04/2026
+            - generic [ref=e172]:
+              - generic [ref=e173]: 0/20
+              - generic [ref=e174]: 20 rest.
+            - generic [ref=e176]: Efectivo
+            - generic [ref=e177]: admin admin
+            - generic [ref=e178]:
+              - button [ref=e179] [cursor=pointer]:
+                - img [ref=e180]: visibility
+              - button [ref=e181] [cursor=pointer]:
+                - img [ref=e182]: edit
+          - generic [ref=e183]:
+            - generic:
+              - generic [ref=e184]: d
+              - generic: dos dos
+            - generic [ref=e185]: Vencida
+            - generic [ref=e186]:
+              - generic [ref=e187]: Completo
+              - generic [ref=e188]: Bs. 200
+            - generic [ref=e189]: helluz
+            - generic [ref=e190]:
+              - generic [ref=e191]: 05/02/2026
+              - generic [ref=e192]: hasta 07/03/2026
+            - generic [ref=e194]:
+              - generic [ref=e195]: 0/20
+              - generic [ref=e196]: 20 rest.
+            - generic [ref=e198]: Efectivo
+            - generic [ref=e199]: admin admin
+            - generic [ref=e200]:
+              - button [ref=e201] [cursor=pointer]:
+                - img [ref=e202]: visibility
+              - button [ref=e203] [cursor=pointer]:
+                - img [ref=e204]: edit
+          - generic [ref=e205]:
+            - generic:
+              - generic [ref=e206]: c
+              - generic: cuatro cuatro
+            - generic [ref=e207]: Vencida
+            - generic [ref=e208]:
+              - generic [ref=e209]: Completo
+              - generic [ref=e210]: Bs. 200
+            - generic [ref=e211]: helluz
+            - generic [ref=e212]:
+              - generic [ref=e213]: 10/03/2026
+              - generic [ref=e214]: hasta 09/04/2026
+            - generic [ref=e216]:
+              - generic [ref=e217]: 1/20
+              - generic [ref=e218]: 19 rest.
+            - generic [ref=e221]: Efectivo
+            - generic [ref=e222]: admin admin
+            - generic [ref=e223]:
+              - button [ref=e224] [cursor=pointer]:
+                - img [ref=e225]: visibility
+              - button [ref=e226] [cursor=pointer]:
+                - img [ref=e227]: edit
+          - generic [ref=e228]:
+            - generic:
+              - generic [ref=e229]: c
+              - generic: cuatro cuatro
+            - generic [ref=e230]: Vencida
+            - generic [ref=e231]:
+              - generic [ref=e232]: Completo
+              - generic [ref=e233]: Bs. 200
+            - generic [ref=e234]: helluz
+            - generic [ref=e235]:
+              - generic [ref=e236]: 07/02/2026
+              - generic [ref=e237]: hasta 09/03/2026
+            - generic [ref=e239]:
+              - generic [ref=e240]: 0/20
+              - generic [ref=e241]: 20 rest.
+            - generic [ref=e243]: Efectivo
+            - generic [ref=e244]: admin admin
+            - generic [ref=e245]:
+              - button [ref=e246] [cursor=pointer]:
+                - img [ref=e247]: visibility
+              - button [ref=e248] [cursor=pointer]:
+                - img [ref=e249]: edit
+          - generic [ref=e250]:
+            - generic:
+              - generic [ref=e251]: t
+              - generic: tres tres
+            - generic [ref=e252]: Cancelada
+            - generic [ref=e253]:
+              - generic [ref=e254]: Completo
+              - generic [ref=e255]: Bs. 200
+            - generic [ref=e256]: helluz
+            - generic [ref=e257]:
+              - generic [ref=e258]: 10/02/2026
+              - generic [ref=e259]: hasta 12/03/2026
+            - generic [ref=e261]:
+              - generic [ref=e262]: 0/20
+              - generic [ref=e263]: 20 rest.
+            - generic [ref=e265]: Efectivo
+            - generic [ref=e266]: admin admin
+            - generic [ref=e267]:
+              - button [ref=e268] [cursor=pointer]:
+                - img [ref=e269]: visibility
+              - button [ref=e270] [cursor=pointer]:
+                - img [ref=e271]: edit
+          - generic [ref=e272]:
+            - generic:
+              - generic [ref=e273]: d
+              - generic: dos dos
+            - generic [ref=e274]: Vencida
+            - generic [ref=e275]:
+              - generic [ref=e276]: Medio Mes
+              - generic [ref=e277]: Bs. 100
+            - generic [ref=e278]: helluz
+            - generic [ref=e279]:
+              - generic [ref=e280]: 09/02/2026
+              - generic [ref=e281]: hasta 24/02/2026
+            - generic [ref=e283]:
+              - generic [ref=e284]: 0/12
+              - generic [ref=e285]: 12 rest.
+            - generic [ref=e287]: Efectivo
+            - generic [ref=e288]: admin admin
+            - generic [ref=e289]:
+              - button [ref=e290] [cursor=pointer]:
+                - img [ref=e291]: visibility
+              - button [ref=e292] [cursor=pointer]:
+                - img [ref=e293]: edit
+          - generic [ref=e294]:
+            - generic:
+              - generic [ref=e295]: A
+              - generic: Alan Beltran
+            - generic [ref=e296]: Cancelada
+            - generic [ref=e297]:
+              - generic [ref=e298]: Completo
+              - generic [ref=e299]: Bs. 200
+            - generic [ref=e300]: helluz
+            - generic [ref=e301]:
+              - generic [ref=e302]: 07/03/2026
+              - generic [ref=e303]: hasta 06/04/2026
+            - generic [ref=e305]:
+              - generic [ref=e306]: 0/12
+              - generic [ref=e307]: 12 rest.
+            - generic [ref=e309]: Efectivo
+            - generic [ref=e310]: admin admin
+            - generic [ref=e311]:
+              - button [ref=e312] [cursor=pointer]:
+                - img [ref=e313]: visibility
+              - button [ref=e314] [cursor=pointer]:
+                - img [ref=e315]: edit
+          - generic [ref=e316]:
+            - generic:
+              - generic [ref=e317]: J
+              - generic: Jose Alaniz
+            - generic [ref=e318]: Vencida
+            - generic [ref=e319]:
+              - generic [ref=e320]: Completo
+              - generic [ref=e321]: Bs. 200
+            - generic [ref=e322]: helluz
+            - generic [ref=e323]:
+              - generic [ref=e324]: 07/03/2026
+              - generic [ref=e325]: hasta 06/04/2026
+            - generic [ref=e327]:
+              - generic [ref=e328]: 3/12
+              - generic [ref=e329]: 9 rest.
+            - generic [ref=e332]: Efectivo
+            - generic [ref=e333]: admin admin
+            - generic [ref=e334]:
+              - button [ref=e335] [cursor=pointer]:
+                - img [ref=e336]: visibility
+              - button [ref=e337] [cursor=pointer]:
+                - img [ref=e338]: edit
+          - generic [ref=e339]:
+            - generic [ref=e340]: Página 1 · 10 registros
+            - button [disabled] [ref=e341] [cursor=pointer]:
+              - img [ref=e342]: chevron_left
+            - generic [ref=e343]: "1"
+            - button [disabled] [ref=e344] [cursor=pointer]:
+              - img [ref=e345]: chevron_right

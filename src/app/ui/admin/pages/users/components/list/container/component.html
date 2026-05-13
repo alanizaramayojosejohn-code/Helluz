@@ -1,212 +1,174 @@
-<div class="min-h-screen bg-white p-6">
-   <div class="max-w-7xl mx-auto">
-      <div class="flex justify-between items-center mb-8">
-         <div>
-            <h1 class="text-4xl font-bold text-red-600 mb-2">Gestión de Usuarios</h1>
-            <p class="text-gray-600">Administra los usuarios del sistema</p>
-         </div>
-         <button
-            (click)="onCreateUser()"
-            class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center gap-2"
-         >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Nuevo Usuario
-         </button>
-      </div>
+<div class="p-8 flex flex-col gap-0">
 
-      <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-4 mb-6">
-         <mat-form-field appearance="outline" class="w-full md:w-64">
-            <mat-label>Filtrar por Rol</mat-label>
-            <mat-select [value]="roleFilter()" (selectionChange)="onRoleFilterChange($event.value)">
-               <mat-option value="all">Todos</mat-option>
-               <mat-option value="admin">Administradores</mat-option>
-               <mat-option value="instructor">Instructores</mat-option>
-            </mat-select>
-         </mat-form-field>
-      </div>
+  <!-- Page header -->
+  <div class="flex items-end justify-between pb-7 border-b border-hairline border-border-default">
+    <div class="flex flex-col gap-1.5">
+      <span class="text-label font-extrabold uppercase tracking-[2.75px] text-text-brand">GESTIÓN</span>
+      <h1 class="font-display text-h1 font-extrabold text-ink leading-none tracking-tightest">Usuarios</h1>
+    </div>
+    <button
+      (click)="onCreateUser()"
+      class="flex items-center gap-2 px-7 py-4 rounded-full bg-brand-500 text-on-brand text-body font-extrabold shadow-brand hover:bg-brand-600 transition-colors duration-fast cursor-pointer border-none"
+    >
+      <mat-icon class="!text-[18px] !w-[18px] !h-[18px] leading-none">add</mat-icon>
+      Nuevo usuario
+    </button>
+  </div>
 
-      @if (isLoading()) {
-         <div class="flex justify-center p-8">
-            <mat-spinner diameter="50"></mat-spinner>
-         </div>
-      }
+  <!-- Filters -->
+  <div class="flex items-center gap-3 pt-6">
+    <!-- Role tabs -->
+    <div class="flex items-center rounded-full bg-bg-inset p-[3px]">
+      <button
+        (click)="onRoleFilterChange('all')"
+        [class]="roleFilter() === 'all'
+          ? 'flex items-center gap-2 px-4 py-2 rounded-full bg-bg-elevated text-caption font-extrabold text-ink shadow-sm cursor-pointer border-none'
+          : 'px-4 py-2 rounded-full text-caption font-extrabold text-muted bg-transparent cursor-pointer border-none'"
+      >
+        Todos
+      </button>
+      <button
+        (click)="onRoleFilterChange('admin')"
+        [class]="roleFilter() === 'admin'
+          ? 'flex items-center gap-2 px-4 py-2 rounded-full bg-bg-elevated text-caption font-extrabold text-ink shadow-sm cursor-pointer border-none'
+          : 'px-4 py-2 rounded-full text-caption font-extrabold text-muted bg-transparent cursor-pointer border-none'"
+      >
+        Admins
+      </button>
+      <button
+        (click)="onRoleFilterChange('instructor')"
+        [class]="roleFilter() === 'instructor'
+          ? 'flex items-center gap-2 px-4 py-2 rounded-full bg-bg-elevated text-caption font-extrabold text-ink shadow-sm cursor-pointer border-none'
+          : 'px-4 py-2 rounded-full text-caption font-extrabold text-muted bg-transparent cursor-pointer border-none'"
+      >
+        Instructores
+      </button>
+    </div>
+    <!-- Search -->
+    <div class="flex-1 flex items-center gap-2 px-4 py-[10px] rounded-full bg-bg-elevated border border-hairline border-border-strong">
+      <mat-icon class="text-faint !text-base !w-4 !h-4 leading-none shrink-0">search</mat-icon>
+      <span class="text-caption text-faint font-medium">Buscar nombre o email…</span>
+    </div>
+  </div>
 
-      @if (errorMessage()) {
-         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
-            {{ errorMessage() }}
-         </div>
-      }
-      @if (usersPending$ | async; as usersPending) {
-         @if (usersPending.length > 0) {
-            <div class="bg-gray-900 shadow-sm shadow-black border border-gray-800 rounded-lg overflow-x-auto mb-10">
-               <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-gray-900">
-                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                           Email
-                        </th>
+  @if (errorMessage()) {
+    <div class="mt-4 px-4 py-3 rounded-lg border border-hairline border-error/30 text-error text-body-sm">
+      {{ errorMessage() }}
+    </div>
+  }
 
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                           Nombre
-                        </th>
-
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                           Rol
-                        </th>
-
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                           Estado
-                        </th>
-
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                           Acciones
-                        </th>
-                     </tr>
-                  </thead>
-                  <tbody class="bg-gray-900 divide-y divide-gray-200">
-                     @for (userPending of usersPending; track userPending.name) {
-                        <tr class="hover:bg-gray-800 transition-colors">
-                           <td class="px-6 py-4 whitespace-nowrap">
-                              <div class="text-sm font-medium text-gray-300">{{ userPending.email }}</div>
-                           </td>
-                           <td class="px-6 py-4 whitespace-nowrap">
-                              <div class="text-sm font-medium text-gray-300"
-                                 >{{ userPending.name }} {{ userPending.lastname }}</div
-                              >
-                           </td>
-                           <td class="px-6 py-4 whitespace-nowrap">
-                              <div class="text-sm font-medium text-gray-300">{{ userPending.role }}</div>
-                           </td>
-                           <td class="px-6 py-4 whitespace-nowrap">
-                              <div class="text-sm font-medium text-gray-300">{{ userPending.status }}</div>
-                           </td>
-                           <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2">
-                              <button
-                                 (click)="onDeletePending(userPending.email)"
-                                 class="text-gray-500 hover:text-red-600 bg-transparent border-none shadow-none"
-                                 mat-icon-button
-                                 matTooltip="Eliminar"
-                              >
-                                 <mat-icon>delete</mat-icon>
-                              </button>
-                           </td>
-                        </tr>
-                     }
-                  </tbody>
-               </table>
+  <!-- Pendientes -->
+  @if (usersPending$ | async; as usersPending) {
+    @if (usersPending.length > 0) {
+      <div class="mt-6 rounded-lg overflow-hidden bg-bg-ink">
+        <div class="flex items-center gap-3 px-5 py-3">
+          <span class="text-[10px] font-extrabold tracking-[1.5px] text-zinc-500 uppercase">PENDIENTES DE ACCESO</span>
+          <span class="px-2 py-0.5 rounded-full bg-warning/20 text-warning text-[10px] font-extrabold">{{ usersPending.length }}</span>
+        </div>
+        <!-- Col headers -->
+        <div class="flex items-center gap-4 px-5 py-[10px] border-t border-hairline border-white/10">
+          <span class="text-[10px] font-extrabold tracking-[1.5px] text-zinc-500 uppercase flex-1 min-w-0">EMAIL</span>
+          <span class="text-[10px] font-extrabold tracking-[1.5px] text-zinc-500 uppercase w-[180px] shrink-0">NOMBRE</span>
+          <span class="text-[10px] font-extrabold tracking-[1.5px] text-zinc-500 uppercase w-[100px] shrink-0">ROL</span>
+          <span class="text-[10px] font-extrabold tracking-[1.5px] text-zinc-500 uppercase w-[100px] shrink-0">ESTADO</span>
+          <span class="w-[60px] shrink-0"></span>
+        </div>
+        @for (userPending of usersPending; track userPending.email) {
+          <div class="flex items-center gap-4 px-5 py-[14px] border-t border-hairline border-white/10 hover:bg-white/5 transition-colors duration-fast">
+            <span class="text-body-sm font-semibold text-zinc-300 flex-1 min-w-0 truncate">{{ userPending.email }}</span>
+            <span class="text-body-sm font-semibold text-zinc-300 w-[180px] shrink-0">{{ userPending.name }} {{ userPending.lastname }}</span>
+            <span class="text-body-sm font-semibold text-zinc-300 w-[100px] shrink-0">{{ userPending.role }}</span>
+            <span class="text-body-sm font-semibold text-zinc-400 w-[100px] shrink-0">{{ userPending.status }}</span>
+            <div class="flex items-center gap-0.5 w-[60px] shrink-0 justify-end">
+              <button (click)="onDeletePending(userPending.email)" class="p-1.5 rounded-full text-zinc-500 hover:text-error hover:bg-error/10 transition-colors duration-fast cursor-pointer border-none bg-transparent" matTooltip="Eliminar">
+                <mat-icon class="!text-[18px] !w-[18px] !h-[18px] leading-none">delete</mat-icon>
+              </button>
             </div>
-         } @else {
-            <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg overflow-x-auto">
-               <tr>
-                  <td colspan="5" class="px-6 py-8 text-center text-gray-500"> No hay usuarios en espera </td>
-               </tr>
-            </div>
-         }
-      }
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <!-- Usuarios activos -->
+  <div class="mt-6 rounded-lg border border-hairline border-border-default bg-bg-elevated overflow-hidden">
+    @if (isLoading()) {
+      <div class="flex justify-center items-center py-12">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    } @else {
+
+      <!-- Col headers -->
+      <div class="flex items-center gap-4 px-5 py-[10px] bg-bg-inset">
+        <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase flex-1 min-w-0">USUARIO</span>
+        <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase w-[200px] shrink-0">EMAIL</span>
+        <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase w-[120px] shrink-0">ROL</span>
+        <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase w-[100px] shrink-0">ESTADO</span>
+        <span class="w-[80px] shrink-0"></span>
+      </div>
 
       @if (users$ | async; as users) {
-         <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-               <thead class="bg-gray-50">
-                  <tr>
-                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Usuario
-                     </th>
-                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Email
-                     </th>
-                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Rol
-                     </th>
-                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Estado
-                     </th>
-                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Acciones
-                     </th>
-                  </tr>
-               </thead>
-               <tbody class="bg-white divide-y divide-gray-200">
-                  @for (user of filterUsers(users); track user.id) {
-                     <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                           <div class="text-sm font-medium text-gray-900">{{ getFullName(user) }}</div>
-                           <div class="text-xs text-gray-500">UID: {{ user.id }}</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                           {{ user.email }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                           <span
-                              [class]="getRoleBadgeClass(user.role)"
-                              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                           >
-                              {{ user.role }}
-                           </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                           <span
-                              [class]="
-                                 user.status === 'activo' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                              "
-                              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full cursor-pointer"
-                              (click)="onToggleStatus(user)"
-                           >
-                              {{ user.status }}
-                           </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2">
-                           <button
-                              mat-icon-button
-                              (click)="onViewDetail(user)"
-                              matTooltip="Ver detalle"
-                              class="text-gray-500 hover:text-blue-600 bg-transparent border-none shadow-none"
-                           >
-                              <mat-icon>visibility</mat-icon>
-                           </button>
-                           <button
-                              mat-icon-button
-                              (click)="onEditUser(user)"
-                              matTooltip="Editar"
-                              class="text-gray-500 hover:text-gray-800 bg-transparent border-none shadow-none"
-                           >
-                              <mat-icon>edit</mat-icon>
-                           </button>
-
-                           <button
-                              class="text-gray-500 hover:text-yellow-300 bg-transparent border-none shadow-none"
-                              (click)="onResetPassword(user)"
-                              matTooltip="Restablecer contraseña"
-                           >
-                              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                 <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
-                                 />
-                              </svg>
-                           </button>
-                           <button
-                              class="text-gray-500 hover:text-red-600 bg-transparent border-none shadow-none"
-                              (click)="deleteUser(user)"
-                              mat-icon-button
-                              matTooltip="Eliminar"
-                           >
-                              <mat-icon>delete</mat-icon>
-                           </button>
-                        </td>
-                     </tr>
-                  } @empty {
-                     <tr>
-                        <td colspan="5" class="px-6 py-8 text-center text-gray-500"> No hay usuarios registrados </td>
-                     </tr>
-                  }
-               </tbody>
-            </table>
-         </div>
+        @for (user of filterUsers(users); track user.id) {
+          <div class="flex items-center gap-4 px-5 py-[14px] border-b border-hairline border-border-subtle hover:bg-bg-surface transition-colors duration-fast last:border-b-0">
+            <!-- Usuario -->
+            <div class="flex items-center gap-2.5 flex-1 min-w-0">
+              <div class="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center text-on-brand text-caption font-extrabold shrink-0 uppercase">
+                {{ user.name[0] }}{{ user.lastname[0] }}
+              </div>
+              <span class="text-body-sm font-extrabold text-ink truncate">{{ getFullName(user) }}</span>
+            </div>
+            <!-- Email -->
+            <span class="text-body-sm font-semibold text-ink w-[200px] shrink-0 truncate">{{ user.email }}</span>
+            <!-- Rol -->
+            <div class="w-[120px] shrink-0">
+              <span [class]="user.role === 'admin'
+                ? 'px-[10px] py-1 rounded-full bg-purple-500/20 text-purple-700 text-caption font-extrabold'
+                : 'px-[10px] py-1 rounded-full bg-info/20 text-info text-caption font-extrabold'">
+                {{ user.role === 'admin' ? 'Administrador' : 'Instructor' }}
+              </span>
+            </div>
+            <!-- Estado -->
+            <div class="w-[100px] shrink-0">
+              <button
+                (click)="onToggleStatus(user)"
+                [class]="user.status === 'activo'
+                  ? 'px-[10px] py-1 rounded-full bg-success/20 text-success text-caption font-extrabold cursor-pointer border-none'
+                  : 'px-[10px] py-1 rounded-full bg-bg-inset text-faint text-caption font-extrabold cursor-pointer border-none'"
+              >
+                {{ user.status === 'activo' ? 'Activo' : 'Inactivo' }}
+              </button>
+            </div>
+            <!-- Acciones -->
+            <div class="flex items-center gap-0.5 w-[80px] shrink-0 justify-end">
+              <button (click)="onViewDetail(user)" class="p-1.5 rounded-full text-faint hover:text-ink hover:bg-bg-inset transition-colors duration-fast cursor-pointer border-none bg-transparent" matTooltip="Ver detalle">
+                <mat-icon class="!text-[18px] !w-[18px] !h-[18px] leading-none">visibility</mat-icon>
+              </button>
+              <button (click)="onEditUser(user)" class="p-1.5 rounded-full text-faint hover:text-ink hover:bg-bg-inset transition-colors duration-fast cursor-pointer border-none bg-transparent" matTooltip="Editar">
+                <mat-icon class="!text-[18px] !w-[18px] !h-[18px] leading-none">edit</mat-icon>
+              </button>
+              <button (click)="onResetPassword(user)" class="p-1.5 rounded-full text-faint hover:text-ink hover:bg-bg-inset transition-colors duration-fast cursor-pointer border-none bg-transparent" matTooltip="Restablecer contraseña">
+                <mat-icon class="!text-[18px] !w-[18px] !h-[18px] leading-none">lock_reset</mat-icon>
+              </button>
+              <button (click)="deleteUser(user)" class="p-1.5 rounded-full text-faint hover:text-error hover:bg-error/10 transition-colors duration-fast cursor-pointer border-none bg-transparent" matTooltip="Eliminar">
+                <mat-icon class="!text-[18px] !w-[18px] !h-[18px] leading-none">delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        } @empty {
+          <div class="px-5 py-12 text-center text-faint text-body-sm">No hay usuarios registrados</div>
+        }
       }
-   </div>
+
+      <!-- Footer -->
+      <div class="flex items-center gap-3 px-5 py-[14px] border-t border-hairline border-border-default">
+        <span class="text-caption font-semibold text-muted flex-1">Usuarios registrados</span>
+        <button class="w-8 h-8 rounded-md bg-bg-inset flex items-center justify-center cursor-pointer border-none">
+          <mat-icon class="text-faint !text-[18px] !w-[18px] !h-[18px] leading-none">chevron_left</mat-icon>
+        </button>
+        <button class="w-8 h-8 rounded-md bg-bg-ink flex items-center justify-center cursor-pointer border-none">
+          <mat-icon class="text-on-brand !text-[18px] !w-[18px] !h-[18px] leading-none">chevron_right</mat-icon>
+        </button>
+      </div>
+    }
+  </div>
 </div>

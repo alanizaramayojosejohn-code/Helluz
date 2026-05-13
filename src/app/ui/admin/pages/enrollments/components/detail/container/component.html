@@ -1,234 +1,194 @@
-<div class="min-h-screen bg-white p-6">
-  <div class="max-w-6xl mx-auto">
-
-    <div class="flex items-center gap-4 mb-8">
-      <button
-        (click)="onBack()"
-        class="text-gray-600 hover:text-gray-800 transition">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-        </svg>
-      </button>
-      <h1 class="text-4xl font-bold text-red-600">Detalle de Inscripción</h1>
-    </div>
-
-    @if (isLoading()) {
-      <div class="flex justify-center items-center py-12">
-        <mat-spinner diameter="50"></mat-spinner>
-      </div>
-    }
-
-    @if (errorMessage() && !isLoading()) {
-      <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-        <div class="flex items-center gap-3">
-          <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-          </svg>
-          <p class="text-sm text-red-800">{{ errorMessage() }}</p>
-        </div>
-      </div>
-    }
-
-    @if (enrollment() && !isLoading()) {
-      @if (isExpiringSoon()) {
-        <div class="bg-orange-50 border-2 border-orange-500 rounded-lg p-4 mb-6">
-          <div class="flex items-center gap-3">
-            <svg class="w-6 h-6 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-            </svg>
-            <div>
-              <p class="font-bold text-orange-800">⚠️ Membresía próxima a vencer</p>
-              <p class="text-orange-700">Esta inscripción vence en {{ daysLeft() }} días. Considera renovarla pronto.</p>
-            </div>
-          </div>
-        </div>
+<div class="min-h-screen bg-bg-base font-body text-ink">
+   <div class="max-w-[1400px] mx-auto px-6 lg:px-8 py-8">
+      @if (isLoading()) {
+         <div class="flex flex-col items-center justify-center py-20 gap-3">
+            <span class="w-8 h-8 rounded-full border-2 border-solid border-bg-inset border-t-text-brand animate-spin"></span>
+            <p class="text-body-sm text-muted m-0">Cargando inscripción…</p>
+         </div>
       }
 
-      <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg overflow-hidden mb-6">
+      @if (errorMessage() && !isLoading() && !enrollment()) {
+         <div class="flex items-start gap-3 px-4 py-3 rounded-md bg-error/10 border border-solid border-hairline border-error/30">
+            <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-error shrink-0 mt-0.5">error</span>
+            <p class="text-caption font-medium text-error m-0 leading-relaxed">{{ errorMessage() }}</p>
+         </div>
+      }
 
-        <div class="bg-red-600 text-white p-6">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-4">
-            <div class="w-16 h-16 rounded-full bg-white text-red-600 flex items-center justify-center font-bold text-2xl">
-              {{ enrollment()!.studentName.charAt(0) }}
+      @if (enrollment(); as e) {
+         <button
+            type="button"
+            (click)="onBack()"
+            class="inline-flex items-center gap-2 mb-4 px-0 py-0 bg-transparent border-0 cursor-pointer text-muted hover:text-ink transition-colors duration-fast"
+         >
+            <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none">arrow_back</span>
+            <span class="text-body-sm font-bold">Volver a Inscripciones</span>
+         </button>
+
+         <header class="flex flex-col md:flex-row md:items-end gap-4 md:gap-6 pb-7 mb-6 border-b border-solid border-hairline border-border-default">
+            <div class="flex-1 flex flex-col gap-1.5 min-w-0">
+               <span class="text-label font-extrabold tracking-[0.25em] text-text-brand uppercase">INSCRIPCIÓN</span>
+               <h1 class="font-display text-[2.5rem] font-extrabold tracking-[-0.04em] text-ink leading-[1.05] m-0 truncate">
+                  {{ e.studentName }}
+               </h1>
+               <p class="text-body-sm text-muted m-0 mt-1">
+                  {{ e.membershipName }} · {{ e.branchName }}
+               </p>
             </div>
-            <div>
-              <h2 class="text-3xl font-bold mb-1">{{ enrollment()!.studentName }}</h2>
-              <p class="text-red-100 text-lg">{{ enrollment()!.membershipName }}</p>
+            <div class="flex items-center gap-2 flex-wrap">
+               <button
+                  type="button"
+                  (click)="onEdit()"
+                  class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-brand-500 hover:bg-brand-600 text-on-brand text-caption font-extrabold tracking-wide shadow-brand transition-colors duration-fast border-0 cursor-pointer"
+               >
+                  <span class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none">edit</span>
+                  Editar inscripción
+               </button>
             </div>
-          </div>
-            <div class="text-right">
-            <span
-              class="px-6 py-2 rounded-full text-white text-sm font-bold shadow-md uppercase tracking-widest
-              {{ enrollment()!.status === 'activa' ? 'bg-green-600' :
-                enrollment()!.status === 'vencida' ? 'bg-red-900' :
-                'bg-gray-500' }}"
-            >
-              {{
-                enrollment()!.status === 'activa' ? 'Activa' :
-                enrollment()!.status === 'vencida' ? 'Vencida' :
-                enrollment()!.status === 'completada' ? 'Completada' : 'Cancelada'
-              }}
-            </span>
-          </div>
-        </div>
-      </div>
+         </header>
 
-        <mat-tab-group class="p-6">
-
-          <mat-tab label="Información General">
-            <div class="py-6 space-y-6">
-
-              <div>
-                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                  </svg>
-                  Datos de la Inscripción
-                </h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label class="block text-sm font-semibold text-gray-600 mb-2">Sucursal</label>
-                    <mat-chip class="bg-gray-100 text-gray-800 text-base px-4 py-2">
-                      {{ enrollment()!.branchName }}
-                    </mat-chip>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-semibold text-gray-600 mb-2">Membresía</label>
-                    <p class="text-lg text-gray-800">{{ enrollment()!.membershipName }}</p>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-semibold text-gray-600 mb-2">Fecha de Inicio</label>
-                    <p class="text-lg text-gray-800">{{ enrollment()!.startDate.toDate() | date:'dd/MM/yyyy' }}</p>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-semibold text-gray-600 mb-2">Fecha de Fin</label>
-                    <div>
-                      <p class="text-lg text-gray-800">{{ enrollment()!.endDate.toDate() | date:'dd/MM/yyyy' }}</p>
-                      @if (enrollment()!.status === 'activa') {
-                        <p class="text-sm text-gray-500 mt-1">
-                          {{ daysLeft() > 0 ? daysLeft() + ' días restantes' : 'Vencida' }}
-                        </p>
-                      }
-                    </div>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-semibold text-gray-600 mb-2">Días Permitidos</label>
-                    <p class="text-lg text-gray-800">{{ getAllowedDaysText(enrollment()!.allowedDays) }}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="border-t border-gray-200 pt-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                  </svg>
-                  Sesiones
-                </h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <p class="text-sm text-blue-600 font-semibold mb-1">Total de Sesiones</p>
-                    <p class="text-3xl font-bold text-blue-800">{{ enrollment()!.totalSessions }}</p>
-                  </div>
-
-                  <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <p class="text-sm text-green-600 font-semibold mb-1">Sesiones Usadas</p>
-                    <p class="text-3xl font-bold text-green-800">{{ enrollment()!.usedSessions }}</p>
-                  </div>
-
-                  <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                    <p class="text-sm text-orange-600 font-semibold mb-1">Sesiones Restantes</p>
-                    <p class="text-3xl font-bold text-orange-800">{{ enrollment()!.remainingSessions }}</p>
-                  </div>
-                </div>
-
-                <div class="mt-6">
-                  <div class="flex justify-between text-sm mb-2">
-                    <span class="text-gray-700 font-medium">Progreso</span>
-                    <!-- <span class="text-gray-600">{{ sessionsProgress() | number:'1.0-0' }}%</span> -->
-                  </div>
-                  <div class="w-full bg-gray-200 rounded-full h-4">
-                    <div
-                      class="bg-blue-600 h-4 rounded-full transition-all flex items-center justify-end pr-2"
-                      [style.width.%]="sessionsProgress()">
-                      @if (sessionsProgress() > 10) {
-                        <span class="text-xs text-white font-bold">{{ enrollment()!.usedSessions }}/{{ enrollment()!.totalSessions }}</span>
-                      }
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="border-t border-gray-200 pt-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-                  </svg>
-                  Información de Pago
-                </h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label class="block text-sm font-semibold text-gray-600 mb-2">Costo</label>
-                    <p class="text-2xl font-bold text-gray-800">Bs. {{ enrollment()!.cost }}</p>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-semibold text-gray-600 mb-2">Estado de Pago</label>
-                    <mat-chip [class]="getPaymentStatusClass(enrollment()!.paymentMethod) + ' text-base px-4 py-2 font-semibold'">
-                      {{ enrollment()!.paymentMethod === 'Efectivo' ? 'Efectivo' :
-                         enrollment()!.paymentMethod === 'Qr' ? 'Qr' : 'Efectivo' }}
-                    </mat-chip>
-                  </div>
-                </div>
-              </div>
-
+         <article class="flex items-center gap-5 p-6 mb-6 bg-bg-elevated border border-solid border-hairline border-border-default rounded-xl">
+            <div class="w-20 h-20 rounded-full bg-brand-500 flex items-center justify-center shrink-0 shadow-brand text-on-brand">
+               <span class="text-h2 font-extrabold leading-none">{{ getInitials(e.studentName) }}</span>
             </div>
-          </mat-tab>
+            <div class="flex-1 flex flex-col gap-2 min-w-0">
+               <div class="flex items-center gap-3 flex-wrap">
+                  <h2 class="text-h3 font-extrabold tracking-[-0.02em] text-ink m-0 truncate">{{ e.studentName }}</h2>
+                  @if (isStatusActive(e.status)) {
+                     <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-success/15 shrink-0">
+                        <span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+                        <span class="text-[9px] font-extrabold tracking-[0.15em] text-success">{{ getStatusLabel(e.status) | uppercase }}</span>
+                     </span>
+                  } @else {
+                     <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-bg-inset shrink-0">
+                        <span class="w-1.5 h-1.5 rounded-full bg-faint"></span>
+                        <span class="text-[9px] font-extrabold tracking-[0.15em] text-faint">{{ getStatusLabel(e.status) | uppercase }}</span>
+                     </span>
+                  }
+               </div>
+               <div class="flex items-center gap-4 flex-wrap text-caption text-muted">
+                  <span class="inline-flex items-center gap-1.5">
+                     <span class="material-symbols-rounded !text-[14px] !w-[14px] !h-[14px] leading-none text-faint">card_membership</span>
+                     <span class="font-medium">{{ e.membershipName }}</span>
+                  </span>
+                  <span class="inline-flex items-center gap-1.5">
+                     <span class="material-symbols-rounded !text-[14px] !w-[14px] !h-[14px] leading-none text-faint">storefront</span>
+                     <span class="font-medium">{{ e.branchName }}</span>
+                  </span>
+                  @if (e.scheduleLabel) {
+                     <span class="inline-flex items-center gap-1.5">
+                        <span class="material-symbols-rounded !text-[14px] !w-[14px] !h-[14px] leading-none text-faint">schedule</span>
+                        <span class="font-bold font-mono">{{ e.scheduleLabel }}</span>
+                     </span>
+                  }
+               </div>
+            </div>
+         </article>
 
-   
+         @if (isExpiringSoon()) {
+            <div class="flex items-start gap-3 px-4 py-3 mb-6 rounded-md bg-warning/15 border border-solid border-hairline border-warning/30">
+               <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-warning shrink-0 mt-0.5">schedule</span>
+               <p class="text-caption font-medium text-ink m-0 leading-relaxed">
+                  <strong class="font-extrabold">Por vencer.</strong> Quedan {{ daysLeft() }} día{{ daysLeft() === 1 ? '' : 's' }} para la fecha de finalización.
+               </p>
+            </div>
+         }
 
-        </mat-tab-group>
+         <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
+            <section class="bg-bg-elevated border border-solid border-hairline border-border-default rounded-lg p-6 flex flex-col gap-5">
+               <header class="flex flex-col gap-1 pb-4 border-b border-solid border-hairline border-border-subtle">
+                  <span class="text-label font-extrabold tracking-[0.2em] text-muted uppercase">Información</span>
+                  <h3 class="text-h4 font-extrabold tracking-tight leading-none m-0">Datos de la inscripción</h3>
+               </header>
 
-        <!-- Acciones -->
-        <div class="border-t border-gray-200 p-6 flex gap-4">
-          <button
-            (click)="onEdit()"
-            class="flex-1 bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-            </svg>
-            Editar
-          </button>
+               <!-- Sessions progress -->
+               <div class="flex flex-col gap-2">
+                  <div class="flex items-center justify-between gap-3">
+                     <span class="text-caption font-bold text-muted">Sesiones</span>
+                     <span class="text-body-sm font-bold font-mono text-ink">{{ e.usedSessions }} / {{ e.totalSessions }} · {{ e.remainingSessions }} restan</span>
+                  </div>
+                  <div class="h-2 rounded-full bg-bg-inset overflow-hidden">
+                     <div class="h-full bg-brand-500 rounded-full transition-all duration-normal" [style.width.%]="sessionsProgress()"></div>
+                  </div>
+               </div>
 
-          @if (enrollment()!.status === 'activa') {
-            <button
-              (click)="onCancel()"
-              [disabled]="isCanceling()"
-              class="flex-1 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-              @if (isCanceling()) {
-                <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Cancelando...
-              } @else {
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-                Cancelar Inscripción
-              }
-            </button>
-          }
-        </div>
-      </div>
-    }
-  </div>
+               <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+                  <div class="flex flex-col gap-1">
+                     <span class="text-label font-extrabold tracking-[0.2em] text-faint uppercase">Inicio</span>
+                     <span class="text-body-sm font-bold text-ink">{{ e.startDate.toDate() | date: 'dd MMM yyyy' : '' : 'es-BO' }}</span>
+                  </div>
+                  <div class="flex flex-col gap-1">
+                     <span class="text-label font-extrabold tracking-[0.2em] text-faint uppercase">Fin</span>
+                     <span class="text-body-sm font-bold text-ink">{{ e.endDate.toDate() | date: 'dd MMM yyyy' : '' : 'es-BO' }}</span>
+                  </div>
+                  <div class="flex flex-col gap-1">
+                     <span class="text-label font-extrabold tracking-[0.2em] text-faint uppercase">Costo</span>
+                     <span class="text-body-sm font-bold font-mono text-ink">Bs {{ e.cost }}</span>
+                  </div>
+                  <div class="flex flex-col gap-1">
+                     <span class="text-label font-extrabold tracking-[0.2em] text-faint uppercase">Pago</span>
+                     <span class="text-body-sm font-bold text-ink">{{ e.paymentMethod }}</span>
+                  </div>
+                  @if (e.scheduleLabel) {
+                     <div class="flex flex-col gap-1">
+                        <span class="text-label font-extrabold tracking-[0.2em] text-faint uppercase">Horario</span>
+                        <span class="text-body-sm font-bold font-mono text-ink">{{ e.scheduleLabel }}</span>
+                     </div>
+                  }
+                  @if (e.instructorName) {
+                     <div class="flex flex-col gap-1">
+                        <span class="text-label font-extrabold tracking-[0.2em] text-faint uppercase">Instructor</span>
+                        <span class="text-body-sm font-bold text-ink">{{ e.instructorName }}</span>
+                     </div>
+                  }
+                  @if (e.allowedDays.length) {
+                     <div class="flex flex-col gap-1 sm:col-span-2">
+                        <span class="text-label font-extrabold tracking-[0.2em] text-faint uppercase">Días permitidos</span>
+                        <span class="text-body-sm font-bold text-ink">{{ getAllowedDaysText(e.allowedDays) }}</span>
+                     </div>
+                  }
+                  <div class="flex flex-col gap-1">
+                     <span class="text-label font-extrabold tracking-[0.2em] text-faint uppercase">Estado</span>
+                     <span
+                        class="text-body-sm font-extrabold"
+                        [class.text-success]="isStatusActive(e.status)"
+                        [class.text-faint]="!isStatusActive(e.status)"
+                     >
+                        {{ getStatusLabel(e.status) }}
+                     </span>
+                  </div>
+               </div>
+            </section>
+
+            <aside class="flex flex-col gap-4">
+               <div class="bg-error/[0.05] border border-solid border-hairline border-error/20 rounded-lg p-5 flex flex-col gap-3">
+                  <span class="text-label font-extrabold tracking-[0.2em] text-error uppercase">Zona de peligro</span>
+                  <p class="text-caption text-muted leading-relaxed m-0">
+                     Cancelar esta inscripción. Las asistencias y pagos asociados quedarán huérfanos.
+                  </p>
+                  <button
+                     type="button"
+                     (click)="onCancel()"
+                     [disabled]="isCanceling()"
+                     class="self-start inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-transparent border border-solid border-hairline border-error text-error text-caption font-extrabold cursor-pointer transition-colors duration-fast hover:bg-error/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                     @if (isCanceling()) {
+                        <span class="w-4 h-4 rounded-full border-2 border-solid border-error/30 border-t-error animate-spin"></span>
+                        Cancelando…
+                     } @else {
+                        <span class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none">cancel</span>
+                        Cancelar inscripción
+                     }
+                  </button>
+               </div>
+
+               @if (errorMessage()) {
+                  <div class="flex items-start gap-3 px-4 py-3 rounded-md bg-error/10 border border-solid border-hairline border-error/30">
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-error shrink-0 mt-0.5">error</span>
+                     <p class="text-caption font-medium text-error m-0 leading-relaxed">{{ errorMessage() }}</p>
+                  </div>
+               }
+            </aside>
+         </div>
+      }
+   </div>
 </div>

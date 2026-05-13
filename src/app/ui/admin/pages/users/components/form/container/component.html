@@ -1,184 +1,192 @@
-<div class="min-h-screen bg-white p-6">
-   <div class="max-w-3xl mx-auto">
-      <div class="mb-8">
-         <h1 class="text-4xl font-bold text-red-600 mb-2">
-            {{ isEditMode() ? 'Editar Usuario' : 'Registrar Usuario' }}
-         </h1>
-         <p class="text-gray-400">
-            {{
-               isEditMode()
-                  ? 'Modifica la información y permisos del usuario'
-                  : 'Completa la información para pre-registrar al nuevo usuario en el sistema'
-            }}
-         </p>
-      </div>
+<div class="min-h-screen bg-bg-base font-body text-ink py-10 px-4">
+   <form
+      [formGroup]="userForm"
+      (ngSubmit)="onSubmit()"
+      class="max-w-[480px] mx-auto bg-bg-elevated border border-solid border-hairline border-border-default rounded-2xl shadow-lg flex flex-col overflow-hidden"
+   >
+      <!-- Header -->
+      <header class="flex items-start gap-4 px-7 py-6 border-b border-solid border-hairline border-border-default">
+         <div class="flex-1 flex flex-col gap-1.5">
+            <span class="text-label font-extrabold tracking-[0.25em] text-text-brand uppercase">
+               {{ isEditMode() ? 'EDITAR USUARIO' : 'NUEVO USUARIO' }}
+            </span>
+            <h1 class="font-display text-[2rem] font-extrabold tracking-[-0.03em] text-ink leading-[1.05] m-0">
+               {{ isEditMode() ? 'Editar usuario' : 'Crear usuario' }}
+            </h1>
+            <p class="text-body-sm text-muted leading-relaxed m-0 mt-1">
+               {{ isEditMode() ? 'Modifica los datos del usuario.' : 'Pre-registra al usuario para que complete su acceso.' }}
+            </p>
+         </div>
 
-      <!-- Aviso nuevo flujo (solo en creación) -->
-      @if (!isEditMode()) {
-         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <div class="flex items-start gap-3">
-               <svg
-                  class="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+         <button
+            type="button"
+            (click)="onCancel()"
+            [disabled]="isSubmitting()"
+            class="w-9 h-9 shrink-0 rounded-full bg-bg-inset hover:bg-border-default flex items-center justify-center text-muted border-0 cursor-pointer transition-colors duration-fast disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Cerrar"
+         >
+            <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none">close</span>
+         </button>
+      </header>
+
+      <!-- Body -->
+      <div class="flex flex-col gap-7 px-7 py-7">
+         <!-- Sec 1 · Identidad -->
+         <section class="flex flex-col gap-4">
+            <header class="flex items-center gap-2">
+               <div class="w-6 h-6 rounded-full bg-bg-brand-soft flex items-center justify-center shrink-0">
+                  <span class="text-[11px] font-extrabold font-mono text-text-brand leading-none">1</span>
+               </div>
+               <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Identidad</h2>
+            </header>
+
+            <label class="flex flex-col gap-1.5">
+               <span class="text-caption font-bold text-muted">Email</span>
+               <span
+                  class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                  [class.border-border-strong]="!hasError('email')"
+                  [class.border-error]="hasError('email')"
+                  [class.border-thick]="hasError('email')"
+                  [class.opacity-60]="isEditMode()"
                >
-                  <path
-                     stroke-linecap="round"
-                     stroke-linejoin="round"
-                     stroke-width="2"
-                     d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">mail</span>
+                  <input
+                     type="email"
+                     formControlName="email"
+                     placeholder="usuario@correo.com"
+                     autocomplete="off"
+                     class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink placeholder:text-faint min-w-0 disabled:cursor-not-allowed"
                   />
-               </svg>
-               <div>
-                  <p class="font-bold text-blue-900 mb-1">¿Cómo funciona el pre-registro?</p>
-                  <ol class="text-sm text-blue-800 space-y-1 list-decimal list-inside">
-                     <li>Completa el formulario con los datos del nuevo usuario</li>
-                     <li>El usuario recibirá acceso al formulario de registro de la app</li>
-                     <li>Al registrarse con su email, heredará el rol y estado que definiste aquí</li>
-                  </ol>
-               </div>
-            </div>
-         </div>
-      }
+               </span>
+               @if (hasError('email')) {
+                  <span class="text-caption font-medium text-error">{{ getErrorMessage('email') }}</span>
+               }
+               @if (isEditMode()) {
+                  <span class="text-caption text-faint">El email no se puede modificar después del registro.</span>
+               }
+            </label>
 
-      @if (isLoading()) {
-         <div class="flex justify-center items-center py-12">
-            <mat-spinner diameter="50"></mat-spinner>
-         </div>
-      }
-
-      <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="space-y-6">
-         <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-6 space-y-6">
-            <!-- Email (solo en creación) -->
-            @if (!isEditMode()) {
-               <div class="space-y-4">
-                  <h2 class="text-sm font-bold text-red-600 uppercase tracking-wider mb-2">Acceso</h2>
-                  <mat-form-field appearance="outline" class="w-full">
-                     <mat-label>Email</mat-label>
+            <div class="grid grid-cols-2 gap-3">
+               <label class="flex flex-col gap-1.5">
+                  <span class="text-caption font-bold text-muted">Nombre</span>
+                  <span
+                     class="flex items-center gap-2 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                     [class.border-border-strong]="!hasError('name')"
+                     [class.border-error]="hasError('name')"
+                     [class.border-thick]="hasError('name')"
+                  >
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">person</span>
                      <input
-                        matInput
-                        type="email"
-                        formControlName="email"
-                        placeholder="ejemplo@correo.com"
-                        required
+                        type="text"
+                        formControlName="name"
+                        placeholder="Nombre"
                         autocomplete="off"
+                        class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink placeholder:text-faint min-w-0"
                      />
-                     <mat-hint>El usuario se registrará con este email desde la app</mat-hint>
-                     @if (hasError('email')) {
-                        <mat-error>{{ getErrorMessage('email') }}</mat-error>
-                     }
-                  </mat-form-field>
-               </div>
-               <div class="border-t border-gray-100 pt-4"></div>
-            }
+                  </span>
+                  @if (hasError('name')) {
+                     <span class="text-caption font-medium text-error">{{ getErrorMessage('name') }}</span>
+                  }
+               </label>
 
-            <!-- Datos personales -->
-            <div class="space-y-4">
-               <h2 class="text-sm font-bold text-red-600 uppercase tracking-wider mb-2">Datos Personales</h2>
-               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <mat-form-field appearance="outline" class="w-full">
-                     <mat-label>Nombre</mat-label>
-                     <input matInput formControlName="name" placeholder="Ej. Juan" required />
-                     @if (hasError('name')) {
-                        <mat-error>{{ getErrorMessage('name') }}</mat-error>
-                     }
-                  </mat-form-field>
-
-                  <mat-form-field appearance="outline" class="w-full">
-                     <mat-label>Apellido</mat-label>
-                     <input matInput formControlName="lastname" placeholder="Ej. Pérez" required />
-                     @if (hasError('lastname')) {
-                        <mat-error>{{ getErrorMessage('lastname') }}</mat-error>
-                     }
-                  </mat-form-field>
-               </div>
+               <label class="flex flex-col gap-1.5">
+                  <span class="text-caption font-bold text-muted">Apellido</span>
+                  <span
+                     class="flex items-center gap-2 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                     [class.border-border-strong]="!hasError('lastname')"
+                     [class.border-error]="hasError('lastname')"
+                     [class.border-thick]="hasError('lastname')"
+                  >
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">person</span>
+                     <input
+                        type="text"
+                        formControlName="lastname"
+                        placeholder="Apellido"
+                        autocomplete="off"
+                        class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink placeholder:text-faint min-w-0"
+                     />
+                  </span>
+                  @if (hasError('lastname')) {
+                     <span class="text-caption font-medium text-error">{{ getErrorMessage('lastname') }}</span>
+                  }
+               </label>
             </div>
+         </section>
 
-            <!-- Configuración -->
-            <div class="pt-4 space-y-4">
-               <h2 class="text-sm font-bold text-red-600 uppercase tracking-wider mb-2">Configuración</h2>
-               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <mat-form-field appearance="outline" class="w-full">
-                     <mat-label>Rol de Usuario</mat-label>
-                     <mat-select formControlName="role" required>
-                        <mat-option value="admin">Administrador</mat-option>
-                        <mat-option value="instructor">Instructor</mat-option>
-                     </mat-select>
-                     @if (hasError('role')) {
-                        <mat-error>{{ getErrorMessage('role') }}</mat-error>
-                     }
-                  </mat-form-field>
-
-                  <mat-form-field appearance="outline" class="w-full">
-                     <mat-label>Estado</mat-label>
-                     <mat-select formControlName="status" required>
-                        <mat-option value="activo">Activo</mat-option>
-                        <mat-option value="inactivo">Inactivo</mat-option>
-                     </mat-select>
-                     @if (hasError('status')) {
-                        <mat-error>{{ getErrorMessage('status') }}</mat-error>
-                     }
-                  </mat-form-field>
+         <!-- Sec 2 · Acceso -->
+         <section class="flex flex-col gap-4">
+            <header class="flex items-center gap-2">
+               <div class="w-6 h-6 rounded-full bg-bg-inset flex items-center justify-center shrink-0">
+                  <span class="text-[11px] font-extrabold font-mono text-faint leading-none">2</span>
                </div>
-            </div>
-         </div>
+               <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Rol y estado</h2>
+            </header>
 
-         <!-- Error -->
+            <div class="grid grid-cols-2 gap-3">
+               <label class="flex flex-col gap-1.5">
+                  <span class="text-caption font-bold text-muted">Rol</span>
+                  <span class="flex items-center gap-2 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline border-border-strong transition-colors duration-fast">
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">badge</span>
+                     <select
+                        formControlName="role"
+                        class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink min-w-0 cursor-pointer appearance-none"
+                     >
+                        <option value="instructor">Instructor</option>
+                        <option value="admin">Administrador</option>
+                     </select>
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">expand_more</span>
+                  </span>
+               </label>
+
+               <label class="flex flex-col gap-1.5">
+                  <span class="text-caption font-bold text-muted">Estado</span>
+                  <span class="flex items-center gap-2 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline border-border-strong transition-colors duration-fast">
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">flag</span>
+                     <select
+                        formControlName="status"
+                        class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink min-w-0 cursor-pointer appearance-none"
+                     >
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                     </select>
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">expand_more</span>
+                  </span>
+               </label>
+            </div>
+         </section>
+
+         <!-- Error message -->
          @if (errorMessage()) {
-            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-               <div class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                     <path
-                        fill-rule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                        clip-rule="evenodd"
-                     />
-                  </svg>
-                  <p class="text-sm text-red-800">{{ errorMessage() }}</p>
-               </div>
+            <div class="flex items-start gap-3 px-4 py-3 rounded-md bg-error/10 border border-solid border-hairline border-error/30">
+               <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-error shrink-0 mt-0.5">error</span>
+               <p class="text-caption font-medium text-error m-0 leading-relaxed">{{ errorMessage() }}</p>
             </div>
          }
+      </div>
 
-         <!-- Botones -->
-         <div class="flex gap-4">
-            <button
-               type="button"
-               (click)="onCancel()"
-               [disabled]="isSubmitting()"
-               class="flex-1 bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50"
-            >
-               Cancelar
-            </button>
-
-            <button
-               type="submit"
-               [disabled]="userForm.invalid || isSubmitting()"
-               class="flex-1 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-               @if (isSubmitting()) {
-                  <svg class="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
-                     <circle
-                        class="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        stroke-width="4"
-                        fill="none"
-                     ></circle>
-                     <path
-                        class="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                     ></path>
-                  </svg>
-                  Guardando...
-               } @else {
-                  {{ isEditMode() ? 'Actualizar Usuario' : 'Pre-registrar Usuario' }}
-               }
-            </button>
-         </div>
-      </form>
-   </div>
+      <!-- Footer -->
+      <footer class="flex items-stretch gap-3 px-7 py-5 bg-bg-elevated border-t border-solid border-hairline border-border-default">
+         <button
+            type="button"
+            (click)="onCancel()"
+            [disabled]="isSubmitting()"
+            class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-transparent border border-solid border-standard border-border-strong text-ink text-body-sm font-bold cursor-pointer transition-colors duration-fast hover:bg-bg-inset disabled:opacity-50 disabled:cursor-not-allowed"
+         >
+            Cancelar
+         </button>
+         <button
+            type="submit"
+            [disabled]="userForm.invalid || isSubmitting()"
+            class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-brand-500 hover:bg-brand-600 text-on-brand text-body-sm font-extrabold border-0 shadow-brand cursor-pointer transition-colors duration-fast disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+         >
+            @if (isSubmitting()) {
+               <span class="w-4 h-4 rounded-full border-2 border-solid border-on-brand/30 border-t-on-brand animate-spin"></span>
+               Guardando…
+            } @else {
+               <span class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none">check</span>
+               {{ isEditMode() ? 'Actualizar usuario' : 'Crear usuario' }}
+            }
+         </button>
+      </footer>
+   </form>
 </div>

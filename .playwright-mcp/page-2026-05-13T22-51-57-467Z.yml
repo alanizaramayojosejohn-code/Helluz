@@ -1,0 +1,149 @@
+- generic [ref=e1]:
+  - generic [ref=e4]:
+    - complementary [ref=e5]:
+      - generic [ref=e6]:
+        - img "Helluz" [ref=e7]
+        - generic [ref=e150]: HELLUZ
+        - button "Toggle sidebar" [ref=e9] [cursor=pointer]:
+          - img [ref=e10]: menu_open
+      - navigation [ref=e11]:
+        - link "Dashboard" [ref=e151] [cursor=pointer]:
+          - /url: /admin/home
+          - img [ref=e13]: dashboard
+          - generic [ref=e152]: Dashboard
+        - link "Alumnos" [ref=e153] [cursor=pointer]:
+          - /url: /admin/alumnos
+          - img [ref=e16]: school
+          - generic [ref=e154]: Alumnos
+        - link "Inscripciones" [ref=e155] [cursor=pointer]:
+          - /url: /admin/inscripciones
+          - img [ref=e19]: assignment
+          - generic [ref=e156]: Inscripciones
+        - link "Horarios" [ref=e157] [cursor=pointer]:
+          - /url: /admin/horarios
+          - img [ref=e22]: schedule
+          - generic [ref=e158]: Horarios
+        - link "Membresías" [ref=e159] [cursor=pointer]:
+          - /url: /admin/membresias
+          - img [ref=e25]: card_membership
+          - generic [ref=e160]: Membresías
+        - link "Instructores" [ref=e161] [cursor=pointer]:
+          - /url: /admin/instructores
+          - img [ref=e28]: fitness_center
+          - generic [ref=e162]: Instructores
+        - link "Usuarios" [ref=e163] [cursor=pointer]:
+          - /url: /admin/usuarios
+          - img [ref=e31]: groups
+          - generic [ref=e164]: Usuarios
+        - link "Sucursales" [ref=e165] [cursor=pointer]:
+          - /url: /admin/sucursales
+          - img [ref=e34]: storefront
+          - generic [ref=e166]: Sucursales
+        - link "Asistencias alumnos" [ref=e167] [cursor=pointer]:
+          - /url: /admin/asistenciasa
+          - img [ref=e37]: list_alt
+          - generic [ref=e168]: Asistencias alumnos
+        - link "Asistencias instructor" [ref=e169] [cursor=pointer]:
+          - /url: /admin/asistenciasi
+          - img [ref=e40]: task_alt
+          - generic [ref=e170]: Asistencias instructor
+        - link "Finanzas" [ref=e171] [cursor=pointer]:
+          - /url: /admin/finanzas
+          - img [ref=e43]: account_balance
+          - generic [ref=e172]: Finanzas
+        - link "Marcar asistencia" [ref=e173] [cursor=pointer]:
+          - /url: /admin/asistenciainstructores
+          - img [ref=e46]: qr_code_scanner
+          - generic [ref=e174]: Marcar asistencia
+      - generic [ref=e48]:
+        - generic [ref=e49]: AA
+        - generic [ref=e175]:
+          - paragraph [ref=e176]: admin admin
+          - paragraph [ref=e177]: Administrador
+        - button "Más opciones" [ref=e178] [cursor=pointer]:
+          - img [ref=e179]: more_horiz
+    - generic [ref=e55]:
+      - banner [ref=e57]:
+        - navigation "Breadcrumb" [ref=e58]:
+          - img [ref=e59]: home
+          - link "Inicio" [ref=e60] [cursor=pointer]:
+            - /url: /admin/home
+          - generic [ref=e61]: ›
+          - generic [ref=e62]: Membresías
+        - button "Menú de usuario" [expanded] [ref=e64] [cursor=pointer]:
+          - generic [ref=e65]: AA
+          - generic [ref=e66]: admin admin
+          - img [ref=e67]: keyboard_arrow_down
+      - main [ref=e68]:
+        - generic [ref=e72]:
+          - generic [ref=e73]:
+            - generic [ref=e74]:
+              - generic [ref=e75]: GESTIÓN
+              - heading "Membresías" [level=1] [ref=e76]
+            - button "Nueva membresía" [ref=e77] [cursor=pointer]:
+              - img [ref=e78]: add
+              - text: Nueva membresía
+          - generic [ref=e79]:
+            - generic [ref=e80]:
+              - button "Todas" [ref=e81] [cursor=pointer]
+              - button "Activas" [ref=e82] [cursor=pointer]
+              - button "Inactivas" [ref=e83] [cursor=pointer]
+            - generic [ref=e84]:
+              - img [ref=e85]: search
+              - generic [ref=e86]: Buscar nombre o disciplina…
+            - generic [ref=e87] [cursor=pointer]:
+              - img [ref=e88]: sort
+              - generic [ref=e89]: Recientes
+              - img [ref=e90]: keyboard_arrow_down
+          - generic [ref=e91]:
+            - generic [ref=e92]:
+              - generic [ref=e93]: NOMBRE
+              - generic [ref=e94]: DURACIÓN
+              - generic [ref=e95]: SESIONES
+              - generic [ref=e96]: COSTO
+              - generic [ref=e97]: ESTADO
+            - generic [ref=e98]:
+              - generic [ref=e99]:
+                - generic [ref=e100]: Completo
+                - generic [ref=e101]: Lun, Mar, Mié, Jue, Vie
+              - generic [ref=e102]: 30 días
+              - generic [ref=e103]: 20 sesiones
+              - generic [ref=e104]: Bs 200
+              - button "activo" [ref=e106] [cursor=pointer]
+              - generic [ref=e107]:
+                - button [ref=e108] [cursor=pointer]:
+                  - img [ref=e109]: visibility
+                - button [ref=e110] [cursor=pointer]:
+                  - img [ref=e111]: edit
+                - button [ref=e112] [cursor=pointer]:
+                  - img [ref=e113]: delete
+            - generic [ref=e114]:
+              - generic [ref=e115]:
+                - generic [ref=e116]: Medio Mes
+                - generic [ref=e117]: Lun, Mar, Mié, Jue, Vie
+              - generic [ref=e118]: 15 días
+              - generic [ref=e119]: 12 sesiones
+              - generic [ref=e120]: Bs 100
+              - button "activo" [ref=e122] [cursor=pointer]
+              - generic [ref=e123]:
+                - button [ref=e124] [cursor=pointer]:
+                  - img [ref=e125]: visibility
+                - button [ref=e126] [cursor=pointer]:
+                  - img [ref=e127]: edit
+                - button [ref=e128] [cursor=pointer]:
+                  - img [ref=e129]: delete
+            - generic [ref=e130]:
+              - generic [ref=e131]: Membresías registradas
+              - button [ref=e132] [cursor=pointer]:
+                - img [ref=e133]: chevron_left
+              - button [ref=e134] [cursor=pointer]:
+                - img [ref=e135]: chevron_right
+  - menu [ref=e183]:
+    - generic [ref=e184]:
+      - generic [ref=e185]:
+        - paragraph [ref=e186]: admin admin
+        - paragraph [ref=e187]: admin@gmail.com
+        - paragraph [ref=e188]: Administrador
+      - menuitem "Cerrar sesión" [active] [ref=e189] [cursor=pointer]:
+        - img [ref=e190]: logout
+        - generic [ref=e191]: Cerrar sesión

@@ -8,11 +8,6 @@ import {
    AsyncValidatorFn,
    ValidationErrors,
 } from '@angular/forms'
-import { MatFormFieldModule } from '@angular/material/form-field'
-import { MatInputModule } from '@angular/material/input'
-import { MatSelectModule } from '@angular/material/select'
-import { MatButtonModule } from '@angular/material/button'
-import { MatCheckboxModule } from '@angular/material/checkbox'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { catchError, debounceTime, distinctUntilChanged, map, Observable, of, switchMap } from 'rxjs'
 import { InstructorService } from '../../../../../../../services/instructor/instructor.service'
@@ -22,14 +17,7 @@ import { status } from '../../../../../../../models/branch.model'
 
 @Component({
    selector: 'x-instructor-form',
-   imports: [
-      MatInputModule,
-      MatSelectModule,
-      MatButtonModule,
-      MatCheckboxModule,
-      ReactiveFormsModule,
-      MatFormFieldModule,
-   ],
+   imports: [ReactiveFormsModule],
    templateUrl: './component.html',
 })
 export class InstructorForm implements OnInit {

@@ -2,18 +2,13 @@
 import { Component, DestroyRef, effect, inject, input, OnInit, output, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
-import { MatFormFieldModule } from '@angular/material/form-field'
-import { MatInputModule } from '@angular/material/input'
-import { MatSelectModule } from '@angular/material/select'
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { StudentService } from '../../../../../../../services/student/student.service'
 import { CreateStudentDto, UpdateStudentDto } from '../../../../../../../models/student.model'
 import { AuthService } from '../../../../../../../services/auth/auth.service'
-import { user } from '@angular/fire/auth'
 
 @Component({
    selector: 'x-student-form',
-   imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatProgressSpinnerModule],
+   imports: [ReactiveFormsModule],
    templateUrl: './component.html',
 })
 export class StudentForm implements OnInit {

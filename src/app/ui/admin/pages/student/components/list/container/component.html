@@ -1,141 +1,138 @@
-<div class="min-h-screen bg-white p-6">
-   <div class="max-w-7xl mx-auto">
-      <div class="flex justify-between items-center mb-8">
-         <div>
-            <h1 class="text-4xl font-bold text-red-600 mb-2">Gestión de Estudiantes</h1>
-            <p class="text-gray-600">Administra los estudiantes registrados</p>
-         </div>
-         <button
-            (click)="onCreateStudent()"
-            class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center gap-2"
-         >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Nuevo Estudiante
-         </button>
+<div class="p-8 flex flex-col gap-0">
+
+  <!-- Page header -->
+  <div class="flex items-end justify-between pb-7 border-b border-hairline border-border-default">
+    <div class="flex flex-col gap-1.5">
+      <span class="text-label font-extrabold uppercase tracking-[2.75px] text-text-brand">GESTIÓN</span>
+      <h1 class="font-display text-h1 font-extrabold text-ink leading-none tracking-tightest">Alumnos</h1>
+    </div>
+    <button
+      (click)="onCreateStudent()"
+      class="flex items-center gap-2 px-7 py-4 rounded-full bg-brand-500 text-on-brand text-body font-extrabold shadow-brand hover:bg-brand-600 transition-colors duration-fast cursor-pointer border-none"
+    >
+      <mat-icon class="!text-[18px] !w-[18px] !h-[18px] leading-none">add</mat-icon>
+      Nuevo alumno
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="flex items-center gap-3 pt-6">
+    <!-- Status tabs -->
+    <div class="flex items-center rounded-full bg-bg-inset p-[3px]">
+      <button
+        (click)="onStatusFilterChange('all')"
+        [class]="statusFilter() === 'all'
+          ? 'flex items-center gap-2 px-4 py-2 rounded-full bg-bg-elevated text-caption font-extrabold text-ink shadow-sm cursor-pointer border-none'
+          : 'px-4 py-2 rounded-full text-caption font-extrabold text-muted bg-transparent cursor-pointer border-none'"
+      >
+        Todos
+      </button>
+      <button
+        (click)="onStatusFilterChange('activo')"
+        [class]="statusFilter() === 'activo'
+          ? 'flex items-center gap-2 px-4 py-2 rounded-full bg-bg-elevated text-caption font-extrabold text-ink shadow-sm cursor-pointer border-none'
+          : 'px-4 py-2 rounded-full text-caption font-extrabold text-muted bg-transparent cursor-pointer border-none'"
+      >
+        Activos
+      </button>
+      <button
+        (click)="onStatusFilterChange('inactivo')"
+        [class]="statusFilter() === 'inactivo'
+          ? 'flex items-center gap-2 px-4 py-2 rounded-full bg-bg-elevated text-caption font-extrabold text-ink shadow-sm cursor-pointer border-none'
+          : 'px-4 py-2 rounded-full text-caption font-extrabold text-muted bg-transparent cursor-pointer border-none'"
+      >
+        Inactivos
+      </button>
+    </div>
+    <!-- Search -->
+    <div class="flex-1 flex items-center gap-2 px-4 py-[10px] rounded-full bg-bg-elevated border border-hairline border-border-strong">
+      <mat-icon class="text-faint !text-base !w-4 !h-4 leading-none shrink-0">search</mat-icon>
+      <span class="text-caption text-faint font-medium">Buscar nombre, CI o celular…</span>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="mt-4 px-4 py-3 rounded-lg border border-hairline border-error/30 text-error text-body-sm">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- Table -->
+  <div class="mt-6 rounded-lg border border-hairline border-border-default bg-bg-elevated overflow-hidden">
+    @if (isLoading()) {
+      <div class="flex justify-center items-center py-12">
+        <mat-spinner diameter="40"></mat-spinner>
       </div>
+    } @else {
 
-      <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-4 mb-6">
-         <mat-form-field appearance="outline" class="w-full md:w-64">
-            <mat-label>Filtrar por Estado</mat-label>
-            <mat-select [value]="statusFilter()" (selectionChange)="onStatusFilterChange($event.value)">
-               <mat-option value="all">Todos</mat-option>
-               <mat-option value="activo">Activos</mat-option>
-               <mat-option value="inactivo">Inactivos</mat-option>
-            </mat-select>
-         </mat-form-field>
+      <!-- Col headers -->
+      <div class="flex items-center gap-4 px-5 py-[10px] bg-bg-inset">
+        <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase flex-1 min-w-0">ALUMNO</span>
+        <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase w-[90px] shrink-0">CI</span>
+        <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase w-[110px] shrink-0">CELULAR</span>
+        <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase w-[190px] shrink-0">EMAIL</span>
+        <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase w-[100px] shrink-0">ESTADO</span>
+        <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase w-[120px] shrink-0">REGISTRADO POR</span>
+        <span class="w-[60px] shrink-0"></span>
       </div>
-
-      @if (isLoading()) {
-         <div class="flex justify-center p-8">
-            <mat-spinner diameter="50"></mat-spinner>
-         </div>
-      }
-
-      @if (errorMessage()) {
-         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
-            {{ errorMessage() }}
-         </div>
-      }
 
       @if (students$ | async; as students) {
-         <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-               <thead class="bg-gray-50">
-                  <tr>
-                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Nombre Completo
-                     </th>
-                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        CI
-                     </th>
-                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Celular
-                     </th>
-                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Email
-                     </th>
-                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Estado
-                     </th>
-                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Usuario
-                     </th>
-                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Acciones
-                     </th>
-                  </tr>
-               </thead>
-               <tbody class="bg-white divide-y divide-gray-200">
-                  @for (student of filterStudents(students); track student.id) {
-                     <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                           <div class="text-sm font-medium text-gray-900">{{ getFullName(student) }}</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                           {{ student.ci }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                           {{ student.cellphone }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                           {{ student.email || '-' }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                           <span
-                              [class]="
-                                 student.status === 'activo'
-                                    ? 'bg-green-100 text-green-800'
-                                    : 'bg-gray-100 text-gray-800'
-                              "
-                              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full cursor-pointer"
-                              (click)="onToggleStatus(student)"
-                           >
-                              {{ student.status }}
-                           </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                           {{ student.createdByName }}
-                        </td>
-
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                           <button
-                              mat-icon-button
-                              (click)="onViewDetail(student)"
-                              matTooltip="Ver detalle"
-                              class="text-gray-500 hover:text-blue-600 bg-transparent border-none shadow-none"
-                           >
-                              <mat-icon>visibility</mat-icon>
-                           </button>
-                           <button
-                              mat-icon-button
-                              (click)="onEditStudent(student)"
-                              matTooltip="Editar"
-                              class="text-gray-500 hover:text-gray-800 bg-transparent border-none shadow-none"
-                           >
-                              <mat-icon>edit</mat-icon>
-                           </button>
-                           <button
-                              class="text-gray-500 hover:text-red-600 bg-transparent border-none shadow-none"
-                              (click)="deleteStudent(student)"
-                              mat-icon-button
-                              matTooltip="Editar"
-                           >
-                              <mat-icon>delete</mat-icon>
-                           </button>
-                        </td>
-                     </tr>
-                  } @empty {
-                     <tr>
-                        <td colspan="6" class="px-6 py-8 text-center text-gray-500">
-                           No hay estudiantes registrados
-                        </td>
-                     </tr>
-                  }
-               </tbody>
-            </table>
-         </div>
+        @for (student of filterStudents(students); track student.id) {
+          <div class="flex items-center gap-4 px-5 py-[14px] border-b border-hairline border-border-subtle hover:bg-bg-surface transition-colors duration-fast last:border-b-0">
+            <!-- Alumno -->
+            <div class="flex items-center gap-2.5 flex-1 min-w-0">
+              <div class="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center text-on-brand text-caption font-extrabold shrink-0 uppercase">
+                {{ student.name[0] }}{{ student.lastname[0] }}
+              </div>
+              <span class="text-body-sm font-extrabold text-ink truncate">{{ getFullName(student) }}</span>
+            </div>
+            <!-- CI -->
+            <span class="text-body-sm font-semibold font-mono text-ink w-[90px] shrink-0">{{ student.ci }}</span>
+            <!-- Celular -->
+            <span class="text-body-sm font-semibold font-mono text-ink w-[110px] shrink-0">{{ student.cellphone }}</span>
+            <!-- Email -->
+            <span class="text-body-sm font-semibold text-ink w-[190px] shrink-0 truncate">{{ student.email || '—' }}</span>
+            <!-- Estado -->
+            <div class="w-[100px] shrink-0">
+              <button
+                (click)="onToggleStatus(student)"
+                [class]="student.status === 'activo'
+                  ? 'px-[10px] py-1 rounded-full bg-success/20 text-success text-caption font-extrabold cursor-pointer border-none'
+                  : 'px-[10px] py-1 rounded-full bg-bg-inset text-faint text-caption font-extrabold cursor-pointer border-none'"
+              >
+                {{ student.status === 'activo' ? 'Activo' : 'Inactivo' }}
+              </button>
+            </div>
+            <!-- Registrado por -->
+            <span class="text-body-sm font-semibold text-ink w-[120px] shrink-0 truncate">{{ student.createdByName }}</span>
+            <!-- Acciones -->
+            <div class="flex items-center gap-0.5 w-[60px] shrink-0 justify-end">
+              <button (click)="onViewDetail(student)" class="p-1.5 rounded-full text-faint hover:text-ink hover:bg-bg-inset transition-colors duration-fast cursor-pointer border-none bg-transparent" matTooltip="Ver detalle">
+                <mat-icon class="!text-[18px] !w-[18px] !h-[18px] leading-none">visibility</mat-icon>
+              </button>
+              <button (click)="onEditStudent(student)" class="p-1.5 rounded-full text-faint hover:text-ink hover:bg-bg-inset transition-colors duration-fast cursor-pointer border-none bg-transparent" matTooltip="Editar">
+                <mat-icon class="!text-[18px] !w-[18px] !h-[18px] leading-none">edit</mat-icon>
+              </button>
+              <button (click)="deleteStudent(student)" class="p-1.5 rounded-full text-faint hover:text-error hover:bg-error/10 transition-colors duration-fast cursor-pointer border-none bg-transparent" matTooltip="Eliminar">
+                <mat-icon class="!text-[18px] !w-[18px] !h-[18px] leading-none">delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        } @empty {
+          <div class="px-5 py-12 text-center text-faint text-body-sm">No hay alumnos registrados</div>
+        }
       }
-   </div>
+
+      <!-- Footer -->
+      <div class="flex items-center gap-3 px-5 py-[14px] border-t border-hairline border-border-default">
+        <span class="text-caption font-semibold text-muted flex-1">Alumnos registrados</span>
+        <button class="w-8 h-8 rounded-md bg-bg-inset flex items-center justify-center cursor-pointer border-none">
+          <mat-icon class="text-faint !text-[18px] !w-[18px] !h-[18px] leading-none">chevron_left</mat-icon>
+        </button>
+        <button class="w-8 h-8 rounded-md bg-bg-ink flex items-center justify-center cursor-pointer border-none">
+          <mat-icon class="text-on-brand !text-[18px] !w-[18px] !h-[18px] leading-none">chevron_right</mat-icon>
+        </button>
+      </div>
+    }
+  </div>
 </div>

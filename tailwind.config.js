@@ -23,6 +23,7 @@ module.exports = {
                elevated: 'var(--color-bg-elevated)',
                inset: 'var(--color-bg-inset)',
                'brand-soft': 'var(--color-bg-brand-soft)',
+               ink: 'var(--color-bg-ink)',
             },
             // Borders (uso: border-border-default, etc.)
             'border-default': 'var(--color-border-default)',
@@ -35,6 +36,7 @@ module.exports = {
             faint: 'var(--color-text-tertiary)',
             'on-brand': 'var(--color-text-on-brand)',
             inverse: 'var(--color-text-inverse)',
+            'text-brand': 'var(--color-text-brand)',
          },
          fontFamily: {
             display: 'var(--font-family-display)',

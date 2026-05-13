@@ -1,34 +1,20 @@
 // components/detail/container/component.ts
 import { Component, DestroyRef, inject, input, OnInit, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatCardModule } from '@angular/material/card';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatDividerModule } from '@angular/material/divider';
-import { DatePipe } from '@angular/common';
+import { DatePipe, TitleCasePipe } from '@angular/common';
 import { MembershipService } from '../../../../../../../services/membership/membership.service';
 import { Membership } from '../../../../../../../models/membership.model';
-import { TitleCasePipe } from '@angular/common'
+import { ConfirmDialogService } from '../../../../../../../../shared/services/confirm-dialog.service';
 
 @Component({
   selector: 'x-membership-detail',
-  imports: [
-    MatButtonModule,
-    MatIconModule,
-    MatChipsModule,
-    MatCardModule,
-    MatProgressSpinnerModule,
-    MatDividerModule,
-    DatePipe,
-    TitleCasePipe,
-  ],
+  imports: [DatePipe, TitleCasePipe],
   templateUrl: './component.html',
 })
 export class MembershipDetail implements OnInit {
   private readonly membershipService = inject(MembershipService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly confirmDialog = inject(ConfirmDialogService);
 
   readonly membershipId = input.required<string>();
 
@@ -94,17 +80,19 @@ export class MembershipDetail implements OnInit {
     const membership = this.membership();
     if (!membership?.id) return;
 
-    const confirmed = confirm(`¿Estás seguro de eliminar la membresía "${membership.name}"?`);
-    if (!confirmed) return;
-
-    try {
-      this.isLoading.set(true);
-      await this.membershipService.deleteMembership(membership.id);
-      this.close.emit();
-    } catch (error) {
-      this.errorMessage.set('Error al eliminar la membresía');
-      this.isLoading.set(false);
-    }
+    this.confirmDialog
+      .confirmDelete(membership.name, 'la membresía')
+      .subscribe(async (confirmed) => {
+        if (!confirmed) return;
+        try {
+          this.isLoading.set(true);
+          await this.membershipService.deleteMembership(membership.id!);
+          this.close.emit();
+        } catch (error) {
+          this.errorMessage.set('Error al eliminar la membresía');
+          this.isLoading.set(false);
+        }
+      });
   }
 
   getDaysLabel(days: number[]): string {

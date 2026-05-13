@@ -1,142 +1,252 @@
-<div class="min-h-screen bg-white text-white p-6">
-   <div class="max-w-3xl mx-auto">
-      <div class="mb-8">
-         <h1 class="text-4xl font-bold text-red-600 mb-2"
-            >{{ isEditMode() ? 'Editar Sucursal' : 'Registrar Sucursal' }}
-         </h1>
-
-         <p class="text-gray-400">Completa la información del producto</p>
-      </div>
-
-      <form [formGroup]="branchForm" (ngSubmit)="onSubmit()" class="space-y-6">
-         <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-6 space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Nombre</mat-label>
-                  <input matInput formControlName="name" placeholder="Nombre...." autocomplete="off" />
-                  @if (hasFieldError('name')) {
-                     <mat-error>{{ getFieldError('name') }}</mat-error>
-                  }
-                  @if (branchForm.get('name')?.pending) {
-                     <mat-hint>Verificando disponibilidad...</mat-hint>
-                  }
-               </mat-form-field>
-
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Ciudad</mat-label>
-                  <input matInput formControlName="city" placeholder="Ciudad..." autocomplete="off" />
-                  @if (hasFieldError('city')) {
-                     <mat-error>{{ getFieldError('city') }}</mat-error>
-                  }
-               </mat-form-field>
-            </div>
-
-            <div>
-
-              
-              <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Latitud</mat-label>
-                  <input matInput formControlName="latitude" placeholder="Nombre...." autocomplete="off" />
-                  @if (hasFieldError('latitude')) {
-                     <mat-error>{{ getFieldError('latitude') }}</mat-error>
-                  }
-               </mat-form-field>
-              <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Longitud</mat-label>
-                  <input matInput formControlName="longitude" placeholder="Nombre...." autocomplete="off" />
-                  @if (hasFieldError('longitude')) {
-                     <mat-error>{{ getFieldError('longitude') }}</mat-error>
-                  }
-               </mat-form-field>
-               
-              </div>
-            <!-- <div>
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>ip</mat-label>
-                  <input matInput formControlName="ip" placeholder="ip..." autocomplete="off" />
-                  @if (hasFieldError('ip')) {
-                     <mat-error>{{ getFieldError('ip') }}</mat-error>
-                  }
-               </mat-form-field>
-
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Mascara</mat-label>
-                  <input matInput formControlName="mask" placeholder="Mascara..." autocomplete="off" />
-                  @if (hasFieldError('mask')) {
-                     <mat-error>{{ getFieldError('mask') }}</mat-error>
-                  }
-               </mat-form-field>
-            </div> -->
-
-            <mat-form-field appearance="outline" class="w-full">
-               <mat-label>Estado</mat-label>
-               <mat-select formControlName="status">
-                  @for (status of branchStatus; track status) {
-                     <mat-option [value]="status">
-                        {{ status === 'activo' ? 'Activo' : 'Inactivo' }}
-                     </mat-option>
-                  }
-               </mat-select>
-            </mat-form-field>
+<div class="min-h-screen bg-bg-base font-body text-ink py-10 px-4">
+   <form
+      [formGroup]="branchForm"
+      (ngSubmit)="onSubmit()"
+      class="max-w-[480px] mx-auto bg-bg-elevated border border-solid border-hairline border-border-default rounded-2xl shadow-lg flex flex-col overflow-hidden"
+   >
+      <!-- ───── Header ──────────────────────────────────────────────────── -->
+      <header
+         class="flex items-start gap-4 px-7 py-6 border-b border-solid border-hairline border-border-default"
+      >
+         <div class="flex-1 flex flex-col gap-1.5">
+            <span class="text-label font-extrabold tracking-[0.25em] text-text-brand uppercase">
+               {{ isEditMode() ? 'EDITAR SUCURSAL' : 'NUEVA SUCURSAL' }}
+            </span>
+            <h1
+               class="font-display text-[2rem] font-extrabold tracking-[-0.03em] text-ink leading-[1.05] m-0"
+            >
+               {{ isEditMode() ? 'Editar sucursal' : 'Crear sucursal' }}
+            </h1>
+            <p class="text-body-sm text-muted leading-relaxed m-0 mt-1">
+               Define los datos básicos de la sucursal.
+            </p>
          </div>
-         @if (errorMessage()) {
-            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-               <div class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                     <path
-                        fill-rule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                        clip-rule="evenodd"
-                     />
-                  </svg>
-                  <p class="text-sm text-red-800">{{ errorMessage() }}</p>
+
+         <button
+            type="button"
+            (click)="onCancel()"
+            [disabled]="isSubmitting()"
+            class="w-9 h-9 shrink-0 rounded-full bg-bg-inset hover:bg-border-default flex items-center justify-center text-muted border-0 cursor-pointer transition-colors duration-fast disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Cerrar"
+         >
+            <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none">close</span>
+         </button>
+      </header>
+
+      <!-- ───── Body ────────────────────────────────────────────────────── -->
+      <div class="flex flex-col gap-7 px-7 py-7">
+         <!-- Sección 1 · Información general -->
+         <section class="flex flex-col gap-4">
+            <header class="flex items-center gap-2">
+               <div
+                  class="w-6 h-6 rounded-full bg-bg-brand-soft flex items-center justify-center shrink-0"
+               >
+                  <span class="text-[11px] font-extrabold font-mono text-text-brand leading-none">1</span>
                </div>
+               <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">
+                  Información general
+               </h2>
+            </header>
+
+            <!-- Nombre -->
+            <label class="flex flex-col gap-1.5">
+               <span class="text-caption font-bold text-muted">Nombre</span>
+               <span
+                  class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                  [class.border-border-strong]="!hasFieldError('name')"
+                  [class.border-error]="hasFieldError('name')"
+                  [class.border-thick]="hasFieldError('name')"
+               >
+                  <span
+                     class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0"
+                     >badge</span
+                  >
+                  <input
+                     type="text"
+                     formControlName="name"
+                     placeholder="Ej. Centro"
+                     autocomplete="off"
+                     class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink placeholder:text-faint min-w-0"
+                  />
+                  @if (branchForm.get('name')?.pending) {
+                     <span class="text-caption text-faint shrink-0">Verificando…</span>
+                  }
+               </span>
+               @if (hasFieldError('name')) {
+                  <span class="text-caption font-medium text-error">{{ getFieldError('name') }}</span>
+               }
+            </label>
+
+            <!-- Ciudad -->
+            <label class="flex flex-col gap-1.5">
+               <span class="text-caption font-bold text-muted">Ciudad</span>
+               <span
+                  class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                  [class.border-border-strong]="!hasFieldError('city')"
+                  [class.border-error]="hasFieldError('city')"
+                  [class.border-thick]="hasFieldError('city')"
+               >
+                  <span
+                     class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0"
+                     >location_city</span
+                  >
+                  <input
+                     type="text"
+                     formControlName="city"
+                     placeholder="Oruro"
+                     autocomplete="off"
+                     class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink placeholder:text-faint min-w-0"
+                  />
+               </span>
+               @if (hasFieldError('city')) {
+                  <span class="text-caption font-medium text-error">{{ getFieldError('city') }}</span>
+               }
+            </label>
+         </section>
+
+         <!-- Sección 2 · Ubicación -->
+         <section class="flex flex-col gap-4">
+            <header class="flex items-center gap-2">
+               <div
+                  class="w-6 h-6 rounded-full bg-bg-inset flex items-center justify-center shrink-0"
+               >
+                  <span class="text-[11px] font-extrabold font-mono text-faint leading-none">2</span>
+               </div>
+               <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Ubicación</h2>
+            </header>
+
+            <div class="grid grid-cols-2 gap-3">
+               <!-- Latitud -->
+               <label class="flex flex-col gap-1.5">
+                  <span class="text-caption font-bold text-muted">Latitud</span>
+                  <span
+                     class="flex items-center gap-2 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                     [class.border-border-strong]="!hasFieldError('latitude')"
+                     [class.border-error]="hasFieldError('latitude')"
+                     [class.border-thick]="hasFieldError('latitude')"
+                  >
+                     <span
+                        class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0"
+                        >my_location</span
+                     >
+                     <input
+                        type="text"
+                        formControlName="latitude"
+                        placeholder="-17.9647"
+                        autocomplete="off"
+                        inputmode="decimal"
+                        class="bg-transparent border-0 outline-none flex-1 text-body-sm font-bold font-mono text-ink placeholder:text-faint placeholder:font-medium min-w-0"
+                     />
+                  </span>
+                  @if (hasFieldError('latitude')) {
+                     <span class="text-caption font-medium text-error">{{ getFieldError('latitude') }}</span>
+                  }
+               </label>
+
+               <!-- Longitud -->
+               <label class="flex flex-col gap-1.5">
+                  <span class="text-caption font-bold text-muted">Longitud</span>
+                  <span
+                     class="flex items-center gap-2 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                     [class.border-border-strong]="!hasFieldError('longitude')"
+                     [class.border-error]="hasFieldError('longitude')"
+                     [class.border-thick]="hasFieldError('longitude')"
+                  >
+                     <span
+                        class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0"
+                        >explore</span
+                     >
+                     <input
+                        type="text"
+                        formControlName="longitude"
+                        placeholder="-67.1029"
+                        autocomplete="off"
+                        inputmode="decimal"
+                        class="bg-transparent border-0 outline-none flex-1 text-body-sm font-bold font-mono text-ink placeholder:text-faint placeholder:font-medium min-w-0"
+                     />
+                  </span>
+                  @if (hasFieldError('longitude')) {
+                     <span class="text-caption font-medium text-error">{{ getFieldError('longitude') }}</span>
+                  }
+               </label>
             </div>
-         }
-         <div class="flex gap-4">
+         </section>
+
+         <!-- Sección 3 · Estado inicial -->
+         <section class="flex flex-col gap-3">
+            <header class="flex items-center gap-2">
+               <div
+                  class="w-6 h-6 rounded-full bg-bg-inset flex items-center justify-center shrink-0"
+               >
+                  <span class="text-[11px] font-extrabold font-mono text-faint leading-none">3</span>
+               </div>
+               <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Estado inicial</h2>
+            </header>
+
             <button
                type="button"
-               (click)="onCancel()"
-               [disabled]="isSubmitting()"
-               class="flex-1 bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
+               (click)="toggleStatus()"
+               class="flex items-center gap-3 px-4 py-3.5 rounded-md bg-bg-base border border-solid border-hairline border-border-default cursor-pointer text-left transition-colors duration-fast hover:bg-bg-inset"
             >
-               Cancelar
-            </button>
-
-            <button
-               type="submit"
-               [disabled]="!canSubmit()"
-               class="flex-1 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-               @if (isSubmitting()) {
-                  <span class="flex items-center justify-center gap-2">
-                     <svg
-                        class="animate-spin h-5 w-5"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                     >
-                        <circle
-                           class="opacity-25"
-                           cx="12"
-                           cy="12"
-                           r="10"
-                           stroke="currentColor"
-                           stroke-width="4"
-                        ></circle>
-                        <path
-                           class="opacity-75"
-                           fill="currentColor"
-                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                     </svg>
-                     Guardando...
+               <div class="flex-1 flex flex-col gap-0.5 min-w-0">
+                  <span class="text-body-sm font-extrabold text-ink">Activar al guardar</span>
+                  <span class="text-caption text-muted leading-relaxed">
+                     La sucursal aparecerá inmediatamente para registrar asistencias.
                   </span>
-               } @else {
-                  {{ submitButtonText() }}
-               }
+               </div>
+               <span
+                  class="w-11 h-6 rounded-full flex items-center shrink-0 transition-colors duration-fast"
+                  [class.bg-brand-500]="branchForm.get('status')?.value === 'activo'"
+                  [class.bg-bg-inset]="branchForm.get('status')?.value !== 'activo'"
+                  [class.justify-end]="branchForm.get('status')?.value === 'activo'"
+                  [class.justify-start]="branchForm.get('status')?.value !== 'activo'"
+               >
+                  <span class="w-5 h-5 rounded-full bg-bg-elevated shadow-sm mx-0.5"></span>
+               </span>
             </button>
-         </div>
-      </form>
-   </div>
+         </section>
+
+         <!-- Error message -->
+         @if (errorMessage()) {
+            <div
+               class="flex items-start gap-3 px-4 py-3 rounded-md bg-error/10 border border-solid border-hairline border-error/30"
+            >
+               <span
+                  class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-error shrink-0 mt-0.5"
+                  >error</span
+               >
+               <p class="text-caption font-medium text-error m-0 leading-relaxed">{{ errorMessage() }}</p>
+            </div>
+         }
+      </div>
+
+      <!-- ───── Footer ──────────────────────────────────────────────────── -->
+      <footer
+         class="flex items-stretch gap-3 px-7 py-5 bg-bg-elevated border-t border-solid border-hairline border-border-default"
+      >
+         <button
+            type="button"
+            (click)="onCancel()"
+            [disabled]="isSubmitting()"
+            class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-transparent border border-solid border-standard border-border-strong text-ink text-body-sm font-bold cursor-pointer transition-colors duration-fast hover:bg-bg-inset disabled:opacity-50 disabled:cursor-not-allowed"
+         >
+            Cancelar
+         </button>
+         <button
+            type="submit"
+            [disabled]="!canSubmit()"
+            class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-brand-500 hover:bg-brand-600 text-on-brand text-body-sm font-extrabold border-0 shadow-brand cursor-pointer transition-colors duration-fast disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+         >
+            @if (isSubmitting()) {
+               <span
+                  class="w-4 h-4 rounded-full border-2 border-on-brand/30 border-t-on-brand animate-spin"
+               ></span>
+               Guardando…
+            } @else {
+               <span class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none">check</span>
+               {{ submitButtonText() }}
+            }
+         </button>
+      </footer>
+   </form>
 </div>

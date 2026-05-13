@@ -1,7 +1,6 @@
 import { Component, inject, signal, output, OnInit } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
-import { MatTableModule } from '@angular/material/table'
 import { MatButtonModule } from '@angular/material/button'
 import { MatIconModule } from '@angular/material/icon'
 import { MatDatepickerModule } from '@angular/material/datepicker'
@@ -12,6 +11,7 @@ import { MatSelectModule } from '@angular/material/select'
 import { MatDialogModule, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { Observable, BehaviorSubject, combineLatest } from 'rxjs'
 import { switchMap, map } from 'rxjs/operators'
+import { ConfirmDialogService } from '../../../../../../shared/services/confirm-dialog.service'
 import { StudentAttendanceService } from '../../../../../services/studentAttendance/student-attendance.service'
 import { BranchService } from '../../../../../services/branch/branch.service'
 import { StudentAttendance, StudentAttendanceStats } from '../../../../../models/studentattendance.model'
@@ -30,7 +30,6 @@ import { StudentService } from '../../../../../services/student/student.service'
    imports: [
       CommonModule,
       ReactiveFormsModule,
-      MatTableModule,
       MatButtonModule,
       MatIconModule,
       MatDatepickerModule,
@@ -57,10 +56,9 @@ export default class StudentAttendanceListComponent implements OnInit {
    private readonly attendanceService = inject(StudentAttendanceService)
    private readonly branchService = inject(BranchService)
    private readonly dialog = inject(MatDialog)
+   private readonly confirmDialog = inject(ConfirmDialogService)
 
    backToMark = output<void>()
-
-   displayedColumns: string[] = ['createdAt', 'studentName', 'sessionInfo', 'status', 'actions']
 
    private selectedBranchId$ = new BehaviorSubject<string>('')
    private selectedDate$ = new BehaviorSubject<Date>(new Date())
@@ -116,11 +114,11 @@ export default class StudentAttendanceListComponent implements OnInit {
 
    getStatusClass(status: string): string {
       const classes: Record<string, string> = {
-         presente: 'bg-green-100 text-green-800',
-         falta: 'bg-red-100 text-red-800',
-         permiso: 'bg-yellow-100 text-yellow-800',
+         presente: 'bg-success/20 text-success',
+         falta: 'bg-error/20 text-error',
+         permiso: 'bg-warning/20 text-warning',
       }
-      return classes[status] || 'bg-gray-100 text-gray-800'
+      return classes[status] || 'bg-bg-inset text-faint'
    }
 
    formatDateTime(timestamp: any): string {
@@ -147,13 +145,16 @@ export default class StudentAttendanceListComponent implements OnInit {
    }
 
    async deleteAttendance(attendance: StudentAttendance): Promise<void> {
-      if (confirm('¿Estás seguro de eliminar esta asistencia?')) {
-         try {
-            await this.attendanceService.deleteAttendance(attendance.id, attendance.enrollmentId)
-         } catch (error: any) {
-            alert('Error al eliminar: ' + error.message)
-         }
-      }
+      this.confirmDialog
+         .confirmDelete(attendance.studentName ?? 'asistencia', 'la asistencia')
+         .subscribe(async (confirmed) => {
+            if (!confirmed) return
+            try {
+               await this.attendanceService.deleteAttendance(attendance.id, attendance.enrollmentId)
+            } catch (error: any) {
+               console.error('Error al eliminar:', error)
+            }
+         })
    }
 
    onBack(): void {

@@ -1,45 +1,58 @@
-<header class="bg-black border-b border-gray-200 z-40 shadow-black fixed top-0 w-full left-0">
-   <div class="flex items-center justify-between h-16 px-4">
-      <div class="flex items-center gap-4">
-         <button
-            (click)="toggleSidebar()"
-            class="p-2 rounded-lg bg-black border-none hover:bg-gray-900 transition-colors"
-            matTooltip="Menu"
-         >
-            <mat-icon class="text-gray-600">menu</mat-icon>
-         </button>
+<header
+   class="sticky top-0 z-sticky h-16 bg-bg-base border-b border-hairline border-border-default px-4 lg:px-8 flex items-center gap-4 font-body"
+>
+   <!-- Mobile-only hamburger -->
+   <button
+      (click)="toggleSidebar()"
+      class="lg:hidden w-9 h-9 rounded-md bg-bg-elevated border border-hairline border-border-default flex items-center justify-center text-muted hover:bg-bg-inset transition-colors duration-fast cursor-pointer"
+      matTooltip="Menú"
+      aria-label="Abrir menú"
+   >
+      <mat-icon class="!text-[18px] !w-[18px] !h-[18px] leading-none">menu</mat-icon>
+   </button>
 
-         <div class="flex items-center gap-3">
-            <img src="images/Logo.webp" alt="Logo" class="w-10 h-10 rounded-full" />
-            <span class="text-xl font-bold text-red-600 hidden md:block">Helluz</span>
-         </div>
-      </div>
+   <!-- Breadcrumb -->
+   <nav class="flex items-center gap-2 text-body" aria-label="Breadcrumb">
+      <mat-icon class="!text-[16px] !w-[16px] !h-[16px] leading-none text-faint">home</mat-icon>
+      <a
+         routerLink="/admin/home"
+         class="font-semibold text-muted hover:text-ink no-underline transition-colors duration-fast"
+         >Inicio</a
+      >
+      @if (currentPageLabel()) {
+         <span class="text-faint" aria-hidden="true">›</span>
+         <span class="font-extrabold text-ink">{{ currentPageLabel() }}</span>
+      }
+   </nav>
 
-      <div class="flex items-center gap-4">
-         <div class="hidden md:flex flex-col items-end">
-            <span class="text-sm font-semibold text-gray-400">{{ getUserDisplayName() }}</span>
-            <span class="text-xs text-gray-300">{{ getUserRole() }}</span>
-         </div>
-
-         <button
-            [matMenuTriggerFor]="userMenu"
-            class="flex items-center justify-center w-10 h-10 rounded-full border-none bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors"
+   <!-- Right actions · avatar pill -->
+   <div class="ml-auto flex items-center gap-2">
+      <button
+         [matMenuTriggerFor]="userMenu"
+         class="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full bg-bg-elevated border border-hairline border-border-default hover:bg-bg-inset transition-colors duration-fast text-ink cursor-pointer"
+         aria-label="Menú de usuario"
+      >
+         <span
+            class="w-7 h-7 rounded-full bg-brand-500 flex items-center justify-center text-on-brand text-[10px] font-extrabold"
          >
             {{ getUserInitials() }}
+         </span>
+         <span class="hidden sm:inline text-caption font-extrabold">{{ getUserDisplayName() }}</span>
+         <mat-icon class="!text-[14px] !w-[14px] !h-[14px] leading-none text-faint">keyboard_arrow_down</mat-icon>
+      </button>
+
+      <mat-menu #userMenu="matMenu">
+         <div class="px-4 py-3 border-b border-hairline border-border-default">
+            <p class="text-caption font-extrabold text-ink m-0">{{ getUserDisplayName() }}</p>
+            <p class="text-caption text-muted m-0">{{ getUserEmail() }}</p>
+            <p class="text-[10px] font-extrabold tracking-[0.15em] text-text-brand uppercase mt-1">
+               {{ getUserRole() }}
+            </p>
+         </div>
+         <button mat-menu-item (click)="logout()">
+            <mat-icon class="text-error">logout</mat-icon>
+            <span>Cerrar sesión</span>
          </button>
-
-         <mat-menu #userMenu="matMenu">
-            <div class="px-4 py-3 border-b md:hidden">
-               <p class="text-sm font-semibold text-gray-800">{{ getUserDisplayName() }}</p>
-               <p class="text-xs text-gray-500">{{ getUserEmail() }}</p>
-               <p class="text-xs text-gray-500 mt-1">{{ getUserRole() }}</p>
-            </div>
-
-            <button mat-menu-item (click)="logout()">
-               <mat-icon class="text-red-600">logout</mat-icon>
-               <span class="text-gray-700">Cerrar sesión</span>
-            </button>
-         </mat-menu>
-      </div>
+      </mat-menu>
    </div>
 </header>

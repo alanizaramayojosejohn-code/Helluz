@@ -21,6 +21,7 @@ import { UserPending } from '../../../../../../../models/userPending'
 export class UserList implements OnInit {
    private readonly userService = inject(UserService)
    private readonly destroyRef = inject(DestroyRef)
+   private readonly confirmDialog = inject(ConfirmDialogService)
 
    readonly createUser = output<void>()
    readonly editUser = output<string>()
@@ -96,15 +97,22 @@ export class UserList implements OnInit {
    }
 
    async onResetPassword(user: User): Promise<void> {
-      const confirmed = confirm(`¿Enviar email de recuperación de contraseña a ${user.email}?`)
-      if (!confirmed) return
-
-      try {
-         await this.userService.resetPassword(user.email)
-         alert('Email de recuperación enviado correctamente')
-      } catch (error: any) {
-         this.errorMessage.set(error.message || 'Error al enviar email de recuperación')
-      }
+      this.confirmDialog
+         .confirm({
+            title: '¿Enviar recuperación?',
+            message: `Se enviará un email de recuperación de contraseña a ${user.email}.`,
+            confirmText: 'Enviar',
+            tone: 'info',
+            confirmIcon: 'mail',
+         })
+         .subscribe(async (confirmed) => {
+            if (!confirmed) return
+            try {
+               await this.userService.resetPassword(user.email)
+            } catch (error: any) {
+               this.errorMessage.set(error.message || 'Error al enviar email de recuperación')
+            }
+         })
    }
 
    onRoleFilterChange(role: 'all' | 'admin' | 'instructor'): void {
@@ -124,7 +132,6 @@ export class UserList implements OnInit {
    getRoleBadgeClass(role: string): string {
       return role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
    }
-   private readonly confirmDialog = inject(ConfirmDialogService)
 
    async deleteUser(user: User): Promise<void> {
       this.confirmDialog.confirmDelete(user.name, 'el usuario').subscribe(async (confirmed) => {

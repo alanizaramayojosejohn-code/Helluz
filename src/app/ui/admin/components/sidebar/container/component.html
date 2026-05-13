@@ -1,22 +1,88 @@
-<aside class="sidebar" [class.sidebar-open]="sidebarService.isOpen()" [class.sidebar-closed]="!sidebarService.isOpen()">
-   <nav class="sidebar-nav bg-black min-h-full">
+<aside
+   class="fixed inset-y-0 left-0 z-drawer bg-bg-ink flex flex-col font-body transition-all duration-normal ease-standard"
+   [class.w-60]="sidebarService.isOpen() || sidebarService.isMobile()"
+   [class.lg:w-16]="!sidebarService.isOpen()"
+   [class.translate-x-0]="sidebarService.isOpen() || !sidebarService.isMobile()"
+   [class.-translate-x-full]="!sidebarService.isOpen() && sidebarService.isMobile()"
+>
+   <!-- Header · logo + collapse toggle -->
+   <div class="flex items-center gap-3 px-5 py-4 border-b border-hairline border-white/10 shrink-0">
+      <img src="images/Logo.webp" alt="Helluz" class="w-8 h-8 rounded-md object-contain shrink-0" />
+      @if (sidebarService.isOpen()) {
+         <span class="text-body-sm font-extrabold tracking-[0.25em] text-bg-base">HELLUZ</span>
+      }
+      <button
+         (click)="toggleSidebar()"
+         class="ml-auto w-6 h-6 rounded-sm bg-white/10 hover:bg-white/20 border-none flex items-center justify-center text-white/70 cursor-pointer transition-colors duration-fast"
+         [matTooltip]="sidebarService.isOpen() ? 'Colapsar' : 'Expandir'"
+         matTooltipPosition="right"
+         aria-label="Toggle sidebar"
+      >
+         <mat-icon class="!text-[14px] !w-[14px] !h-[14px] leading-none">
+            {{ sidebarService.isOpen() ? 'menu_open' : 'menu' }}
+         </mat-icon>
+      </button>
+   </div>
+
+   <!-- Nav items -->
+   <nav class="flex-1 flex flex-col gap-0.5 p-3 overflow-y-auto">
       @for (item of getFilteredMenuItems(); track item.route) {
          <a
             [routerLink]="item.route"
-            routerLinkActive="active"
+            #rla="routerLinkActive"
+            routerLinkActive
             [routerLinkActiveOptions]="{ exact: item.route === '/admin/home' }"
             (click)="closeSidebarOnMobile()"
-            class="sidebar-item rounded-lg"
-            [matTooltip]="!sidebarService.isOpen() ? item.label : ''"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-md no-underline transition-colors duration-fast cursor-pointer"
+            [class.bg-brand-500/20]="rla.isActive"
+            [class.text-brand-500]="rla.isActive"
+            [class.text-white/90]="!rla.isActive"
+            [class.hover:bg-white/5]="!rla.isActive"
+            [matTooltip]="!sidebarService.isOpen() && !sidebarService.isMobile() ? item.label : ''"
             matTooltipPosition="right"
          >
-            <mat-icon class="sidebar-icon">{{ item.icon }}</mat-icon>
-            <span class="sidebar-label">{{ item.label }}</span>
+            <mat-icon
+               class="!text-[20px] !w-[20px] !h-[20px] leading-none shrink-0"
+               [class.text-brand-500]="rla.isActive"
+               [class.text-white/70]="!rla.isActive"
+               >{{ item.icon }}</mat-icon
+            >
+            @if (sidebarService.isOpen()) {
+               <span class="text-body font-bold whitespace-nowrap">{{ item.label }}</span>
+            }
          </a>
       }
    </nav>
+
+   <!-- Footer · user pill -->
+   <div class="flex items-center gap-3 px-4 py-3 border-t border-hairline border-white/10 shrink-0">
+      <div
+         class="w-9 h-9 rounded-full bg-brand-500 flex items-center justify-center shrink-0 text-on-brand text-caption font-extrabold"
+      >
+         {{ userInitials() }}
+      </div>
+      @if (sidebarService.isOpen()) {
+         <div class="flex-1 flex flex-col gap-0 min-w-0">
+            <p class="text-body-sm font-extrabold text-bg-base m-0 truncate">{{ userName() }}</p>
+            <p class="text-caption text-white/50 m-0 truncate">{{ roleLabel() }}</p>
+         </div>
+         <button
+            [matMenuTriggerFor]="userMenu"
+            class="text-white/70 hover:text-bg-base bg-transparent border-none cursor-pointer p-1 rounded-sm transition-colors duration-fast"
+            aria-label="Más opciones"
+         >
+            <mat-icon class="!text-[18px] !w-[18px] !h-[18px] leading-none">more_horiz</mat-icon>
+         </button>
+         <mat-menu #userMenu="matMenu">
+            <button mat-menu-item (click)="logout()">
+               <mat-icon class="text-error">logout</mat-icon>
+               <span>Cerrar sesión</span>
+            </button>
+         </mat-menu>
+      }
+   </div>
 </aside>
 
 @if (sidebarService.isOpen() && sidebarService.isMobile()) {
-   <div class="sidebar-overlay" (click)="sidebarService.close()"></div>
+   <div class="fixed inset-0 z-modal lg:hidden bg-black/50" (click)="sidebarService.close()"></div>
 }

@@ -1,23 +1,19 @@
 import { Component, DestroyRef, inject, input, OnInit, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { DatePipe } from '@angular/common';
+import { DatePipe, UpperCasePipe } from '@angular/common';
 import { UserService } from '../../../../../../../services/user/user.service';
 import { User } from '../../../../../../../models/user.model';
-import { MatChipsModule } from '@angular/material/chips'
+import { ConfirmDialogService } from '../../../../../../../../shared/services/confirm-dialog.service';
 
 @Component({
   selector: 'x-user-detail',
-  imports: [
-    MatProgressSpinnerModule,
-    DatePipe,
-    MatChipsModule,
-  ],
+  imports: [DatePipe, UpperCasePipe],
   templateUrl: './component.html',
 })
 export class UserDetail implements OnInit {
   private readonly userService = inject(UserService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly confirmDialog = inject(ConfirmDialogService);
 
   readonly userId = input.required<string>();
 
@@ -81,40 +77,48 @@ export class UserDetail implements OnInit {
     const user = this.user();
     if (!user?.email) return;
 
-    const confirmed = confirm(`¿Enviar email de recuperación de contraseña a ${user.email}?`);
-    if (!confirmed) return;
-
-    try {
-      await this.userService.resetPassword(user.email);
-      alert('Email de recuperación enviado correctamente');
-    } catch (error: any) {
-      this.errorMessage.set(error.message || 'Error al enviar email');
-    }
+    this.confirmDialog
+      .confirm({
+        title: '¿Enviar recuperación?',
+        message: `Se enviará un email de recuperación de contraseña a ${user.email}.`,
+        confirmText: 'Enviar',
+        tone: 'info',
+        confirmIcon: 'mail',
+      })
+      .subscribe(async (confirmed) => {
+        if (!confirmed) return;
+        try {
+          await this.userService.resetPassword(user.email);
+        } catch (error: any) {
+          this.errorMessage.set(error.message || 'Error al enviar email');
+        }
+      });
   }
 
   async onDelete(): Promise<void> {
     const user = this.user();
     if (!user?.id) return;
 
-    const confirmed = confirm(
-      `⚠️ ADVERTENCIA: Esta acción solo eliminará el usuario de Firestore.\n\n` +
-      `Debes eliminar manualmente el usuario de Firebase Authentication:\n` +
-      `1. Ir a Firebase Console → Authentication → Users\n` +
-      `2. Buscar y eliminar: ${user.email}\n\n` +
-      `¿Continuar con la eliminación en Firestore?`
-    );
-
-    if (!confirmed) return;
-
-    try {
-      this.isLoading.set(true);
-      await this.userService.deleteUser(user.id);
-      alert('Usuario eliminado de Firestore. No olvides eliminarlo también de Firebase Authentication.');
-      this.close.emit();
-    } catch (error) {
-      this.errorMessage.set('Error al eliminar el usuario');
-      this.isLoading.set(false);
-    }
+    this.confirmDialog
+      .confirm({
+        title: '¿Eliminar usuario?',
+        message:
+          `Esta acción eliminará a ${user.email} de Firestore. ` +
+          `Recuerda eliminarlo también de Firebase Authentication para revocar el acceso.`,
+        confirmText: 'Eliminar',
+        tone: 'danger',
+      })
+      .subscribe(async (confirmed) => {
+        if (!confirmed) return;
+        try {
+          this.isLoading.set(true);
+          await this.userService.deleteUser(user.id!);
+          this.close.emit();
+        } catch (error) {
+          this.errorMessage.set('Error al eliminar el usuario');
+          this.isLoading.set(false);
+        }
+      });
   }
 
   getFullName(): string {
@@ -133,6 +137,14 @@ export class UserDetail implements OnInit {
   getRoleLabel(): string {
     const user = this.user();
     return user?.role === 'admin' ? 'Administrador' : 'Instructor';
+  }
+
+  getInitials(): string {
+    const user = this.user();
+    if (!user) return '?';
+    const first = user.name?.[0] ?? '';
+    const last = user.lastname?.[0] ?? '';
+    return (first + last).toUpperCase() || '?';
   }
 
   getCreatedAtDate(): Date | null {

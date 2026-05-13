@@ -1,190 +1,111 @@
-<div class="min-h-screen bg-white p-6">
-   <div class="max-w-7xl mx-auto">
-      <!-- Header -->
-      <div class="flex justify-between items-center mb-8">
-         <div>
-            <h1 class="text-4xl font-bold text-red-600 mb-2">Gestión de Horarios</h1>
-            <p class="text-gray-600">Administra los horarios de las clases</p>
-         </div>
-         <button
-            (click)="onCreateSchedule()"
-            class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center gap-2"
-         >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Nuevo Horario
-         </button>
+<div class="p-8 flex flex-col gap-0">
+
+  <!-- Page header -->
+  <div class="flex items-end justify-between pb-7 border-b border-hairline border-border-default">
+    <div class="flex flex-col gap-1.5">
+      <span class="text-label font-extrabold uppercase tracking-[2.75px] text-text-brand">GESTIÓN</span>
+      <h1 class="font-display text-h1 font-extrabold text-ink leading-none tracking-tightest">Horarios</h1>
+    </div>
+    <button
+      (click)="onCreateSchedule()"
+      class="flex items-center gap-2 px-7 py-4 rounded-full bg-brand-500 text-on-brand text-body font-extrabold shadow-brand hover:bg-brand-600 transition-colors duration-fast cursor-pointer border-none"
+    >
+      <mat-icon class="!text-[18px] !w-[18px] !h-[18px] leading-none">add</mat-icon>
+      Nuevo horario
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="flex items-center gap-3 pt-6">
+    <!-- Branch filter -->
+    <div class="flex items-center gap-2 px-4 py-[10px] rounded-full bg-bg-elevated border border-hairline border-border-strong">
+      <mat-icon class="text-muted !text-base !w-4 !h-4 leading-none shrink-0">storefront</mat-icon>
+      <select
+        (change)="onBranchFilterChange($any($event.target).value)"
+        class="text-caption font-extrabold text-ink bg-transparent border-none outline-none cursor-pointer"
+      >
+        <option value="all">Todas las sucursales</option>
+        @for (branch of branches$ | async; track branch.id) {
+          <option [value]="branch.id">{{ branch.name }}</option>
+        }
+      </select>
+    </div>
+    <!-- Search -->
+    <div class="flex-1 flex items-center gap-2 px-4 py-[10px] rounded-full bg-bg-elevated border border-hairline border-border-strong">
+      <mat-icon class="text-faint !text-base !w-4 !h-4 leading-none shrink-0">search</mat-icon>
+      <span class="text-caption text-faint font-medium">Buscar horario…</span>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="mt-4 px-4 py-3 rounded-lg border border-hairline border-error/30 text-error text-body-sm">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- Table -->
+  <div class="mt-6 rounded-lg border border-hairline border-border-default bg-bg-elevated overflow-hidden">
+    @if (isLoading()) {
+      <div class="flex justify-center items-center py-12">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    } @else {
+
+      <!-- Col headers -->
+      <div class="flex items-center gap-4 px-5 py-[10px] bg-bg-inset">
+        <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase flex-1 min-w-0">DÍA</span>
+        <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase w-[130px] shrink-0">HORARIO</span>
+        <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase w-[120px] shrink-0">DISCIPLINA</span>
+        <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase w-[160px] shrink-0">INSTRUCTOR</span>
+        <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase w-[110px] shrink-0">SUCURSAL</span>
+        <span class="w-[60px] shrink-0"></span>
       </div>
 
-      <!-- Filtro -->
-      <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-4 mb-6">
-         <mat-form-field appearance="outline" class="w-full md:w-64">
-            <mat-label>Filtrar por Sucursal</mat-label>
-            <mat-select [value]="'all'" (selectionChange)="onBranchFilterChange($event.value)">
-               <mat-option value="all">Todas las sucursales</mat-option>
-               @for (branch of branches$ | async; track branch.id) {
-                  <mat-option [value]="branch.id">{{ branch.name }}</mat-option>
-               }
-            </mat-select>
-         </mat-form-field>
+      @if (schedules$ | async; as schedules) {
+        @for (schedule of schedules; track schedule.id) {
+          <div class="flex items-center gap-4 px-5 py-[14px] border-b border-hairline border-border-subtle hover:bg-bg-surface transition-colors duration-fast last:border-b-0">
+            <!-- Día -->
+            <span class="text-body-sm font-extrabold text-ink flex-1 min-w-0 truncate">{{ getDaysLabel(schedule.days) }}</span>
+            <!-- Horario -->
+            <span class="text-body-sm font-semibold font-mono text-ink w-[130px] shrink-0">{{ getTimeRange(schedule) }}</span>
+            <!-- Disciplina -->
+            <div class="w-[120px] shrink-0">
+              <span class="px-[10px] py-1 rounded-full bg-info/20 text-info text-caption font-extrabold">
+                {{ getDisciplineLabel(schedule.discipline) }}
+              </span>
+            </div>
+            <!-- Instructor -->
+            <span class="text-body-sm font-semibold text-ink w-[160px] shrink-0 truncate">{{ schedule.instructorName || '—' }}</span>
+            <!-- Sucursal -->
+            <span class="text-body-sm font-semibold text-ink w-[110px] shrink-0 truncate">{{ schedule.branchName }}</span>
+            <!-- Acciones -->
+            <div class="flex items-center gap-0.5 w-[60px] shrink-0 justify-end">
+              <button (click)="onViewDetail(schedule)" class="p-1.5 rounded-full text-faint hover:text-ink hover:bg-bg-inset transition-colors duration-fast cursor-pointer border-none bg-transparent" matTooltip="Ver detalle">
+                <mat-icon class="!text-[18px] !w-[18px] !h-[18px] leading-none">visibility</mat-icon>
+              </button>
+              <button (click)="onEditSchedule(schedule)" class="p-1.5 rounded-full text-faint hover:text-ink hover:bg-bg-inset transition-colors duration-fast cursor-pointer border-none bg-transparent" matTooltip="Editar">
+                <mat-icon class="!text-[18px] !w-[18px] !h-[18px] leading-none">edit</mat-icon>
+              </button>
+              <button (click)="deleteSchedule(schedule)" class="p-1.5 rounded-full text-faint hover:text-error hover:bg-error/10 transition-colors duration-fast cursor-pointer border-none bg-transparent" matTooltip="Eliminar">
+                <mat-icon class="!text-[18px] !w-[18px] !h-[18px] leading-none">delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        } @empty {
+          <div class="px-5 py-12 text-center text-faint text-body-sm">No hay horarios registrados</div>
+        }
+      }
+
+      <!-- Footer -->
+      <div class="flex items-center gap-3 px-5 py-[14px] border-t border-hairline border-border-default">
+        <span class="text-caption font-semibold text-muted flex-1">Horarios registrados</span>
+        <button class="w-8 h-8 rounded-md bg-bg-inset flex items-center justify-center cursor-pointer border-none">
+          <mat-icon class="text-faint !text-[18px] !w-[18px] !h-[18px] leading-none">chevron_left</mat-icon>
+        </button>
+        <button class="w-8 h-8 rounded-md bg-bg-ink flex items-center justify-center cursor-pointer border-none">
+          <mat-icon class="text-on-brand !text-[18px] !w-[18px] !h-[18px] leading-none">chevron_right</mat-icon>
+        </button>
       </div>
-
-      <!-- Error -->
-      @if (errorMessage()) {
-         <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <div class="flex items-center gap-3">
-               <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                     fill-rule="evenodd"
-                     d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                     clip-rule="evenodd"
-                  />
-               </svg>
-               <p class="text-sm text-red-800">{{ errorMessage() }}</p>
-            </div>
-         </div>
-      }
-
-      <!-- Loading -->
-      @if (isLoading()) {
-         <div class="flex justify-center items-center py-12">
-            <mat-spinner diameter="50"></mat-spinner>
-         </div>
-      }
-
-      @if (!isLoading()) {
-         @if ((schedules$ | async)?.length === 0) {
-            <!-- Empty state -->
-            <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-12 text-center">
-               <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                     stroke-linecap="round"
-                     stroke-linejoin="round"
-                     stroke-width="2"
-                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-               </svg>
-               <p class="text-xl text-gray-600 mb-2">No hay horarios registrados</p>
-               <p class="text-gray-500 mb-6">Comienza creando tu primer horario</p>
-               <button
-                  (click)="onCreateSchedule()"
-                  class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition"
-               >
-                  Crear Horario
-               </button>
-            </div>
-         } @else {
-            <!-- Tabla -->
-            <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg overflow-x-auto">
-               <table class="w-full min-w-full divide-y divide-gray-200">
-                  <thead class="bg-gray-50">
-                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
-                           >Día</th
-                        >
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
-                           >Horario</th
-                        >
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
-                           >Disciplina</th
-                        >
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
-                           >Instructor</th
-                        >
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
-                           >Sucursal</th
-                        >
-                        <th class="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider"
-                           >Acciones</th
-                        >
-                     </tr>
-                  </thead>
-                  <tbody class="bg-white divide-y divide-gray-200">
-                     @for (schedule of schedules$ | async; track schedule.id) {
-                        <tr class="hover:bg-gray-50 transition-colors">
-                           <!-- Día -->
-                           <td class="px-6 py-4 whitespace-nowrap">
-                              <span class="font-medium text-gray-700">{{ getDaysLabel(schedule.days) }}</span>
-                           </td>
-
-                           <!-- Horario -->
-                           <td class="px-6 py-4 whitespace-nowrap">
-                              <div class="flex items-center gap-2 text-gray-700">
-                                 <svg
-                                    class="w-4 h-4 text-gray-500"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                 >
-                                    <path
-                                       stroke-linecap="round"
-                                       stroke-linejoin="round"
-                                       stroke-width="2"
-                                       d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                                    />
-                                 </svg>
-                                 <span>{{ getTimeRange(schedule) }}</span>
-                              </div>
-                           </td>
-
-                           <!-- Disciplina -->
-                           <td class="px-6 py-4 whitespace-nowrap">
-                              <span
-                                 [class]="getDisciplineColor(schedule.discipline)"
-                                 class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full text-white"
-                              >
-                                 {{ getDisciplineLabel(schedule.discipline) }}
-                              </span>
-                           </td>
-
-                           <!-- Instructor -->
-                           <td class="px-6 py-4 whitespace-nowrap">
-                              @if (schedule.instructorName) {
-                                 <span class="text-gray-700">{{ schedule.instructorName }}</span>
-                              } @else {
-                                 <span class="text-gray-400 text-sm">Sin asignar</span>
-                              }
-                           </td>
-
-                           <!-- Sucursal -->
-                           <td class="px-6 py-4 whitespace-nowrap text-gray-700">
-                              {{ schedule.branchName }}
-                           </td>
-
-                           <!-- Acciones -->
-                           <td class="px-6 py-4 whitespace-nowrap text-right">
-                              <button
-                                 mat-icon-button
-                                 (click)="onViewDetail(schedule)"
-                                 matTooltip="Ver detalle"
-                                 class="text-blue-600 hover:text-blue-800"
-                              >
-                                 <mat-icon>visibility</mat-icon>
-                              </button>
-                              <button
-                                 mat-icon-button
-                                 (click)="onEditSchedule(schedule)"
-                                 matTooltip="Editar"
-                                 class="text-gray-600 hover:text-gray-800"
-                              >
-                                 <mat-icon>edit</mat-icon>
-                              </button>
-                              <button
-                                 mat-icon-button
-                                 (click)="deleteSchedule(schedule)"
-                                 matTooltip="Eliminar"
-                                 class="text-red-500 hover:text-white hover:bg-red-500 rounded-full"
-                              >
-                                 <mat-icon>delete</mat-icon>
-                              </button>
-                           </td>
-                        </tr>
-                     }
-                  </tbody>
-               </table>
-            </div>
-         }
-      }
-   </div>
+    }
+  </div>
 </div>

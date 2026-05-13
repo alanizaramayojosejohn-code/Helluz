@@ -1,22 +1,17 @@
 import { Component, DestroyRef, inject, input, OnInit, output, signal } from '@angular/core'
-import { MatButtonModule } from '@angular/material/button'
-import { MatIconModule } from '@angular/material/icon'
-import { MatChipsModule } from '@angular/material/chips'
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
-import { MatDialog, MatDialogModule } from '@angular/material/dialog'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { ScheduleService } from '../../../../../../../services/schedule/schedule.service'
 import { Schedule } from '../../../../../../../models/schedule.model'
-import { ConfirmDialogComponent } from '../../../../../../../components/shared/confirm-dialog/confirm-dialog.component'
+import { ConfirmDialogService } from '../../../../../../../../shared/services/confirm-dialog.service'
 
 @Component({
    selector: 'x-schedule-detail',
-   imports: [MatButtonModule, MatIconModule, MatChipsModule, MatProgressSpinnerModule, MatDialogModule],
+   imports: [],
    templateUrl: './component.html',
 })
 export class ScheduleDetail implements OnInit {
    private readonly scheduleService = inject(ScheduleService)
-   private readonly dialog = inject(MatDialog)
+   private readonly confirmDialog = inject(ConfirmDialogService)
    private readonly destroyRef = inject(DestroyRef)
 
    readonly scheduleId = input.required<string>()
@@ -48,7 +43,7 @@ export class ScheduleDetail implements OnInit {
                }
                this.isLoading.set(false)
             },
-            error: (error) => {
+            error: () => {
                this.errorMessage.set('Error al cargar horario')
                this.isLoading.set(false)
             },
@@ -67,28 +62,38 @@ export class ScheduleDetail implements OnInit {
       const schedule = this.schedule()
       if (!schedule) return
 
-      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-         data: {
-            title: 'Eliminar Horario',
-            // message: `¿Estás seguro de eliminar el horario de ${this.getDisciplineLabel(schedule.discipline)} del ${this.getDayLabel(schedule.day)}?`
-         },
-      })
-
-      dialogRef.afterClosed().subscribe(async (result) => {
-         if (result) {
-            this.isDeleting.set(true)
-            try {
-               await this.scheduleService.deleteSchedule(this.scheduleId())
-               this.back.emit()
-            } catch (error) {
-               this.errorMessage.set('Error al eliminar horario')
-               this.isDeleting.set(false)
-            }
+      const label = `${this.formatDays(schedule)} ${this.getTimeRange(schedule)}`
+      this.confirmDialog.confirmDelete(label, 'el horario').subscribe(async (confirmed) => {
+         if (!confirmed) return
+         this.isDeleting.set(true)
+         try {
+            await this.scheduleService.deleteSchedule(this.scheduleId())
+            this.back.emit()
+         } catch (error) {
+            this.errorMessage.set('Error al eliminar horario')
+            this.isDeleting.set(false)
          }
       })
    }
 
    getTimeRange(schedule: Schedule): string {
-      return `${schedule.startTime} - ${schedule.endTime}`
+      return `${schedule.startTime} – ${schedule.endTime}`
+   }
+
+   formatDays(schedule: Schedule): string {
+      const days = (schedule as any).days
+      if (Array.isArray(days)) return days.map((d) => this.titleCase(String(d))).join(' · ')
+      return this.titleCase(String(days ?? ''))
+   }
+
+   isActive(schedule: Schedule): boolean {
+      const s = schedule.status as unknown
+      if (typeof s === 'string') return s === 'activo'
+      return !!s
+   }
+
+   private titleCase(s: string): string {
+      if (!s) return ''
+      return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()
    }
 }

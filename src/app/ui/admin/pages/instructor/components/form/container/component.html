@@ -1,150 +1,261 @@
-<div class="min-h-screen bg-white text-white p-6">
-   <div class="max-w-3xl mx-auto">
-      <div class="mb-8">
-         <h1 class="text-4xl font-bold text-red-600 mb-2">
-            {{ isEditMode() ? 'Editar Instructor' : 'Registrar Instructor' }}
-         </h1>
-         <p class="text-gray-400">Completa la información del instructor</p>
-      </div>
-
-      <form [formGroup]="instructorForm" (ngSubmit)="onSubmit()" class="space-y-6">
-         <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-6 space-y-6">
-            <!-- Sucursal -->
-            <mat-form-field appearance="outline" class="w-full">
-               <mat-label>Sucursal</mat-label>
-               <mat-select formControlName="branchId" required>
-                  @for (branch of branches(); track branch.id) {
-                     <mat-option [value]="branch.id">{{ branch.name }}</mat-option>
-                  }
-               </mat-select>
-               @if (hasFieldError('branchId')) {
-                  <mat-error>{{ getFieldError('branchId') }}</mat-error>
-               }
-            </mat-form-field>
-
-            <!-- Nombre y Apellido -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Nombre</mat-label>
-                  <input matInput formControlName="name" placeholder="Nombre..." autocomplete="off" />
-                  @if (hasFieldError('name')) {
-                     <mat-error>{{ getFieldError('name') }}</mat-error>
-                  }
-               </mat-form-field>
-
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Apellido</mat-label>
-                  <input matInput formControlName="lastname" placeholder="Apellido..." autocomplete="off" />
-                  @if (hasFieldError('lastname')) {
-                     <mat-error>{{ getFieldError('lastname') }}</mat-error>
-                  }
-               </mat-form-field>
-            </div>
-
-            <!-- CI y Celular -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Cédula de Identidad</mat-label>
-                  <input matInput formControlName="ci" placeholder="CI..." autocomplete="off" />
-                  @if (hasFieldError('ci')) {
-                     <mat-error>{{ getFieldError('ci') }}</mat-error>
-                  }
-                  @if (instructorForm.get('ci')?.pending) {
-                     <mat-hint>Verificando disponibilidad...</mat-hint>
-                  }
-               </mat-form-field>
-
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Celular</mat-label>
-                  <input matInput formControlName="cellphone" placeholder="Celular..." autocomplete="off" />
-                  @if (hasFieldError('cellphone')) {
-                     <mat-error>{{ getFieldError('cellphone') }}</mat-error>
-                  }
-               </mat-form-field>
-            </div>
-
-            <!-- Email -->
-            <mat-form-field appearance="outline" class="w-full">
-               <mat-label>Email (opcional)</mat-label>
-               <input
-                  matInput
-                  type="email"
-                  formControlName="email"
-                  placeholder="email@ejemplo.com"
-                  autocomplete="off"
-               />
-               @if (hasFieldError('email')) {
-                  <mat-error>{{ getFieldError('email') }}</mat-error>
-               }
-            </mat-form-field>
-
-            <!-- Activo -->
-            <div class="flex items-center">
-               <mat-checkbox formControlName="status" class="text-gray-700"> Instructor activo </mat-checkbox>
-            </div>
+<div class="min-h-screen bg-bg-base font-body text-ink py-10 px-4">
+   <form
+      [formGroup]="instructorForm"
+      (ngSubmit)="onSubmit()"
+      class="max-w-[520px] mx-auto bg-bg-elevated border border-solid border-hairline border-border-default rounded-2xl shadow-lg flex flex-col overflow-hidden"
+   >
+      <header class="flex items-start gap-4 px-7 py-6 border-b border-solid border-hairline border-border-default">
+         <div class="flex-1 flex flex-col gap-1.5">
+            <span class="text-label font-extrabold tracking-[0.25em] text-text-brand uppercase">
+               {{ isEditMode() ? 'EDITAR INSTRUCTOR' : 'NUEVO INSTRUCTOR' }}
+            </span>
+            <h1 class="font-display text-[2rem] font-extrabold tracking-[-0.03em] text-ink leading-[1.05] m-0">
+               {{ isEditMode() ? 'Editar instructor' : 'Crear instructor' }}
+            </h1>
+            <p class="text-body-sm text-muted leading-relaxed m-0 mt-1">
+               Define los datos del instructor y la sucursal donde dará clases.
+            </p>
          </div>
 
-         <!-- Error Message -->
-         @if (errorMessage()) {
-            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-               <div class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                     <path
-                        fill-rule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16
-zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                        clip-rule="evenodd"
-                     />
-                  </svg>
-                  <p class="text-sm text-red-800">{{ errorMessage() }}</p>
+         <button
+            type="button"
+            (click)="onCancel()"
+            [disabled]="isSubmitting()"
+            class="w-9 h-9 shrink-0 rounded-full bg-bg-inset hover:bg-border-default flex items-center justify-center text-muted border-0 cursor-pointer transition-colors duration-fast disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Cerrar"
+         >
+            <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none">close</span>
+         </button>
+      </header>
+
+      <div class="flex flex-col gap-7 px-7 py-7">
+         <!-- Sec 1 · Sucursal -->
+         <section class="flex flex-col gap-4">
+            <header class="flex items-center gap-2">
+               <div class="w-6 h-6 rounded-full bg-bg-brand-soft flex items-center justify-center shrink-0">
+                  <span class="text-[11px] font-extrabold font-mono text-text-brand leading-none">1</span>
                </div>
+               <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Sucursal</h2>
+            </header>
+
+            <label class="flex flex-col gap-1.5">
+               <span class="text-caption font-bold text-muted">Sucursal asignada</span>
+               <span
+                  class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                  [class.border-border-strong]="!hasFieldError('branchId')"
+                  [class.border-error]="hasFieldError('branchId')"
+                  [class.border-thick]="hasFieldError('branchId')"
+               >
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">storefront</span>
+                  <select
+                     formControlName="branchId"
+                     class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink min-w-0 cursor-pointer appearance-none"
+                  >
+                     <option value="">Seleccionar sucursal…</option>
+                     @for (branch of branches(); track branch.id) {
+                        <option [value]="branch.id">{{ branch.name }}</option>
+                     }
+                  </select>
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">expand_more</span>
+               </span>
+               @if (hasFieldError('branchId')) {
+                  <span class="text-caption font-medium text-error">{{ getFieldError('branchId') }}</span>
+               }
+            </label>
+         </section>
+
+         <!-- Sec 2 · Identidad -->
+         <section class="flex flex-col gap-4">
+            <header class="flex items-center gap-2">
+               <div class="w-6 h-6 rounded-full bg-bg-inset flex items-center justify-center shrink-0">
+                  <span class="text-[11px] font-extrabold font-mono text-faint leading-none">2</span>
+               </div>
+               <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Identidad</h2>
+            </header>
+
+            <div class="grid grid-cols-2 gap-3">
+               <label class="flex flex-col gap-1.5">
+                  <span class="text-caption font-bold text-muted">Nombre</span>
+                  <span
+                     class="flex items-center gap-2 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                     [class.border-border-strong]="!hasFieldError('name')"
+                     [class.border-error]="hasFieldError('name')"
+                     [class.border-thick]="hasFieldError('name')"
+                  >
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">person</span>
+                     <input
+                        type="text"
+                        formControlName="name"
+                        placeholder="Nombre"
+                        autocomplete="off"
+                        class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink placeholder:text-faint min-w-0"
+                     />
+                  </span>
+                  @if (hasFieldError('name')) {
+                     <span class="text-caption font-medium text-error">{{ getFieldError('name') }}</span>
+                  }
+               </label>
+
+               <label class="flex flex-col gap-1.5">
+                  <span class="text-caption font-bold text-muted">Apellido</span>
+                  <span
+                     class="flex items-center gap-2 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                     [class.border-border-strong]="!hasFieldError('lastname')"
+                     [class.border-error]="hasFieldError('lastname')"
+                     [class.border-thick]="hasFieldError('lastname')"
+                  >
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">person</span>
+                     <input
+                        type="text"
+                        formControlName="lastname"
+                        placeholder="Apellido"
+                        autocomplete="off"
+                        class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink placeholder:text-faint min-w-0"
+                     />
+                  </span>
+                  @if (hasFieldError('lastname')) {
+                     <span class="text-caption font-medium text-error">{{ getFieldError('lastname') }}</span>
+                  }
+               </label>
+            </div>
+
+            <label class="flex flex-col gap-1.5">
+               <span class="text-caption font-bold text-muted">CI</span>
+               <span
+                  class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                  [class.border-border-strong]="!hasFieldError('ci')"
+                  [class.border-error]="hasFieldError('ci')"
+                  [class.border-thick]="hasFieldError('ci')"
+               >
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">badge</span>
+                  <input
+                     type="text"
+                     formControlName="ci"
+                     placeholder="1234567"
+                     autocomplete="off"
+                     inputmode="numeric"
+                     class="bg-transparent border-0 outline-none flex-1 text-body-sm font-bold font-mono text-ink placeholder:text-faint placeholder:font-medium min-w-0"
+                  />
+                  @if (instructorForm.get('ci')?.pending) {
+                     <span class="text-caption text-faint shrink-0">Verificando…</span>
+                  }
+               </span>
+               @if (hasFieldError('ci')) {
+                  <span class="text-caption font-medium text-error">{{ getFieldError('ci') }}</span>
+               }
+            </label>
+         </section>
+
+         <!-- Sec 3 · Contacto -->
+         <section class="flex flex-col gap-4">
+            <header class="flex items-center gap-2">
+               <div class="w-6 h-6 rounded-full bg-bg-inset flex items-center justify-center shrink-0">
+                  <span class="text-[11px] font-extrabold font-mono text-faint leading-none">3</span>
+               </div>
+               <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Contacto</h2>
+            </header>
+
+            <label class="flex flex-col gap-1.5">
+               <span class="text-caption font-bold text-muted">Celular</span>
+               <span
+                  class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                  [class.border-border-strong]="!hasFieldError('cellphone')"
+                  [class.border-error]="hasFieldError('cellphone')"
+                  [class.border-thick]="hasFieldError('cellphone')"
+               >
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">call</span>
+                  <input
+                     type="tel"
+                     formControlName="cellphone"
+                     placeholder="78123456"
+                     autocomplete="off"
+                     inputmode="numeric"
+                     class="bg-transparent border-0 outline-none flex-1 text-body-sm font-bold font-mono text-ink placeholder:text-faint placeholder:font-medium min-w-0"
+                  />
+               </span>
+               @if (hasFieldError('cellphone')) {
+                  <span class="text-caption font-medium text-error">{{ getFieldError('cellphone') }}</span>
+               }
+            </label>
+
+            <label class="flex flex-col gap-1.5">
+               <span class="text-caption font-bold text-muted">Email <span class="text-faint font-medium">(opcional)</span></span>
+               <span
+                  class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                  [class.border-border-strong]="!hasFieldError('email')"
+                  [class.border-error]="hasFieldError('email')"
+                  [class.border-thick]="hasFieldError('email')"
+               >
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">mail</span>
+                  <input
+                     type="email"
+                     formControlName="email"
+                     placeholder="instructor@correo.com"
+                     autocomplete="off"
+                     class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink placeholder:text-faint min-w-0"
+                  />
+               </span>
+               @if (hasFieldError('email')) {
+                  <span class="text-caption font-medium text-error">{{ getFieldError('email') }}</span>
+               }
+            </label>
+         </section>
+
+         <!-- Sec 4 · Estado -->
+         <section class="flex flex-col gap-3">
+            <header class="flex items-center gap-2">
+               <div class="w-6 h-6 rounded-full bg-bg-inset flex items-center justify-center shrink-0">
+                  <span class="text-[11px] font-extrabold font-mono text-faint leading-none">4</span>
+               </div>
+               <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Estado</h2>
+            </header>
+
+            <label class="flex flex-col gap-1.5">
+               <span class="text-caption font-bold text-muted">Estado</span>
+               <span class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline border-border-strong transition-colors duration-fast">
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">flag</span>
+                  <select
+                     formControlName="status"
+                     class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink min-w-0 cursor-pointer appearance-none"
+                  >
+                     <option value="activo">Activo</option>
+                     <option value="inactivo">Inactivo</option>
+                  </select>
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">expand_more</span>
+               </span>
+            </label>
+         </section>
+
+         @if (errorMessage()) {
+            <div class="flex items-start gap-3 px-4 py-3 rounded-md bg-error/10 border border-solid border-hairline border-error/30">
+               <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-error shrink-0 mt-0.5">error</span>
+               <p class="text-caption font-medium text-error m-0 leading-relaxed">{{ errorMessage() }}</p>
             </div>
          }
-         <!-- Botones -->
-         <div class="flex gap-4">
-            <button
-               type="button"
-               (click)="onCancel()"
-               [disabled]="isSubmitting()"
-               class="flex-1 bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-               Cancelar
-            </button>
+      </div>
 
-            <button
-               type="submit"
-               [disabled]="!canSubmit()"
-               class="flex-1 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-               @if (isSubmitting()) {
-                  <span class="flex items-center justify-center gap-2">
-                     <svg
-                        class="animate-spin h-5 w-5"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                     >
-                        <circle
-                           class="opacity-25"
-                           cx="12"
-                           cy="12"
-                           r="10"
-                           stroke="currentColor"
-                           stroke-width="4"
-                        ></circle>
-                        <path
-                           class="opacity-75"
-                           fill="currentColor"
-                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                     </svg>
-                     Guardando...
-                  </span>
-               } @else {
-                  {{ submitButtonText() }}
-               }
-            </button>
-         </div>
-      </form>
-   </div>
+      <footer class="flex items-stretch gap-3 px-7 py-5 bg-bg-elevated border-t border-solid border-hairline border-border-default">
+         <button
+            type="button"
+            (click)="onCancel()"
+            [disabled]="isSubmitting()"
+            class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-transparent border border-solid border-standard border-border-strong text-ink text-body-sm font-bold cursor-pointer transition-colors duration-fast hover:bg-bg-inset disabled:opacity-50 disabled:cursor-not-allowed"
+         >
+            Cancelar
+         </button>
+         <button
+            type="submit"
+            [disabled]="!canSubmit()"
+            class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-brand-500 hover:bg-brand-600 text-on-brand text-body-sm font-extrabold border-0 shadow-brand cursor-pointer transition-colors duration-fast disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+         >
+            @if (isSubmitting()) {
+               <span class="w-4 h-4 rounded-full border-2 border-solid border-on-brand/30 border-t-on-brand animate-spin"></span>
+               Guardando…
+            } @else {
+               <span class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none">check</span>
+               {{ submitButtonText() }}
+            }
+         </button>
+      </footer>
+   </form>
 </div>

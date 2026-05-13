@@ -1,257 +1,287 @@
-<div class="min-h-screen bg-white text-white p-6">
-   <div class="max-w-3xl mx-auto">
-      <div class="mb-8">
-         <h1 class="text-4xl font-bold text-red-600 mb-2">
-            {{ isEditMode() ? 'Editar Inscripción' : 'Nueva Inscripción' }}
-         </h1>
-         <p class="text-gray-400">
-            {{ isEditMode() ? 'Modifica los datos de la inscripción' : 'Inscribe a un alumno con una membresía' }}
-         </p>
-      </div>
-
-      <form [formGroup]="enrollmentForm" (ngSubmit)="onSubmit()" class="space-y-6">
-         <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-6 space-y-6">
-            <!-- Alumno -->
-             <!--
-            <mat-form-field appearance="outline" class="w-full">
-               <mat-label>Alumno</mat-label>
-               <mat-select formControlName="studentId" required>
-                  @for (student of students$ | async; track student.id) {
-                     <mat-option [value]="student.id">
-                        {{ getStudentFullName(student) }} - CI: {{ student.ci }}
-                     </mat-option>
-                  }
-               </mat-select>
-               @if (hasFieldError('studentId')) {
-                  <mat-error>{{ getFieldError('studentId') }}</mat-error>
-               }
-            </mat-form-field>
-            -->
-            <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Alumno</mat-label>
-            <mat-select formControlName="studentId" required>
-              <div class="px-3 py-2 sticky top-0 bg-white z-10 border-b">
-                <input
-                  matInput
-                  placeholder="Buscar por nombre o CI..."
-                  (input)="onSearchInputChange($event)"
-                  (keydown)="$event.stopPropagation()"
-                  class="w-full p-2 bg-gray-50 border rounded-md text-black"
-                />
-              </div>
-
-              @for (student of students$ | async; track student.id) {
-                <mat-option [value]="student.id">
-                  {{ getStudentFullName(student) }} - CI: {{ student.ci }}
-                </mat-option>
-              } @empty {
-                <mat-option disabled>No se encontraron alumnos</mat-option>
-              }
-            </mat-select>
-            @if (hasFieldError('studentId')) {
-              <mat-error>{{ getFieldError('studentId') }}</mat-error>
-            }
-          </mat-form-field>
-
-            <!-- Sucursal y Membresía -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Sucursal</mat-label>
-                  <mat-select formControlName="branchId" required>
-                     @for (branch of branches$ | async; track branch.id) {
-                        <mat-option [value]="branch.id" getBrancheId>{{ branch.name }}</mat-option>
-                     }
-                  </mat-select>
-                  @if (hasFieldError('branchId')) {
-                     <mat-error>{{ getFieldError('branchId') }}</mat-error>
-                  }
-               </mat-form-field>
-
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Membresía</mat-label>
-                  <mat-select formControlName="membershipId" required>
-                     @for (membership of memberships$ | async; track membership.id) {
-                        <mat-option [value]="membership.id">
-                           {{ membership.name }} - Bs. {{ membership.cost }}
-                        </mat-option>
-                     }
-                  </mat-select>
-                  @if (hasFieldError('membershipId')) {
-                     <mat-error>{{ getFieldError('membershipId') }}</mat-error>
-                  }
-               </mat-form-field>
-            </div>
-
-            <!-- Horario -->
-             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Horario</mat-label>
-                  <mat-select formControlName="scheduleId" required>
-                     @for (schedule of schedule$ | async; track schedule.id) {
-                        <mat-option [value]="schedule.id">{{ schedule.startTime }} - {{ schedule.endTime }}</mat-option>
-                     }
-                  </mat-select>
-                  @if (hasFieldError('branchId')) {
-                     <mat-error>{{ getFieldError('branchId') }}</mat-error>
-                  }
-               </mat-form-field>
-            </div>
-
-            <!-- Detalles de Membresía -->
-            @if (selectedMembership()) {
-               <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h3 class="font-semibold text-blue-900 mb-2">Detalles de la Membresía</h3>
-                  <div class="grid grid-cols-2 gap-4 text-sm text-blue-800">
-                     <div>
-                        <span class="font-medium">Duración:</span>
-                        {{ selectedMembership()!.durationDays }} días
-                     </div>
-                     <div>
-                        <span class="font-medium">Sesiones:</span>
-                        {{ selectedMembership()!.totalSessions }} clases
-                     </div>
-                     <div>
-                        <span class="font-medium">Costo:</span>
-                        Bs. {{ selectedMembership()!.cost }}
-                     </div>
-                     <div>
-                        <span class="font-medium">Días permitidos:</span>
-                        @switch (selectedMembership()!.allowedDays.length) {
-                           @case (5) {
-                              Lunes a Viernes
-                           }
-                           @case (6) {
-                              Lunes a Sábado
-                           }
-                           @case (7) {
-                              Todos los días
-                           }
-                           @default {
-                              {{ selectedMembership()!.allowedDays.length }} días/semana
-                           }
-                        }
-                     </div>
-                  </div>
-               </div>
-            }
-
-            <!-- Fecha, Pago y Estado -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Fecha de Inicio</mat-label>
-                  <input matInput [matDatepicker]="picker" formControlName="startDate" required />
-                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                  <mat-datepicker #picker></mat-datepicker>
-                  @if (hasFieldError('startDate')) {
-                     <mat-error>{{ getFieldError('startDate') }}</mat-error>
-                  }
-               </mat-form-field>
-
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Método de Pago</mat-label>
-                  <mat-select formControlName="paymentMethod" required>
-                     <mat-option value="Efectivo">Efectivo</mat-option>
-                     <mat-option value="Qr">Qr</mat-option>
-                  </mat-select>
-                  @if (hasFieldError('paymentMethod')) {
-                     <mat-error>{{ getFieldError('paymentMethod') }}</mat-error>
-                  }
-               </mat-form-field>
-
-               @if (isEditMode()) {
-                  <mat-form-field appearance="outline" class="w-full">
-                     <mat-label>Estado</mat-label>
-                     <mat-select formControlName="status" required>
-                        @for (option of statusOptions; track option.value) {
-                           <mat-option [value]="option.value">
-                              {{ option.label }}
-                           </mat-option>
-                        }
-                     </mat-select>
-                     @if (hasFieldError('status')) {
-                        <mat-error>{{ getFieldError('status') }}</mat-error>
-                     }
-                  </mat-form-field>
-               }
-            </div>
-
-            <!-- Info sesiones (solo edición) -->
-            @if (isEditMode() && currentEnrollment()) {
-               <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <h3 class="font-semibold text-yellow-900 mb-2">⚠️ Información Importante</h3>
-                  <div class="text-sm text-yellow-800 space-y-1">
-                     <p>
-                        <strong>Sesiones usadas:</strong> {{ currentEnrollment()!.usedSessions }} /
-                        {{ currentEnrollment()!.totalSessions }}
-                     </p>
-                     <p> <strong>Sesiones restantes:</strong> {{ currentEnrollment()!.remainingSessions }} </p>
-                     <p class="mt-2 text-xs"> Al cambiar la membresía, las sesiones usadas se mantendrán. </p>
-                  </div>
-               </div>
-            }
+<div class="min-h-screen bg-bg-base font-body text-ink py-10 px-4">
+   <form
+      [formGroup]="enrollmentForm"
+      (ngSubmit)="onSubmit()"
+      class="max-w-[560px] mx-auto bg-bg-elevated border border-solid border-hairline border-border-default rounded-2xl shadow-lg flex flex-col overflow-hidden"
+   >
+      <header class="flex items-start gap-4 px-7 py-6 border-b border-solid border-hairline border-border-default">
+         <div class="flex-1 flex flex-col gap-1.5">
+            <span class="text-label font-extrabold tracking-[0.25em] text-text-brand uppercase">
+               {{ isEditMode() ? 'EDITAR INSCRIPCIÓN' : 'NUEVA INSCRIPCIÓN' }}
+            </span>
+            <h1 class="font-display text-[2rem] font-extrabold tracking-[-0.03em] text-ink leading-[1.05] m-0">
+               {{ isEditMode() ? 'Editar inscripción' : 'Crear inscripción' }}
+            </h1>
+            <p class="text-body-sm text-muted leading-relaxed m-0 mt-1">
+               {{ isEditMode() ? 'Modifica los datos de la inscripción.' : 'Inscribe a un alumno en un plan y horario.' }}
+            </p>
          </div>
 
-         <!-- Error Message -->
-         @if (errorMessage()) {
-            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-               <div class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                     <path
-                        fill-rule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                        clip-rule="evenodd"
-                     />
-                  </svg>
-                  <p class="text-sm text-red-800">{{ errorMessage() }}</p>
+         <button
+            type="button"
+            (click)="onCancel()"
+            [disabled]="isSubmitting()"
+            class="w-9 h-9 shrink-0 rounded-full bg-bg-inset hover:bg-border-default flex items-center justify-center text-muted border-0 cursor-pointer transition-colors duration-fast disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Cerrar"
+         >
+            <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none">close</span>
+         </button>
+      </header>
+
+      <div class="flex flex-col gap-7 px-7 py-7">
+         <!-- Sec 1 · Alumno -->
+         <section class="flex flex-col gap-4">
+            <header class="flex items-center gap-2">
+               <div class="w-6 h-6 rounded-full bg-bg-brand-soft flex items-center justify-center shrink-0">
+                  <span class="text-[11px] font-extrabold font-mono text-text-brand leading-none">1</span>
                </div>
+               <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Alumno</h2>
+            </header>
+
+            <label class="flex flex-col gap-1.5">
+               <span class="text-caption font-bold text-muted">Buscar</span>
+               <span class="flex items-center gap-2.5 px-4 py-3 rounded-md bg-bg-elevated border border-solid border-hairline border-border-strong">
+                  <span class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none text-faint shrink-0">search</span>
+                  <input
+                     type="text"
+                     (input)="onSearchInputChange($event)"
+                     placeholder="Por nombre, apellido o CI…"
+                     class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink placeholder:text-faint min-w-0"
+                  />
+               </span>
+            </label>
+
+            <label class="flex flex-col gap-1.5">
+               <span class="text-caption font-bold text-muted">Alumno</span>
+               <span
+                  class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                  [class.border-border-strong]="!hasFieldError('studentId')"
+                  [class.border-error]="hasFieldError('studentId')"
+                  [class.border-thick]="hasFieldError('studentId')"
+               >
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">person</span>
+                  <select
+                     formControlName="studentId"
+                     class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink min-w-0 cursor-pointer appearance-none"
+                  >
+                     <option value="">Seleccionar alumno…</option>
+                     @for (student of students$ | async; track student.id) {
+                        <option [value]="student.id">{{ getStudentFullName(student) }} · {{ student.ci }}</option>
+                     }
+                  </select>
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">expand_more</span>
+               </span>
+               @if (hasFieldError('studentId')) {
+                  <span class="text-caption font-medium text-error">{{ getFieldError('studentId') }}</span>
+               }
+            </label>
+         </section>
+
+         <!-- Sec 2 · Sucursal y horario -->
+         <section class="flex flex-col gap-4">
+            <header class="flex items-center gap-2">
+               <div class="w-6 h-6 rounded-full bg-bg-inset flex items-center justify-center shrink-0">
+                  <span class="text-[11px] font-extrabold font-mono text-faint leading-none">2</span>
+               </div>
+               <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Sucursal y horario</h2>
+            </header>
+
+            <label class="flex flex-col gap-1.5">
+               <span class="text-caption font-bold text-muted">Sucursal</span>
+               <span
+                  class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                  [class.border-border-strong]="!hasFieldError('branchId')"
+                  [class.border-error]="hasFieldError('branchId')"
+                  [class.border-thick]="hasFieldError('branchId')"
+               >
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">storefront</span>
+                  <select
+                     formControlName="branchId"
+                     class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink min-w-0 cursor-pointer appearance-none"
+                  >
+                     <option value="">Seleccionar sucursal…</option>
+                     @for (branch of branches$ | async; track branch.id) {
+                        <option [value]="branch.id">{{ branch.name }}</option>
+                     }
+                  </select>
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">expand_more</span>
+               </span>
+               @if (hasFieldError('branchId')) {
+                  <span class="text-caption font-medium text-error">{{ getFieldError('branchId') }}</span>
+               }
+            </label>
+
+            @if (schedule$) {
+               <label class="flex flex-col gap-1.5">
+                  <span class="text-caption font-bold text-muted">Horario</span>
+                  <span
+                     class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                     [class.border-border-strong]="!hasFieldError('scheduleId')"
+                     [class.border-error]="hasFieldError('scheduleId')"
+                     [class.border-thick]="hasFieldError('scheduleId')"
+                  >
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">schedule</span>
+                     <select
+                        formControlName="scheduleId"
+                        class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink min-w-0 cursor-pointer appearance-none"
+                     >
+                        <option value="">Seleccionar horario…</option>
+                        @for (s of schedule$ | async; track s.id) {
+                           <option [value]="s.id">{{ s.startTime }} – {{ s.endTime }} · {{ s.instructorName || 'Sin instructor' }}</option>
+                        }
+                     </select>
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">expand_more</span>
+                  </span>
+                  @if (hasFieldError('scheduleId')) {
+                     <span class="text-caption font-medium text-error">{{ getFieldError('scheduleId') }}</span>
+                  }
+               </label>
+            }
+         </section>
+
+         <!-- Sec 3 · Plan -->
+         <section class="flex flex-col gap-4">
+            <header class="flex items-center gap-2">
+               <div class="w-6 h-6 rounded-full bg-bg-inset flex items-center justify-center shrink-0">
+                  <span class="text-[11px] font-extrabold font-mono text-faint leading-none">3</span>
+               </div>
+               <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Plan</h2>
+            </header>
+
+            <label class="flex flex-col gap-1.5">
+               <span class="text-caption font-bold text-muted">Membresía</span>
+               <span
+                  class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                  [class.border-border-strong]="!hasFieldError('membershipId')"
+                  [class.border-error]="hasFieldError('membershipId')"
+                  [class.border-thick]="hasFieldError('membershipId')"
+               >
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">card_membership</span>
+                  <select
+                     formControlName="membershipId"
+                     class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink min-w-0 cursor-pointer appearance-none"
+                  >
+                     <option value="">Seleccionar membresía…</option>
+                     @for (m of memberships$ | async; track m.id) {
+                        <option [value]="m.id">{{ m.name }} · {{ m.totalSessions }} sesiones · Bs {{ m.cost }}</option>
+                     }
+                  </select>
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">expand_more</span>
+               </span>
+               @if (hasFieldError('membershipId')) {
+                  <span class="text-caption font-medium text-error">{{ getFieldError('membershipId') }}</span>
+               }
+            </label>
+
+            @if (selectedMembership(); as m) {
+               <div class="flex items-center justify-between gap-2 px-4 py-3 rounded-md bg-bg-brand-soft border border-solid border-hairline border-border-brand">
+                  <div class="flex flex-col gap-0.5">
+                     <span class="text-caption text-muted">Plan seleccionado</span>
+                     <span class="text-body-sm font-extrabold text-ink">{{ m.name }}</span>
+                  </div>
+                  <div class="flex items-center gap-3 text-caption font-bold font-mono text-text-brand">
+                     <span>{{ m.durationDays }}d</span>
+                     <span>{{ m.totalSessions }} sesiones</span>
+                     <span>Bs {{ m.cost }}</span>
+                  </div>
+               </div>
+            }
+
+            <label class="flex flex-col gap-1.5">
+               <span class="text-caption font-bold text-muted">Fecha de inicio</span>
+               <span
+                  class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                  [class.border-border-strong]="!hasFieldError('startDate')"
+                  [class.border-error]="hasFieldError('startDate')"
+                  [class.border-thick]="hasFieldError('startDate')"
+               >
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">event</span>
+                  <input
+                     type="date"
+                     formControlName="startDate"
+                     class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink min-w-0"
+                  />
+               </span>
+               @if (hasFieldError('startDate')) {
+                  <span class="text-caption font-medium text-error">{{ getFieldError('startDate') }}</span>
+               }
+            </label>
+         </section>
+
+         <!-- Sec 4 · Pago y estado -->
+         <section class="flex flex-col gap-4">
+            <header class="flex items-center gap-2">
+               <div class="w-6 h-6 rounded-full bg-bg-inset flex items-center justify-center shrink-0">
+                  <span class="text-[11px] font-extrabold font-mono text-faint leading-none">4</span>
+               </div>
+               <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Pago y estado</h2>
+            </header>
+
+            <div class="grid grid-cols-2 gap-3">
+               <label class="flex flex-col gap-1.5">
+                  <span class="text-caption font-bold text-muted">Método de pago</span>
+                  <span class="flex items-center gap-2 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline border-border-strong">
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">payments</span>
+                     <select
+                        formControlName="paymentMethod"
+                        class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink min-w-0 cursor-pointer appearance-none"
+                     >
+                        @for (option of paymentMethodOptions; track option.value) {
+                           <option [value]="option.value">{{ option.label }}</option>
+                        }
+                     </select>
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">expand_more</span>
+                  </span>
+               </label>
+
+               <label class="flex flex-col gap-1.5">
+                  <span class="text-caption font-bold text-muted">Estado</span>
+                  <span class="flex items-center gap-2 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline border-border-strong">
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">flag</span>
+                     <select
+                        formControlName="status"
+                        class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink min-w-0 cursor-pointer appearance-none"
+                     >
+                        @for (option of statusOptions; track option.value) {
+                           <option [value]="option.value">{{ option.label }}</option>
+                        }
+                     </select>
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">expand_more</span>
+                  </span>
+               </label>
+            </div>
+         </section>
+
+         @if (errorMessage()) {
+            <div class="flex items-start gap-3 px-4 py-3 rounded-md bg-error/10 border border-solid border-hairline border-error/30">
+               <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-error shrink-0 mt-0.5">error</span>
+               <p class="text-caption font-medium text-error m-0 leading-relaxed">{{ errorMessage() }}</p>
             </div>
          }
+      </div>
 
-         <!-- Botones -->
-         <div class="flex gap-4">
-            <button
-               type="button"
-               (click)="onCancel()"
-               [disabled]="isSubmitting()"
-               class="flex-1 bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-               Cancelar
-            </button>
-
-            <button
-               type="submit"
-               [disabled]="!canSubmit()"
-               class="flex-1 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-               @if (isSubmitting()) {
-                  <span class="flex items-center justify-center gap-2">
-                     <svg
-                        class="animate-spin h-5 w-5"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                     >
-                        <circle
-                           class="opacity-25"
-                           cx="12"
-                           cy="12"
-                           r="10"
-                           stroke="currentColor"
-                           stroke-width="4"
-                        ></circle>
-                        <path
-                           class="opacity-75"
-                           fill="currentColor"
-                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                     </svg>
-                     Guardando...
-                  </span>
-               } @else {
-                  {{ submitButtonText() }}
-               }
-            </button>
-         </div>
-      </form>
-   </div>
+      <footer class="flex items-stretch gap-3 px-7 py-5 bg-bg-elevated border-t border-solid border-hairline border-border-default">
+         <button
+            type="button"
+            (click)="onCancel()"
+            [disabled]="isSubmitting()"
+            class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-transparent border border-solid border-standard border-border-strong text-ink text-body-sm font-bold cursor-pointer transition-colors duration-fast hover:bg-bg-inset disabled:opacity-50 disabled:cursor-not-allowed"
+         >
+            Cancelar
+         </button>
+         <button
+            type="submit"
+            [disabled]="!canSubmit()"
+            class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-brand-500 hover:bg-brand-600 text-on-brand text-body-sm font-extrabold border-0 shadow-brand cursor-pointer transition-colors duration-fast disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+         >
+            @if (isSubmitting()) {
+               <span class="w-4 h-4 rounded-full border-2 border-solid border-on-brand/30 border-t-on-brand animate-spin"></span>
+               Guardando…
+            } @else {
+               <span class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none">check</span>
+               {{ submitButtonText() }}
+            }
+         </button>
+      </footer>
+   </form>
 </div>
