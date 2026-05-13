@@ -1,13 +1,7 @@
 import { Component, computed, DestroyRef, inject, input, OnInit, output, signal } from '@angular/core'
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms'
-import { MatFormFieldModule } from '@angular/material/form-field'
-import { MatInputModule } from '@angular/material/input'
-import { MatSelectModule } from '@angular/material/select'
-import { MatButtonModule } from '@angular/material/button'
-import { MatDatepickerModule } from '@angular/material/datepicker'
-import { MatNativeDateModule } from '@angular/material/core'
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
-import { Observable, combineLatest, map, tap } from 'rxjs';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop'
+import { Observable, combineLatest, map, tap } from 'rxjs'
 import { AsyncPipe } from '@angular/common'
 import { EnrollmentService } from '../../../../../../../services/enrollment/enrollment.service'
 import { BranchService } from '../../../../../../../services/branch/branch.service'
@@ -21,22 +15,11 @@ import { Membership } from '../../../../../../../models/membership.model'
 import { Timestamp } from '@angular/fire/firestore'
 import { ScheduleService } from '../../../../../../../services/schedule/schedule.service'
 import { Schedule } from '../../../../../../../models/schedule.model'
-import { FormsModule } from '@angular/forms'
-import { toObservable } from '@angular/core/rxjs-interop';
 
 @Component({
    selector: 'x-enrollment-form',
    standalone: true,
-   imports: [
-      MatInputModule,
-      MatSelectModule,
-      MatButtonModule,
-      MatDatepickerModule,
-      MatNativeDateModule,
-      ReactiveFormsModule,
-      MatFormFieldModule,
-      AsyncPipe,
-   ],
+   imports: [ReactiveFormsModule, AsyncPipe],
    templateUrl: './component.html',
 })
 export class EnrollmentForm implements OnInit {
@@ -146,12 +129,19 @@ export class EnrollmentForm implements OnInit {
          branchId: ['', Validators.required],
          membershipId: ['', Validators.required],
          scheduleId: ['', Validators.required],
-         startDate: [new Date(), Validators.required],
+         startDate: [this.toDateInputValue(new Date()), Validators.required],
          paymentMethod: ['Efectivo' as 'Efectivo' | 'Qr', Validators.required],
          status: ['activa' as 'activa' | 'vencida' | 'cancelada' | 'completada', Validators.required],
       })
 
       this.formValueChanges()
+   }
+
+   private toDateInputValue(date: Date): string {
+      const y = date.getFullYear()
+      const m = String(date.getMonth() + 1).padStart(2, '0')
+      const d = String(date.getDate()).padStart(2, '0')
+      return `${y}-${m}-${d}`
    }
 
    private formValueChanges(): void {
@@ -234,7 +224,7 @@ export class EnrollmentForm implements OnInit {
                      studentId: enrollment.studentId,
                      branchId: enrollment.branchId,
                      membershipId: enrollment.membershipId,
-                     startDate: enrollment.startDate.toDate(),
+                     startDate: this.toDateInputValue(enrollment.startDate.toDate()),
                      paymentMethod: enrollment.paymentMethod,
                      status: enrollment.status,
                   })

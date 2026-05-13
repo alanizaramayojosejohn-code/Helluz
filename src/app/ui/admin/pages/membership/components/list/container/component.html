@@ -1,116 +1,119 @@
-<!-- components/list/container/component.html -->
-<div class="p-6">
-   <div class="flex justify-between items-center mb-6">
-      <h1 class="text-4xl font-bold text-red-600">Membresías</h1>
-      <button
-         class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
-         (click)="onCreateMembership()"
-      >
-         <mat-icon>add</mat-icon>
-         Nueva Membresía
+<div class="p-8 flex flex-col gap-0">
+
+  <!-- Page header -->
+  <div class="flex items-end justify-between pb-7 border-b border-hairline border-border-default">
+    <div class="flex flex-col gap-1.5">
+      <span class="text-label font-extrabold uppercase tracking-[2.75px] text-text-brand">GESTIÓN</span>
+      <h1 class="font-display text-h1 font-extrabold text-ink leading-none tracking-tightest">Membresías</h1>
+    </div>
+    <button
+      (click)="onCreateMembership()"
+      class="flex items-center gap-2 px-7 py-4 rounded-full bg-brand-500 text-on-brand text-body font-extrabold shadow-brand hover:bg-brand-600 transition-colors duration-fast cursor-pointer border-none"
+    >
+      <mat-icon class="!text-[18px] !w-[18px] !h-[18px] leading-none">add</mat-icon>
+      Nueva membresía
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="flex items-center gap-3 pt-6">
+    <div class="flex items-center rounded-full bg-bg-inset p-[3px]">
+      <button class="flex items-center gap-2 px-4 py-2 rounded-full bg-bg-elevated text-caption font-extrabold text-ink shadow-sm cursor-pointer border-none">
+        Todas
       </button>
-   </div>
+      <button class="flex items-center gap-2 px-4 py-2 rounded-full text-caption font-extrabold text-muted bg-transparent cursor-pointer border-none">
+        Activas
+      </button>
+      <button class="flex items-center gap-2 px-4 py-2 rounded-full text-caption font-extrabold text-muted bg-transparent cursor-pointer border-none">
+        Inactivas
+      </button>
+    </div>
+    <div class="flex-1 flex items-center gap-2 px-4 py-[10px] rounded-full bg-bg-elevated border border-hairline border-border-strong">
+      <mat-icon class="text-faint !text-base !w-4 !h-4 leading-none shrink-0">search</mat-icon>
+      <span class="text-caption text-faint font-medium">Buscar nombre o disciplina…</span>
+    </div>
+    <div class="flex items-center gap-2 px-4 py-[10px] rounded-full bg-bg-elevated border border-hairline border-border-strong cursor-pointer">
+      <mat-icon class="text-muted !text-base !w-4 !h-4 leading-none">sort</mat-icon>
+      <span class="text-caption font-extrabold text-ink">Recientes</span>
+      <mat-icon class="text-faint !text-[14px] !w-[14px] !h-[14px] leading-none">keyboard_arrow_down</mat-icon>
+    </div>
+  </div>
 
-   @if (isLoading()) {
-      <div class="flex justify-center p-8">
-         <mat-spinner diameter="50"></mat-spinner>
-      </div>
-   }
+  @if (errorMessage()) {
+    <div class="mt-4 px-4 py-3 rounded-lg border border-hairline border-error/30 text-error text-body-sm">
+      {{ errorMessage() }}
+    </div>
+  }
 
-   @if (errorMessage()) {
-      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
-         {{ errorMessage() }}
+  <!-- Table -->
+  <div class="mt-6 rounded-lg border border-hairline border-border-default bg-bg-elevated overflow-hidden">
+    @if (isLoading()) {
+      <div class="flex justify-center items-center py-12">
+        <mat-spinner diameter="40"></mat-spinner>
       </div>
-   }
+    } @else {
 
-   @if (memberships$ | async; as memberships) {
-      <div class="bg-white rounded-lg shadow overflow-x-auto">
-         <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-               <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                     Nombre
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                     Duración
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                     Sesiones
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                     Costo
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                     Estado
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                     Acciones
-                  </th>
-               </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-               @for (membership of memberships; track membership.id) {
-                  <tr class="hover:bg-gray-50 transition-colors">
-                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-gray-900">{{ membership.name }}</div>
-                        <div class="text-xs text-gray-500">{{ getDaysLabel(membership.allowedDays) }}</div>
-                     </td>
-                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                        {{ membership.durationDays }} días
-                     </td>
-                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                        {{ membership.totalSessions }} sesiones
-                     </td>
-                     <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                        ${{ membership.cost }}
-                     </td>
-                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span
-                           [class]="
-                              membership.status === 'activo'
-                                 ? 'bg-green-100 text-green-800'
-                                 : 'bg-gray-100 text-gray-800'
-                           "
-                           class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full cursor-pointer"
-                           (click)="onToggleStatus(membership)"
-                        >
-                           {{ membership.status }}
-                        </span>
-                     </td>
-                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button
-                           class="text-blue-600 hover:text-blue-900 mr-3"
-                           (click)="onViewDetail(membership)"
-                           mat-icon-button
-                           matTooltip="Ver detalle"
-                        >
-                           <mat-icon>visibility</mat-icon>
-                        </button>
-                        <button
-                           class="text-indigo-600 hover:text-indigo-900"
-                           (click)="onEditMembership(membership)"
-                           mat-icon-button
-                           matTooltip="Editar"
-                        >
-                           <mat-icon>edit</mat-icon>
-                        </button>
-                        <button
-                           class="text-red-500 bg-white hover:text-white hover:bg-red-500 border-none rounded-full"
-                           (click)="deleteMembership(membership)"
-                           mat-icon-button
-                           matTooltip="Editar"
-                        >
-                           <mat-icon>delete</mat-icon>
-                        </button>
-                     </td>
-                  </tr>
-               } @empty {
-                  <tr>
-                     <td colspan="6" class="px-6 py-8 text-center text-gray-500"> No hay membresías registradas </td>
-                  </tr>
-               }
-            </tbody>
-         </table>
+      <!-- Col headers -->
+      <div class="flex items-center gap-4 px-5 py-[10px] bg-bg-inset">
+        <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase flex-1 min-w-0">NOMBRE</span>
+        <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase w-[100px] shrink-0">DURACIÓN</span>
+        <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase w-[100px] shrink-0">SESIONES</span>
+        <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase w-[100px] shrink-0">COSTO</span>
+        <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase w-[120px] shrink-0">ESTADO</span>
+        <span class="w-[60px] shrink-0"></span>
       </div>
-   }
+
+      @if (memberships$ | async; as memberships) {
+        @for (membership of memberships; track membership.id) {
+          <div class="flex items-center gap-4 px-5 py-[14px] border-b border-hairline border-border-subtle hover:bg-bg-surface transition-colors duration-fast last:border-b-0">
+            <!-- Nombre -->
+            <div class="flex flex-col gap-0.5 flex-1 min-w-0">
+              <span class="text-body-sm font-extrabold text-ink truncate">{{ membership.name }}</span>
+              <span class="text-caption text-faint">{{ getDaysLabel(membership.allowedDays) }}</span>
+            </div>
+            <!-- Duración -->
+            <span class="text-body-sm font-semibold text-ink w-[100px] shrink-0">{{ membership.durationDays }} días</span>
+            <!-- Sesiones -->
+            <span class="text-body-sm font-semibold text-ink w-[100px] shrink-0">{{ membership.totalSessions }} sesiones</span>
+            <!-- Costo -->
+            <span class="text-body-sm font-extrabold font-mono text-ink w-[100px] shrink-0">Bs {{ membership.cost }}</span>
+            <!-- Estado -->
+            <div class="w-[120px] shrink-0">
+              <button
+                (click)="onToggleStatus(membership)"
+                [class]="membership.status === 'activo'
+                  ? 'px-[10px] py-1 rounded-full bg-success/20 text-success text-caption font-extrabold cursor-pointer border-none'
+                  : 'px-[10px] py-1 rounded-full bg-bg-inset text-faint text-caption font-extrabold cursor-pointer border-none'"
+              >{{ membership.status }}</button>
+            </div>
+            <!-- Acciones -->
+            <div class="flex items-center gap-0.5 w-[60px] shrink-0 justify-end">
+              <button (click)="onViewDetail(membership)" class="p-1.5 rounded-full text-faint hover:text-ink hover:bg-bg-inset transition-colors duration-fast cursor-pointer border-none bg-transparent" matTooltip="Ver detalle">
+                <mat-icon class="!text-[18px] !w-[18px] !h-[18px] leading-none">visibility</mat-icon>
+              </button>
+              <button (click)="onEditMembership(membership)" class="p-1.5 rounded-full text-faint hover:text-ink hover:bg-bg-inset transition-colors duration-fast cursor-pointer border-none bg-transparent" matTooltip="Editar">
+                <mat-icon class="!text-[18px] !w-[18px] !h-[18px] leading-none">edit</mat-icon>
+              </button>
+              <button (click)="deleteMembership(membership)" class="p-1.5 rounded-full text-faint hover:text-error hover:bg-error/10 transition-colors duration-fast cursor-pointer border-none bg-transparent" matTooltip="Eliminar">
+                <mat-icon class="!text-[18px] !w-[18px] !h-[18px] leading-none">delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        } @empty {
+          <div class="px-5 py-12 text-center text-faint text-body-sm">No hay membresías registradas</div>
+        }
+      }
+
+      <!-- Footer -->
+      <div class="flex items-center gap-3 px-5 py-[14px] border-t border-hairline border-border-default">
+        <span class="text-caption font-semibold text-muted flex-1">Membresías registradas</span>
+        <button class="w-8 h-8 rounded-md bg-bg-inset flex items-center justify-center cursor-pointer border-none">
+          <mat-icon class="text-faint !text-[18px] !w-[18px] !h-[18px] leading-none">chevron_left</mat-icon>
+        </button>
+        <button class="w-8 h-8 rounded-md bg-bg-ink flex items-center justify-center cursor-pointer border-none">
+          <mat-icon class="text-on-brand !text-[18px] !w-[18px] !h-[18px] leading-none">chevron_right</mat-icon>
+        </button>
+      </div>
+    }
+  </div>
 </div>

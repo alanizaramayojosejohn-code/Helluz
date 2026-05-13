@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs grep *)",
+      "Bash(bunx tsc *)",
+      "Bash(bun run *)",
+      "Bash(npx tsc *)",
+      "Bash(node_modules/.bin/tsc --noEmit -p tsconfig.json)"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "nanobanana-mcp"
+  ],
+  "enableAllProjectMcpServers": true
+}

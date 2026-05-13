@@ -129,13 +129,22 @@ export default class InstructorAttendanceListComponent implements OnInit {
 
 
    async markDeparture(attendance: InstructorAttendance): Promise<void> {
-      if (confirm('¿Marcar salida para este instructor?')) {
-         try {
-            await this.attendanceService.markDeparture(attendance.id)
-         } catch (error: any) {
-            alert('Error al marcar salida: ' + error.message)
-         }
-      }
+      this.confirmDialog
+         .confirm({
+            title: '¿Marcar salida?',
+            message: 'Se registrará la hora actual como salida para este instructor.',
+            confirmText: 'Marcar',
+            tone: 'info',
+            confirmIcon: 'logout',
+         })
+         .subscribe(async (confirmed) => {
+            if (!confirmed) return
+            try {
+               await this.attendanceService.markDeparture(attendance.id)
+            } catch (error: any) {
+               console.error('Error al marcar salida:', error)
+            }
+         })
    }
 
    private readonly confirmDialog = inject(ConfirmDialogService)

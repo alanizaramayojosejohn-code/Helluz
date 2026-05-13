@@ -10,22 +10,12 @@ import {
 } from '@angular/forms'
 import { BranchService } from '../../../../../../services/branch/branch.service'
 import { Branch, BranchStatus, status } from '../../../../../../models/branch.model'
-import { MatFormFieldModule } from '@angular/material/form-field'
-import { MatInputModule } from '@angular/material/input'
-import { MatSelectModule } from '@angular/material/select'
-import { MatButtonModule } from '@angular/material/button'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { catchError, debounceTime, distinctUntilChanged, map, Observable, of, switchMap } from 'rxjs'
 
 @Component({
    selector: 'x-form',
-   imports: [
-      MatInputModule,
-      MatSelectModule,
-      MatButtonModule,
-      ReactiveFormsModule,
-      MatFormFieldModule,
-   ],
+   imports: [ReactiveFormsModule],
    templateUrl: './form.html',
    styleUrl: './form.css',
 })
@@ -205,6 +195,12 @@ export class BranchForm implements OnInit {
 
    onCancel(): void {
       this.cancel.emit()
+   }
+
+   toggleStatus(): void {
+      const current = this.branchForm.get('status')?.value as BranchStatus
+      const next: BranchStatus = current === 'activo' ? 'inactivo' : 'activo'
+      this.branchForm.get('status')?.setValue(next)
    }
 
    getFieldError(fieldName: string): string | null {

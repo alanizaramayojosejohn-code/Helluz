@@ -1,11 +1,6 @@
 import { Component, computed, DestroyRef, inject, input, OnInit, output, signal } from '@angular/core'
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms'
-import { MatFormFieldModule } from '@angular/material/form-field'
-import { MatInputModule } from '@angular/material/input'
-import { MatSelectModule } from '@angular/material/select'
-import { MatButtonModule } from '@angular/material/button'
-import { MatCheckboxModule } from '@angular/material/checkbox'
-import { AsyncPipe } from '@angular/common' // ← IMPORTANTE: Faltaba esto
+import { AsyncPipe, TitleCasePipe } from '@angular/common'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { ScheduleService } from '../../../../../../../services/schedule/schedule.service'
 import { BranchService } from '../../../../../../../services/branch/branch.service'
@@ -20,15 +15,7 @@ import { Observable, tap } from 'rxjs'
 
 @Component({
    selector: 'x-schedule-form',
-   imports: [
-      MatInputModule,
-      MatSelectModule,
-      MatButtonModule,
-      MatCheckboxModule,
-      ReactiveFormsModule,
-      MatFormFieldModule,
-      AsyncPipe, 
-   ],
+   imports: [ReactiveFormsModule, AsyncPipe, TitleCasePipe],
    templateUrl: './component.html',
 })
 export class ScheduleForm implements OnInit {
@@ -48,6 +35,7 @@ export class ScheduleForm implements OnInit {
    readonly isSubmitting = signal<boolean>(false)
    readonly currentSchedule = signal<Schedule | null>(null)
    readonly formValid = signal<boolean>(false)
+   readonly selectedDays = signal<string[]>([])
 
    branches$!: Observable<Branch[]>
    days$!: Observable<Day[]>
@@ -61,8 +49,8 @@ export class ScheduleForm implements OnInit {
    readonly canSubmit = computed(() => this.formValid() && !this.isSubmitting())
 
    readonly submitButtonText = computed(() => {
-      if (this.isSubmitting()) return 'Guardando...'
-      return this.isEditMode() ? 'Actualizar Horario' : 'Crear Horario'
+      if (this.isSubmitting()) return 'Guardando…'
+      return this.isEditMode() ? 'Actualizar horario' : 'Crear horario'
    })
 
    scheduleForm!: FormGroup
@@ -82,32 +70,30 @@ export class ScheduleForm implements OnInit {
       this.scheduleForm = this.fb.group(
          {
             branchId: ['', Validators.required],
-            days: [[], Validators.required],
+            days: [[] as string[], Validators.required],
             startTime: ['', [Validators.required, Validators.pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)]],
             endTime: ['', [Validators.required, Validators.pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)]],
             instructorId: [''],
             status: ['activo'],
          },
-         { validators: timeRangeValidator }
+         { validators: timeRangeValidator },
       )
 
       this.formValueChanges()
    }
 
    private loadData(): void {
-
-    this.branches$ = this.branchService.getActiveBranches().pipe(tap((branches) => (this.branchesCache = branches)))
-
+      this.branches$ = this.branchService.getActiveBranches().pipe(tap((branches) => (this.branchesCache = branches)))
       this.days$ = this.seedService.getDays()
-
       this.disciplines$ = this.seedService.getDiscipline()
    }
 
    private formValueChanges(): void {
-      this.scheduleForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.scheduleForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((value) => {
          if (this.errorMessage()) {
             this.errorMessage.set(null)
          }
+         this.selectedDays.set([...(value.days ?? [])])
       })
 
       this.scheduleForm.statusChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
@@ -142,6 +128,7 @@ export class ScheduleForm implements OnInit {
          this.loadSchedule(scheduleId)
       }
    }
+
    private loadSchedule(id: string): void {
       this.scheduleService
          .getScheduleById(id)
@@ -158,6 +145,7 @@ export class ScheduleForm implements OnInit {
                      instructorId: schedule.instructorId || '',
                      status: schedule.status,
                   })
+                  this.selectedDays.set([...(schedule.days ?? [])])
 
                   if (schedule.branchId) {
                      this.loadInstructorsByBranch(schedule.branchId)
@@ -168,10 +156,20 @@ export class ScheduleForm implements OnInit {
          })
    }
 
+   toggleDay(dayName: string): void {
+      const current = this.selectedDays()
+      const next = current.includes(dayName) ? current.filter((d) => d !== dayName) : [...current, dayName]
+      this.selectedDays.set(next)
+      this.scheduleForm.get('days')?.setValue(next)
+      this.scheduleForm.get('days')?.markAsTouched()
+   }
+
+   isDaySelected(dayName: string): boolean {
+      return this.selectedDays().includes(dayName)
+   }
+
    async onSubmit(): Promise<void> {
-      if (!this.validateForm()) {
-         return
-      }
+      if (!this.validateForm()) return
 
       this.resetErrors()
       this.isSubmitting.set(true)
@@ -211,26 +209,25 @@ export class ScheduleForm implements OnInit {
             branchName,
             instructorId: formValue.instructorId || undefined,
             instructorName,
-         };
+         }
 
          await this.scheduleService.updateSchedule(this.scheduleId()!, updateData)
       } else {
-
-            const createData: CreateScheduleDto = {
-               branchId: formValue.branchId,
-               branchName,
-               days: formValue.days,
-               startTime: formValue.startTime,
-               endTime: formValue.endTime,
-               discipline: 'MMA',
-               instructorId: formValue.instructorId || undefined,
-               instructorName,
-               status: formValue.status,
-
-              }
-              await this.scheduleService.addSchedule(createData)
+         const createData: CreateScheduleDto = {
+            branchId: formValue.branchId,
+            branchName,
+            days: formValue.days,
+            startTime: formValue.startTime,
+            endTime: formValue.endTime,
+            discipline: 'MMA',
+            instructorId: formValue.instructorId || undefined,
+            instructorName,
+            status: formValue.status,
+         }
+         await this.scheduleService.addSchedule(createData)
       }
    }
+
    private getInstructorName(instructorId: string): string {
       const instructor = this.instructorsCache.find((i) => i.id === instructorId)
       return instructor ? this.instructorService.getInstructorFullName(instructor) : ''
@@ -238,14 +235,12 @@ export class ScheduleForm implements OnInit {
 
    private handleSaveError(error: unknown): void {
       console.error('Error al guardar horario:', error)
-
       const errorMsg =
          error instanceof Error
             ? error.message
             : typeof error === 'string'
               ? error
               : 'Error desconocido al guardar el horario'
-
       this.errorMessage.set(errorMsg)
    }
 
@@ -259,9 +254,7 @@ export class ScheduleForm implements OnInit {
 
       const errors = field.errors
       if (errors['required']) {
-         if (fieldName === 'days') {
-            return 'Selecciona al menos un día'
-         }
+         if (fieldName === 'days') return 'Selecciona al menos un día'
          return 'Campo requerido'
       }
       if (errors['pattern']) return 'Formato inválido (HH:mm)'

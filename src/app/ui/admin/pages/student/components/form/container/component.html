@@ -1,132 +1,222 @@
-<div class="min-h-screen bg-white p-6">
-   <div class="max-w-3xl mx-auto">
-      <div class="mb-8">
-         <h1 class="text-4xl font-bold text-red-600 mb-2">
-            {{ isEditMode() ? 'Editar Estudiante' : 'Registrar Estudiante' }}
-         </h1>
-         <p class="text-gray-400">
-            {{ isEditMode() ? 'Modifica la información del estudiante' : 'Completa la información para el nuevo registro' }}
-         </p>
-      </div>
-
-      @if (isLoading()) {
-         <div class="flex justify-center items-center py-12">
-            <mat-spinner diameter="50"></mat-spinner>
+<div class="min-h-screen bg-bg-base font-body text-ink py-10 px-4">
+   <form
+      [formGroup]="studentForm"
+      (ngSubmit)="onSubmit()"
+      class="max-w-[520px] mx-auto bg-bg-elevated border border-solid border-hairline border-border-default rounded-2xl shadow-lg flex flex-col overflow-hidden"
+   >
+      <header class="flex items-start gap-4 px-7 py-6 border-b border-solid border-hairline border-border-default">
+         <div class="flex-1 flex flex-col gap-1.5">
+            <span class="text-label font-extrabold tracking-[0.25em] text-text-brand uppercase">
+               {{ isEditMode() ? 'EDITAR ALUMNO' : 'NUEVO ALUMNO' }}
+            </span>
+            <h1 class="font-display text-[2rem] font-extrabold tracking-[-0.03em] text-ink leading-[1.05] m-0">
+               {{ isEditMode() ? 'Editar alumno' : 'Crear alumno' }}
+            </h1>
+            <p class="text-body-sm text-muted leading-relaxed m-0 mt-1">
+               Define los datos básicos del fighter y un contacto de emergencia.
+            </p>
          </div>
-      }
 
-      <form [formGroup]="studentForm" (ngSubmit)="onSubmit()" class="space-y-6">
-         <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-6 space-y-6">
+         <button
+            type="button"
+            (click)="onCancel()"
+            [disabled]="isSubmitting()"
+            class="w-9 h-9 shrink-0 rounded-full bg-bg-inset hover:bg-border-default flex items-center justify-center text-muted border-0 cursor-pointer transition-colors duration-fast disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Cerrar"
+         >
+            <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none">close</span>
+         </button>
+      </header>
 
-            <div class="space-y-4">
-               <h2 class="text-sm font-bold text-red-600 uppercase tracking-wider mb-2">Datos Personales</h2>
-
-               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <mat-form-field appearance="outline" class="w-full">
-                     <mat-label>Nombre</mat-label>
-                     <input matInput formControlName="name" placeholder="Ej. Juan" required autocomplete="off" />
-                     @if (hasError('name')) {
-                        <mat-error>{{ getErrorMessage('name') }}</mat-error>
-                     }
-                  </mat-form-field>
-
-                  <mat-form-field appearance="outline" class="w-full">
-                     <mat-label>Apellido</mat-label>
-                     <input matInput formControlName="lastname" placeholder="Ej. Pérez" required autocomplete="off" />
-                     @if (hasError('lastname')) {
-                        <mat-error>{{ getErrorMessage('lastname') }}</mat-error>
-                     }
-                  </mat-form-field>
-
-                  <mat-form-field appearance="outline" class="w-full">
-                     <mat-label>CI</mat-label>
-                     <input matInput formControlName="ci" placeholder="Cédula de identidad" required autocomplete="off" />
-                     @if (hasError('ci')) {
-                        <mat-error>{{ getErrorMessage('ci') }}</mat-error>
-                     }
-                  </mat-form-field>
-
-                  <mat-form-field appearance="outline" class="w-full">
-                     <mat-label>Celular</mat-label>
-                     <input matInput formControlName="cellphone" placeholder="77788899" required autocomplete="off" />
-                     @if (hasError('cellphone')) {
-                        <mat-error>{{ getErrorMessage('cellphone') }}</mat-error>
-                     }
-                  </mat-form-field>
+      <div class="flex flex-col gap-7 px-7 py-7">
+         <!-- Sec 1 · Identidad -->
+         <section class="flex flex-col gap-4">
+            <header class="flex items-center gap-2">
+               <div class="w-6 h-6 rounded-full bg-bg-brand-soft flex items-center justify-center shrink-0">
+                  <span class="text-[11px] font-extrabold font-mono text-text-brand leading-none">1</span>
                </div>
+               <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Identidad</h2>
+            </header>
 
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Email (Opcional)</mat-label>
-                  <input matInput type="email" formControlName="email" placeholder="ejemplo@correo.com" autocomplete="off" />
-                  @if (hasError('email')) {
-                     <mat-error>{{ getErrorMessage('email') }}</mat-error>
+            <div class="grid grid-cols-2 gap-3">
+               <label class="flex flex-col gap-1.5">
+                  <span class="text-caption font-bold text-muted">Nombre</span>
+                  <span
+                     class="flex items-center gap-2 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                     [class.border-border-strong]="!hasError('name')"
+                     [class.border-error]="hasError('name')"
+                     [class.border-thick]="hasError('name')"
+                  >
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">person</span>
+                     <input type="text" formControlName="name" placeholder="Nombre" autocomplete="off"
+                        class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink placeholder:text-faint min-w-0" />
+                  </span>
+                  @if (hasError('name')) {
+                     <span class="text-caption font-medium text-error">{{ getErrorMessage('name') }}</span>
                   }
-               </mat-form-field>
+               </label>
+
+               <label class="flex flex-col gap-1.5">
+                  <span class="text-caption font-bold text-muted">Apellido</span>
+                  <span
+                     class="flex items-center gap-2 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                     [class.border-border-strong]="!hasError('lastname')"
+                     [class.border-error]="hasError('lastname')"
+                     [class.border-thick]="hasError('lastname')"
+                  >
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">person</span>
+                     <input type="text" formControlName="lastname" placeholder="Apellido" autocomplete="off"
+                        class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink placeholder:text-faint min-w-0" />
+                  </span>
+                  @if (hasError('lastname')) {
+                     <span class="text-caption font-medium text-error">{{ getErrorMessage('lastname') }}</span>
+                  }
+               </label>
             </div>
 
-            <div class="pt-4 space-y-4">
-               <h2 class="text-sm font-bold text-red-600 uppercase tracking-wider mb-2">Contacto de Emergencia</h2>
-               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <mat-form-field appearance="outline" class="w-full">
-                     <mat-label>Nombre del Contacto</mat-label>
-                     <input matInput formControlName="emergencyContact" placeholder="Nombre completo" />
-                  </mat-form-field>
+            <label class="flex flex-col gap-1.5">
+               <span class="text-caption font-bold text-muted">CI</span>
+               <span
+                  class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                  [class.border-border-strong]="!hasError('ci')"
+                  [class.border-error]="hasError('ci')"
+                  [class.border-thick]="hasError('ci')"
+               >
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">badge</span>
+                  <input type="text" formControlName="ci" placeholder="1234567" autocomplete="off" inputmode="numeric"
+                     class="bg-transparent border-0 outline-none flex-1 text-body-sm font-bold font-mono text-ink placeholder:text-faint placeholder:font-medium min-w-0" />
+               </span>
+               @if (hasError('ci')) {
+                  <span class="text-caption font-medium text-error">{{ getErrorMessage('ci') }}</span>
+               }
+            </label>
+         </section>
 
-                  <mat-form-field appearance="outline" class="w-full">
-                     <mat-label>Teléfono de Emergencia</mat-label>
-                     <input matInput formControlName="emergencyPhone" placeholder="Número de contacto" />
-                  </mat-form-field>
+         <!-- Sec 2 · Contacto -->
+         <section class="flex flex-col gap-4">
+            <header class="flex items-center gap-2">
+               <div class="w-6 h-6 rounded-full bg-bg-inset flex items-center justify-center shrink-0">
+                  <span class="text-[11px] font-extrabold font-mono text-faint leading-none">2</span>
                </div>
-            </div>
+               <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Contacto</h2>
+            </header>
 
-            <div class="pt-4">
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Estado del Estudiante</mat-label>
-                  <mat-select formControlName="status">
-                     <mat-option value="activo">Activo</mat-option>
-                     <mat-option value="inactivo">Inactivo</mat-option>
-                  </mat-select>
-               </mat-form-field>
+            <label class="flex flex-col gap-1.5">
+               <span class="text-caption font-bold text-muted">Celular</span>
+               <span
+                  class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                  [class.border-border-strong]="!hasError('cellphone')"
+                  [class.border-error]="hasError('cellphone')"
+                  [class.border-thick]="hasError('cellphone')"
+               >
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">call</span>
+                  <input type="tel" formControlName="cellphone" placeholder="78123456" autocomplete="off" inputmode="numeric"
+                     class="bg-transparent border-0 outline-none flex-1 text-body-sm font-bold font-mono text-ink placeholder:text-faint placeholder:font-medium min-w-0" />
+               </span>
+               @if (hasError('cellphone')) {
+                  <span class="text-caption font-medium text-error">{{ getErrorMessage('cellphone') }}</span>
+               }
+            </label>
+
+            <label class="flex flex-col gap-1.5">
+               <span class="text-caption font-bold text-muted">Email <span class="text-faint font-medium">(opcional)</span></span>
+               <span
+                  class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                  [class.border-border-strong]="!hasError('email')"
+                  [class.border-error]="hasError('email')"
+                  [class.border-thick]="hasError('email')"
+               >
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">mail</span>
+                  <input type="email" formControlName="email" placeholder="alumno@correo.com" autocomplete="off"
+                     class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink placeholder:text-faint min-w-0" />
+               </span>
+               @if (hasError('email')) {
+                  <span class="text-caption font-medium text-error">{{ getErrorMessage('email') }}</span>
+               }
+            </label>
+         </section>
+
+         <!-- Sec 3 · Contacto de emergencia -->
+         <section class="flex flex-col gap-4">
+            <header class="flex items-center gap-2">
+               <div class="w-6 h-6 rounded-full bg-bg-inset flex items-center justify-center shrink-0">
+                  <span class="text-[11px] font-extrabold font-mono text-faint leading-none">3</span>
+               </div>
+               <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Contacto de emergencia <span class="text-caption font-medium text-faint">(opcional)</span></h2>
+            </header>
+
+            <div class="grid grid-cols-2 gap-3">
+               <label class="flex flex-col gap-1.5">
+                  <span class="text-caption font-bold text-muted">Nombre</span>
+                  <span class="flex items-center gap-2 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline border-border-strong">
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">contact_emergency</span>
+                     <input type="text" formControlName="emergencyContact" placeholder="Pariente o tutor" autocomplete="off"
+                        class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink placeholder:text-faint min-w-0" />
+                  </span>
+               </label>
+               <label class="flex flex-col gap-1.5">
+                  <span class="text-caption font-bold text-muted">Teléfono</span>
+                  <span class="flex items-center gap-2 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline border-border-strong">
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">call</span>
+                     <input type="tel" formControlName="emergencyPhone" placeholder="78123456" autocomplete="off" inputmode="numeric"
+                        class="bg-transparent border-0 outline-none flex-1 text-body-sm font-bold font-mono text-ink placeholder:text-faint placeholder:font-medium min-w-0" />
+                  </span>
+               </label>
             </div>
-         </div>
+         </section>
+
+         <!-- Sec 4 · Estado -->
+         <section class="flex flex-col gap-3">
+            <header class="flex items-center gap-2">
+               <div class="w-6 h-6 rounded-full bg-bg-inset flex items-center justify-center shrink-0">
+                  <span class="text-[11px] font-extrabold font-mono text-faint leading-none">4</span>
+               </div>
+               <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Estado</h2>
+            </header>
+
+            <label class="flex flex-col gap-1.5">
+               <span class="text-caption font-bold text-muted">Estado</span>
+               <span class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline border-border-strong">
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">flag</span>
+                  <select formControlName="status" class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink min-w-0 cursor-pointer appearance-none">
+                     <option value="activo">Activo</option>
+                     <option value="inactivo">Inactivo</option>
+                  </select>
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">expand_more</span>
+               </span>
+            </label>
+         </section>
 
          @if (errorMessage()) {
-            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-               <div class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                  </svg>
-                  <p class="text-sm text-red-800">{{ errorMessage() }}</p>
-               </div>
+            <div class="flex items-start gap-3 px-4 py-3 rounded-md bg-error/10 border border-solid border-hairline border-error/30">
+               <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-error shrink-0 mt-0.5">error</span>
+               <p class="text-caption font-medium text-error m-0 leading-relaxed">{{ errorMessage() }}</p>
             </div>
          }
+      </div>
 
-         <div class="flex gap-4">
-            <button
-               type="button"
-               (click)="onCancel()"
-               [disabled]="isSubmitting()"
-               class="flex-1 bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50"
-            >
-               Cancelar
-            </button>
-
-            <button
-               type="submit"
-               [disabled]="isSubmitting() || studentForm.invalid"
-               class="flex-1 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-               @if (isSubmitting()) {
-                  <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Guardando...
-               } @else {
-                  {{ isEditMode() ? 'Actualizar Estudiante' : 'Registrar Estudiante' }}
-               }
-            </button>
-         </div>
-      </form>
-   </div>
+      <footer class="flex items-stretch gap-3 px-7 py-5 bg-bg-elevated border-t border-solid border-hairline border-border-default">
+         <button
+            type="button"
+            (click)="onCancel()"
+            [disabled]="isSubmitting()"
+            class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-transparent border border-solid border-standard border-border-strong text-ink text-body-sm font-bold cursor-pointer transition-colors duration-fast hover:bg-bg-inset disabled:opacity-50 disabled:cursor-not-allowed"
+         >
+            Cancelar
+         </button>
+         <button
+            type="submit"
+            [disabled]="studentForm.invalid || isSubmitting()"
+            class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-brand-500 hover:bg-brand-600 text-on-brand text-body-sm font-extrabold border-0 shadow-brand cursor-pointer transition-colors duration-fast disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+         >
+            @if (isSubmitting()) {
+               <span class="w-4 h-4 rounded-full border-2 border-solid border-on-brand/30 border-t-on-brand animate-spin"></span>
+               Guardando…
+            } @else {
+               <span class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none">check</span>
+               {{ isEditMode() ? 'Actualizar alumno' : 'Crear alumno' }}
+            }
+         </button>
+      </footer>
+   </form>
 </div>

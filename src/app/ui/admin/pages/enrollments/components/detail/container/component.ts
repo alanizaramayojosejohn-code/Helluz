@@ -1,36 +1,22 @@
 import { Component, DestroyRef, inject, input, OnInit, output, signal, computed } from '@angular/core'
-import { MatButtonModule } from '@angular/material/button'
-import { MatIconModule } from '@angular/material/icon'
-import { MatChipsModule } from '@angular/material/chips'
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
-import { MatTabsModule } from '@angular/material/tabs'
-import { MatDialog, MatDialogModule } from '@angular/material/dialog'
-import { DatePipe } from '@angular/common'
+import { DatePipe, UpperCasePipe } from '@angular/common'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { EnrollmentService } from '../../../../../../../services/enrollment/enrollment.service'
 import { AttendanceService } from '../../../../../../../services/attendance/attendance.service'
 import { Enrollment } from '../../../../../../../models/enrollment.model'
 import { Attendance } from '../../../../../../../models/attendance.model'
-import { ConfirmDialogComponent } from '../../../../../../../components/shared/confirm-dialog/confirm-dialog.component'
+import { ConfirmDialogService } from '../../../../../../../../shared/services/confirm-dialog.service'
 
 @Component({
    selector: 'x-enrollment-detail',
    standalone: true,
-   imports: [
-      MatButtonModule,
-      MatIconModule,
-      MatChipsModule,
-      MatProgressSpinnerModule,
-      MatTabsModule,
-      MatDialogModule,
-      DatePipe,
-   ],
+   imports: [DatePipe, UpperCasePipe],
    templateUrl: './component.html',
 })
 export class EnrollmentDetail implements OnInit {
    private readonly enrollmentService = inject(EnrollmentService)
    private readonly attendanceService = inject(AttendanceService)
-   private readonly dialog = inject(MatDialog)
+   private readonly confirmDialog = inject(ConfirmDialogService)
    private readonly destroyRef = inject(DestroyRef)
 
    readonly enrollmentId = input.required<string>()
@@ -45,14 +31,13 @@ export class EnrollmentDetail implements OnInit {
 
    readonly sessionsProgress = computed(() => {
       const enr = this.enrollment()
-      if (!enr) return 0
+      if (!enr || !enr.totalSessions) return 0
       return (enr.usedSessions / enr.totalSessions) * 100
    })
 
    readonly daysLeft = computed(() => {
       const enr = this.enrollment()
       if (!enr) return 0
-
       const today = new Date()
       const endDate = enr.endDate.toDate()
       return Math.floor((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
@@ -91,8 +76,6 @@ export class EnrollmentDetail implements OnInit {
          })
    }
 
-
-
    onEdit(): void {
       this.edit.emit(this.enrollmentId())
    }
@@ -105,15 +88,17 @@ export class EnrollmentDetail implements OnInit {
       const enrollment = this.enrollment()
       if (!enrollment) return
 
-      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-         data: {
-            title: 'Cancelar Inscripción',
-            message: `¿Estás seguro de cancelar la inscripción de ${enrollment.studentName}?`,
-         },
-      })
-
-      dialogRef.afterClosed().subscribe(async (result) => {
-         if (result) {
+      this.confirmDialog
+         .confirm({
+            title: '¿Cancelar inscripción?',
+            message: `Se cancelará la inscripción de ${enrollment.studentName}. Esta acción no se puede deshacer.`,
+            confirmText: 'Cancelar inscripción',
+            cancelText: 'Volver',
+            tone: 'danger',
+            confirmIcon: 'cancel',
+         })
+         .subscribe(async (confirmed) => {
+            if (!confirmed) return
             this.isCanceling.set(true)
             try {
                await this.enrollmentService.cancelEnrollment(this.enrollmentId())
@@ -122,31 +107,33 @@ export class EnrollmentDetail implements OnInit {
                this.errorMessage.set('Error al cancelar inscripción')
                this.isCanceling.set(false)
             }
-         }
-      })
+         })
    }
 
-   getStatusClass(status: string): string {
-      const classes: Record<string, string> = {
-         activa: 'bg-green-100 text-green-800',
-         vencida: 'bg-red-100 text-red-800',
-         cancelada: 'bg-gray-100 text-gray-800',
-         completada: 'bg-blue-100 text-blue-800',
-      }
-      return classes[status] || 'bg-gray-100 text-gray-800'
+   getInitials(name?: string): string {
+      if (!name) return '?'
+      const parts = name.trim().split(/\s+/)
+      if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
    }
 
-   getPaymentStatusClass(status: string): string {
-      const classes: Record<string, string> = {
-         Efectivo: 'bg-green-100 text-green-800',
-         Qr: 'bg-yellow-100 text-yellow-800',
-      }
-      return classes[status] || 'bg-gray-100 text-gray-800'
-   }
-
-
-   getAllowedDaysText(days: number[]): string {
+   getAllowedDaysText(days: number[] | undefined): string {
+      if (!days?.length) return '—'
       const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
       return days.map((d) => dayNames[d]).join(', ')
+   }
+
+   isStatusActive(status: string | undefined): boolean {
+      return status === 'activa'
+   }
+
+   getStatusLabel(status: string | undefined): string {
+      const labels: Record<string, string> = {
+         activa: 'Activa',
+         vencida: 'Vencida',
+         cancelada: 'Cancelada',
+         completada: 'Completada',
+      }
+      return labels[status ?? ''] || (status ?? '—')
    }
 }

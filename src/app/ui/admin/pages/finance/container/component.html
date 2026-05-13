@@ -1,178 +1,137 @@
-<div class="min-h-screen bg-white p-6">
-   <div class="max-w-5xl mx-auto space-y-6">
-      <div>
-         <h1 class="text-4xl font-bold text-red-600 mb-1">Finanzas</h1>
-         <p class="text-gray-500">Inscripciones por sucursal agrupadas por horario</p>
+<div class="p-8 flex flex-col gap-0">
+
+  <!-- Page header -->
+  <div class="flex items-end justify-between pb-7 border-b border-hairline border-border-default">
+    <div class="flex flex-col gap-1.5">
+      <span class="text-label font-extrabold uppercase tracking-[2.75px] text-text-brand">REPORTES</span>
+      <h1 class="font-display text-h1 font-extrabold text-ink leading-none tracking-tightest">Finanzas</h1>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <form [formGroup]="filterForm" (ngSubmit)="onSearch()" class="flex items-end gap-3 pt-6 flex-wrap">
+    <mat-form-field appearance="outline" class="w-44">
+      <mat-label>Sucursal</mat-label>
+      <mat-select formControlName="branchId" required>
+        @for (branch of branches$ | async; track branch.id) {
+          <mat-option [value]="branch.id">{{ branch.name }}</mat-option>
+        }
+      </mat-select>
+      @if (hasFieldError('branchId')) {
+        <mat-error>{{ getFieldError('branchId') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-40">
+      <mat-label>Desde</mat-label>
+      <input matInput [matDatepicker]="pickerStart" formControlName="startDate" placeholder="DD/MM/YYYY" readonly />
+      <mat-datepicker-toggle matIconSuffix [for]="pickerStart" />
+      <mat-datepicker #pickerStart />
+      @if (hasFieldError('startDate')) {
+        <mat-error>{{ getFieldError('startDate') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-40">
+      <mat-label>Hasta</mat-label>
+      <input matInput [matDatepicker]="pickerEnd" formControlName="endDate" placeholder="DD/MM/YYYY" readonly />
+      <mat-datepicker-toggle matIconSuffix [for]="pickerEnd" />
+      <mat-datepicker #pickerEnd />
+      @if (hasFieldError('endDate')) {
+        <mat-error>{{ getFieldError('endDate') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="flex items-center gap-2 self-end pb-[6px]">
+      <button
+        type="submit"
+        [disabled]="!canSearch()"
+        class="flex items-center gap-2 px-6 py-2.5 rounded-full bg-brand-500 text-on-brand text-caption font-extrabold shadow-brand hover:bg-brand-600 transition-colors duration-fast disabled:opacity-disabled disabled:cursor-not-allowed border-none cursor-pointer"
+      >
+        @if (isLoading()) {
+          Buscando…
+        } @else {
+          Buscar
+        }
+      </button>
+      <button
+        type="button"
+        (click)="onClear()"
+        class="px-6 py-2.5 rounded-full bg-bg-inset hover:bg-bg-surface text-muted text-caption font-extrabold transition-colors duration-fast border-none cursor-pointer"
+      >
+        Limpiar
+      </button>
+    </div>
+  </form>
+
+  @if (errorMessage()) {
+    <div class="mt-4 px-4 py-3 rounded-lg border border-hairline border-error/30 text-error text-body-sm">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (hasSearched()) {
+    @if (hasResults()) {
+
+      <!-- Stats -->
+      <div class="flex gap-4 mt-6">
+        <div class="flex flex-col gap-1 flex-1 px-5 py-4 rounded-lg border border-hairline border-border-default bg-bg-elevated">
+          <span class="text-caption font-semibold text-muted">Total recaudado</span>
+          <span class="font-display text-[28px] font-extrabold text-ink leading-none">{{ totalRecaudado() | currency: 'Bs' }}</span>
+        </div>
+        <div class="flex flex-col gap-1 flex-1 px-5 py-4 rounded-lg border border-hairline border-border-default bg-bg-elevated">
+          <span class="text-caption font-semibold text-muted">Inscripciones</span>
+          <span class="font-display text-[28px] font-extrabold text-ink leading-none">{{ totalInscripciones() }}</span>
+        </div>
       </div>
 
-      <form
-         [formGroup]="filterForm"
-         (ngSubmit)="onSearch()"
-         class="bg-white border border-gray-200 shadow-sm rounded-lg p-6"
-      >
-         <h2 class="text-base font-semibold text-gray-700 mb-4">Filtros</h2>
+      <!-- Schedule groups -->
+      @for (group of scheduleGroups(); track group.scheduleId) {
+        <div class="mt-4 rounded-lg border border-hairline border-border-default bg-bg-elevated overflow-hidden">
 
-         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <mat-form-field appearance="outline" class="w-full">
-               <mat-label>Sucursal</mat-label>
-               <mat-select formControlName="branchId" required>
-                  @for (branch of branches$ | async; track branch.id) {
-                     <mat-option [value]="branch.id">{{ branch.name }}</mat-option>
-                  }
-               </mat-select>
-               @if (hasFieldError('branchId')) {
-                  <mat-error>{{ getFieldError('branchId') }}</mat-error>
-               }
-            </mat-form-field>
+          <!-- Group header -->
+          <div class="flex items-center justify-between px-5 py-3 bg-bg-inset border-b border-hairline border-border-default">
+            <div class="flex flex-col gap-0.5">
+              <span class="text-body-sm font-extrabold text-ink">{{ group.scheduleLabel }}</span>
+              <span class="text-caption text-faint">Instructor: {{ group.instructorName }}</span>
+            </div>
+            <span class="px-[10px] py-1 rounded-full bg-success/20 text-success text-caption font-extrabold">
+              {{ group.count }} inscripciones
+            </span>
+          </div>
 
-            <mat-form-field appearance="outline" class="w-full">
-               <mat-label>Desde</mat-label>
-               <input
-                  matInput
-                  [matDatepicker]="pickerStart"
-                  formControlName="startDate"
-                  placeholder="DD/MM/YYYY"
-                  readonly
-               />
-               <mat-datepicker-toggle matIconSuffix [for]="pickerStart" />
-               <mat-datepicker #pickerStart />
-               @if (hasFieldError('startDate')) {
-                  <mat-error>{{ getFieldError('startDate') }}</mat-error>
-               }
-            </mat-form-field>
+          <!-- Col headers -->
+          <div class="flex items-center gap-4 px-5 py-[10px] border-b border-hairline border-border-subtle">
+            <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase flex-1 min-w-0">ALUMNO</span>
+            <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase w-[150px] shrink-0">MEMBRESÍA</span>
+            <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase w-[130px] shrink-0">MÉTODO DE PAGO</span>
+            <span class="text-[10px] font-extrabold tracking-[1.5px] text-faint uppercase w-[90px] shrink-0 text-right">MONTO</span>
+          </div>
 
-            <mat-form-field appearance="outline" class="w-full">
-               <mat-label>Hasta</mat-label>
-               <input
-                  matInput
-                  [matDatepicker]="pickerEnd"
-                  formControlName="endDate"
-                  placeholder="DD/MM/YYYY"
-                  readonly
-               />
-               <mat-datepicker-toggle matIconSuffix [for]="pickerEnd" />
-               <mat-datepicker #pickerEnd />
-               @if (hasFieldError('endDate')) {
-                  <mat-error>{{ getFieldError('endDate') }}</mat-error>
-               }
-            </mat-form-field>
-         </div>
+          <!-- Rows -->
+          @for (enrollment of group.enrollments; track enrollment.id) {
+            <div class="flex items-center gap-4 px-5 py-[14px] border-b border-hairline border-border-subtle hover:bg-bg-surface transition-colors duration-fast last:border-b-0">
+              <span class="text-body-sm font-extrabold text-ink flex-1 min-w-0 truncate">{{ enrollment.studentName }}</span>
+              <span class="text-body-sm font-semibold text-ink w-[150px] shrink-0 truncate">{{ enrollment.membershipName }}</span>
+              <span class="text-body-sm font-semibold text-ink w-[130px] shrink-0">{{ enrollment.paymentMethod }}</span>
+              <span class="text-body-sm font-extrabold text-ink w-[90px] shrink-0 text-right">{{ enrollment.cost | currency: 'Bs' }}</span>
+            </div>
+          }
 
-         <div class="flex gap-3 mt-2">
-            <button
-               type="submit"
-               [disabled]="!canSearch()"
-               class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            >
-               @if (isLoading()) {
-                  <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  Buscando...
-               } @else {
-                  Buscar
-               }
-            </button>
+          <!-- Subtotal -->
+          <div class="flex items-center gap-4 px-5 py-3 bg-bg-inset border-t border-hairline border-border-default">
+            <span class="flex-1 text-caption font-semibold text-muted text-right">Subtotal</span>
+            <span class="text-body-sm font-extrabold text-success w-[90px] shrink-0 text-right">{{ group.subtotal | currency: 'Bs' }}</span>
+          </div>
 
-            <button
-               type="button"
-               (click)="onClear()"
-               class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-semibold transition"
-            >
-               Limpiar
-            </button>
-         </div>
-      </form>
-
-      @if (errorMessage()) {
-         <div class="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
-            <svg class="w-5 h-5 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-               <path
-                  fill-rule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clip-rule="evenodd"
-               />
-            </svg>
-            <p class="text-sm text-red-700">{{ errorMessage() }}</p>
-         </div>
+        </div>
       }
 
-      @if (hasSearched()) {
-         @if (hasResults()) {
-            <div class="grid grid-cols-2 gap-4">
-               <div class="bg-red-600 text-white rounded-lg p-5">
-                  <p class="text-sm opacity-80 mb-1">Total recaudado</p>
-                  <p class="text-3xl font-bold">{{ totalRecaudado() | currency: 'Bs' }}</p>
-               </div>
+    } @else {
+      <div class="mt-6 rounded-lg border border-hairline border-border-default bg-bg-elevated px-5 py-12 text-center text-faint text-body-sm">
+        Sin inscripciones en este período
+      </div>
+    }
+  }
 
-               <div class="bg-gray-800 text-white rounded-lg p-5">
-                  <p class="text-sm opacity-80 mb-1">Total inscripciones</p>
-                  <p class="text-3xl font-bold">{{ totalInscripciones() }}</p>
-               </div>
-            </div>
-
-            @for (group of scheduleGroups(); track group.scheduleId) {
-               <div class="bg-white border border-gray-200 shadow-sm rounded-lg overflow-hidden">
-                  <div class="bg-gray-50 border-b border-gray-200 px-5 py-3 flex items-center justify-between">
-                     <div>
-                        <p class="font-semibold text-gray-800">{{ group.scheduleLabel }}</p>
-                        <p class="text-xs text-gray-500 mt-0.5">Instructor: {{ group.instructorName }}</p>
-                     </div>
-                     <span class="bg-green-900 text-green-500 text-sm font-semibold px-3 py-1 rounded-full">
-                        {{ group.count }} inscripciones
-                     </span>
-                  </div>
-
-                  <!-- Tabla de inscripciones -->
-                  <table class="w-full text-sm">
-                     <thead class="text-xs text-gray-500 uppercase bg-white border-b border-gray-100">
-                        <tr>
-                           <th class="px-5 py-2 text-left">Alumno</th>
-                           <th class="px-5 py-2 text-left">Membresía</th>
-                           <th class="px-5 py-2 text-left">Método de pago</th>
-                           <th class="px-5 py-2 text-right">Monto</th>
-                        </tr>
-                     </thead>
-                     <tbody class="divide-y divide-gray-50">
-                        @for (enrollment of group.enrollments; track enrollment.id) {
-                           <tr class="hover:bg-gray-50 transition">
-                              <td class="px-5 py-3 font-medium text-gray-800">{{ enrollment.studentName }}</td>
-                              <td class="px-5 py-3 text-gray-600">{{ enrollment.membershipName }}</td>
-                              <td class="px-5 py-3 text-gray-600">{{ enrollment.paymentMethod }}</td>
-                              <td class="px-5 py-3 text-right font-semibold text-gray-800">
-                                 {{ enrollment.cost | currency: 'Bs' }}
-                              </td>
-                           </tr>
-                        }
-                     </tbody>
-                     <!-- Subtotal del horario -->
-                     <tfoot>
-                        <tr class="bg-gray-50 border-t border-gray-200">
-                           <td colspan="3" class="px-5 py-2 text-sm text-gray-500 text-right">Subtotal</td>
-                           <td class="px-5 py-2 text-right font-bold text-green-500">
-                              {{ group.subtotal | currency: 'Bs' }}
-                           </td>
-                        </tr>
-                     </tfoot>
-                  </table>
-               </div>
-            }
-         } @else {
-            <!-- Sin resultados -->
-            <div class="border border-gray-200 rounded-lg p-12 text-center">
-               <svg class="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                     stroke-linecap="round"
-                     stroke-linejoin="round"
-                     stroke-width="2"
-                     d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                  />
-               </svg>
-               <p class="text-gray-500 font-medium">Sin inscripciones en este período</p>
-               <p class="text-gray-400 text-sm mt-1">Prueba con otro rango de fechas</p>
-            </div>
-         }
-      }
-   </div>
 </div>

@@ -38,3 +38,14 @@ body {
       transform: translateY(0);
    }
 }
+
+/* MatDialog · panel custom para diálogos rediseñados (sin padding default) */
+.helluz-dialog-panel {
+   --mdc-dialog-container-color: var(--color-bg-elevated);
+   --mdc-dialog-container-shape: var(--radius-xl);
+
+   .mat-mdc-dialog-surface {
+      padding: 0 !important;
+      overflow: hidden !important;
+   }
+}

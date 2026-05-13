@@ -1,24 +1,20 @@
 // components/detail/container/component.ts
 import { Component, DestroyRef, inject, input, OnInit, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { DatePipe } from '@angular/common';
 import { StudentService } from '../../../../../../../services/student/student.service';
 import { Student } from '../../../../../../../models/student.model';
-import { MatChipsModule } from '@angular/material/chips'
+import { ConfirmDialogService } from '../../../../../../../../shared/services/confirm-dialog.service';
 
 @Component({
   selector: 'x-student-detail',
-  imports: [
-    MatProgressSpinnerModule,
-    DatePipe,
-    MatChipsModule,
-  ],
+  imports: [DatePipe],
   templateUrl: './component.html',
 })
 export class StudentDetail implements OnInit {
   private readonly studentService = inject(StudentService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly confirmDialog = inject(ConfirmDialogService);
 
   readonly studentId = input.required<string>();
 
@@ -82,23 +78,33 @@ export class StudentDetail implements OnInit {
     const student = this.student();
     if (!student?.id) return;
 
-    const confirmed = confirm(`¿Estás seguro de eliminar al estudiante "${student.name} ${student.lastname}"?`);
-    if (!confirmed) return;
-
-    try {
-      this.isLoading.set(true);
-      await this.studentService.deleteStudent(student.id);
-      this.close.emit();
-    } catch (error) {
-      this.errorMessage.set('Error al eliminar el estudiante');
-      this.isLoading.set(false);
-    }
+    this.confirmDialog
+      .confirmDelete(`${student.name} ${student.lastname}`, 'al estudiante')
+      .subscribe(async (confirmed) => {
+        if (!confirmed) return;
+        try {
+          this.isLoading.set(true);
+          await this.studentService.deleteStudent(student.id!);
+          this.close.emit();
+        } catch (error) {
+          this.errorMessage.set('Error al eliminar el estudiante');
+          this.isLoading.set(false);
+        }
+      });
   }
 
   getFullName(): string {
     const student = this.student();
     if (!student) return '';
     return `${student.name} ${student.lastname}`;
+  }
+
+  getInitials(): string {
+    const s = this.student();
+    if (!s) return '?';
+    const first = s.name?.[0] ?? '';
+    const last = s.lastname?.[0] ?? '';
+    return (first + last).toUpperCase() || '?';
   }
 
   getCreatedAtDate(): Date | null {

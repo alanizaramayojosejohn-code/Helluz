@@ -1,177 +1,238 @@
-<div class="min-h-screen bg-white text-white p-6">
-   <div class="max-w-3xl mx-auto">
-      <div class="mb-8">
-         <h1 class="text-4xl font-bold text-red-600 mb-2">
-            {{ isEditMode() ? 'Editar Horario' : 'Registrar Horarios' }}
-         </h1>
-         <p class="text-gray-400">
-            {{ isEditMode() ? 'Modifica la información del horario' : 'Crea horarios para múltiples días' }}
-         </p>
+<div class="min-h-screen bg-bg-base font-body text-ink py-10 px-4">
+   <form
+      [formGroup]="scheduleForm"
+      (ngSubmit)="onSubmit()"
+      class="max-w-[560px] mx-auto bg-bg-elevated border border-solid border-hairline border-border-default rounded-2xl shadow-lg flex flex-col overflow-hidden"
+   >
+      <!-- Header -->
+      <header class="flex items-start gap-4 px-7 py-6 border-b border-solid border-hairline border-border-default">
+         <div class="flex-1 flex flex-col gap-1.5">
+            <span class="text-label font-extrabold tracking-[0.25em] text-text-brand uppercase">
+               {{ isEditMode() ? 'EDITAR HORARIO' : 'NUEVO HORARIO' }}
+            </span>
+            <h1 class="font-display text-[2rem] font-extrabold tracking-[-0.03em] text-ink leading-[1.05] m-0">
+               {{ isEditMode() ? 'Editar horario' : 'Crear horario' }}
+            </h1>
+            <p class="text-body-sm text-muted leading-relaxed m-0 mt-1">
+               {{
+                  isEditMode()
+                     ? 'Modifica los datos del horario.'
+                     : 'Define la sucursal, días, hora e instructor opcional.'
+               }}
+            </p>
+         </div>
+
+         <button
+            type="button"
+            (click)="onCancel()"
+            [disabled]="isSubmitting()"
+            class="w-9 h-9 shrink-0 rounded-full bg-bg-inset hover:bg-border-default flex items-center justify-center text-muted border-0 cursor-pointer transition-colors duration-fast disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Cerrar"
+         >
+            <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none">close</span>
+         </button>
+      </header>
+
+      <!-- Body -->
+      <div class="flex flex-col gap-7 px-7 py-7">
+         <!-- Sec 1 · Sucursal -->
+         <section class="flex flex-col gap-4">
+            <header class="flex items-center gap-2">
+               <div class="w-6 h-6 rounded-full bg-bg-brand-soft flex items-center justify-center shrink-0">
+                  <span class="text-[11px] font-extrabold font-mono text-text-brand leading-none">1</span>
+               </div>
+               <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Sucursal</h2>
+            </header>
+
+            <label class="flex flex-col gap-1.5">
+               <span class="text-caption font-bold text-muted">Sucursal</span>
+               <span
+                  class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                  [class.border-border-strong]="!hasFieldError('branchId')"
+                  [class.border-error]="hasFieldError('branchId')"
+                  [class.border-thick]="hasFieldError('branchId')"
+               >
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">storefront</span>
+                  <select
+                     formControlName="branchId"
+                     class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink min-w-0 cursor-pointer appearance-none"
+                  >
+                     <option value="">Seleccionar sucursal…</option>
+                     @for (branch of branches$ | async; track branch.id) {
+                        <option [value]="branch.id">{{ branch.name }}</option>
+                     }
+                  </select>
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">expand_more</span>
+               </span>
+               @if (hasFieldError('branchId')) {
+                  <span class="text-caption font-medium text-error">{{ getFieldError('branchId') }}</span>
+               }
+            </label>
+         </section>
+
+         <!-- Sec 2 · Días -->
+         <section class="flex flex-col gap-4">
+            <header class="flex items-center gap-2">
+               <div class="w-6 h-6 rounded-full bg-bg-inset flex items-center justify-center shrink-0">
+                  <span class="text-[11px] font-extrabold font-mono text-faint leading-none">2</span>
+               </div>
+               <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Días de la semana</h2>
+            </header>
+
+            <div class="flex flex-wrap gap-2">
+               @for (day of days$ | async; track day.id) {
+                  <button
+                     type="button"
+                     (click)="toggleDay(day.name)"
+                     class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-caption font-extrabold tracking-wide cursor-pointer border border-solid border-hairline transition-colors duration-fast"
+                     [class.bg-brand-500]="isDaySelected(day.name)"
+                     [class.text-on-brand]="isDaySelected(day.name)"
+                     [class.border-brand-500]="isDaySelected(day.name)"
+                     [class.shadow-brand]="isDaySelected(day.name)"
+                     [class.bg-bg-elevated]="!isDaySelected(day.name)"
+                     [class.text-ink]="!isDaySelected(day.name)"
+                     [class.border-border-strong]="!isDaySelected(day.name)"
+                  >
+                     @if (isDaySelected(day.name)) {
+                        <span class="material-symbols-rounded !text-[14px] !w-[14px] !h-[14px] leading-none">check</span>
+                     }
+                     {{ day.name | titlecase }}
+                  </button>
+               }
+            </div>
+            @if (hasFieldError('days')) {
+               <span class="text-caption font-medium text-error">{{ getFieldError('days') }}</span>
+            }
+         </section>
+
+         <!-- Sec 3 · Horario -->
+         <section class="flex flex-col gap-4">
+            <header class="flex items-center gap-2">
+               <div class="w-6 h-6 rounded-full bg-bg-inset flex items-center justify-center shrink-0">
+                  <span class="text-[11px] font-extrabold font-mono text-faint leading-none">3</span>
+               </div>
+               <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Horario</h2>
+            </header>
+
+            <div class="grid grid-cols-2 gap-3">
+               <label class="flex flex-col gap-1.5">
+                  <span class="text-caption font-bold text-muted">Inicio</span>
+                  <span
+                     class="flex items-center gap-2 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                     [class.border-border-strong]="!hasFieldError('startTime')"
+                     [class.border-error]="hasFieldError('startTime')"
+                     [class.border-thick]="hasFieldError('startTime')"
+                  >
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">schedule</span>
+                     <input
+                        type="time"
+                        formControlName="startTime"
+                        class="bg-transparent border-0 outline-none flex-1 text-body-sm font-bold font-mono text-ink min-w-0"
+                     />
+                  </span>
+                  @if (hasFieldError('startTime')) {
+                     <span class="text-caption font-medium text-error">{{ getFieldError('startTime') }}</span>
+                  }
+               </label>
+
+               <label class="flex flex-col gap-1.5">
+                  <span class="text-caption font-bold text-muted">Fin</span>
+                  <span
+                     class="flex items-center gap-2 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+                     [class.border-border-strong]="!hasFieldError('endTime')"
+                     [class.border-error]="hasFieldError('endTime')"
+                     [class.border-thick]="hasFieldError('endTime')"
+                  >
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">schedule</span>
+                     <input
+                        type="time"
+                        formControlName="endTime"
+                        class="bg-transparent border-0 outline-none flex-1 text-body-sm font-bold font-mono text-ink min-w-0"
+                     />
+                  </span>
+                  @if (hasFieldError('endTime')) {
+                     <span class="text-caption font-medium text-error">{{ getFieldError('endTime') }}</span>
+                  }
+               </label>
+            </div>
+
+            @if (scheduleForm.hasError('invalidTimeRange') && scheduleForm.touched) {
+               <div class="flex items-start gap-3 px-4 py-3 rounded-md bg-error/10 border border-solid border-hairline border-error/30">
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-error shrink-0 mt-0.5">error</span>
+                  <p class="text-caption font-medium text-error m-0 leading-relaxed">La hora de fin debe ser posterior a la hora de inicio.</p>
+               </div>
+            }
+
+            <!-- Disciplina info -->
+            <div class="flex items-start gap-2 px-4 py-3 rounded-md bg-bg-brand-soft border border-solid border-hairline border-border-brand">
+               <span class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none text-text-brand shrink-0 mt-0.5">info</span>
+               <p class="text-caption text-muted m-0 leading-relaxed">
+                  Disciplina: <span class="font-extrabold text-text-brand">MMA</span>
+               </p>
+            </div>
+         </section>
+
+         <!-- Sec 4 · Instructor -->
+         @if (instructors$) {
+            <section class="flex flex-col gap-4">
+               <header class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-full bg-bg-inset flex items-center justify-center shrink-0">
+                     <span class="text-[11px] font-extrabold font-mono text-faint leading-none">4</span>
+                  </div>
+                  <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Instructor (opcional)</h2>
+               </header>
+
+               <label class="flex flex-col gap-1.5">
+                  <span class="text-caption font-bold text-muted">Asignar instructor</span>
+                  <span class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline border-border-strong transition-colors duration-fast">
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">fitness_center</span>
+                     <select
+                        formControlName="instructorId"
+                        class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink min-w-0 cursor-pointer appearance-none"
+                     >
+                        <option value="">Sin instructor asignado</option>
+                        @for (instructor of instructors$ | async; track instructor.id) {
+                           <option [value]="instructor.id">{{ getInstructorFullName(instructor) }}</option>
+                        }
+                     </select>
+                     <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">expand_more</span>
+                  </span>
+               </label>
+            </section>
+         }
+
+         <!-- Error message -->
+         @if (errorMessage()) {
+            <div class="flex items-start gap-3 px-4 py-3 rounded-md bg-error/10 border border-solid border-hairline border-error/30">
+               <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-error shrink-0 mt-0.5">error</span>
+               <p class="text-caption font-medium text-error m-0 leading-relaxed">{{ errorMessage() }}</p>
+            </div>
+         }
       </div>
 
-      <form [formGroup]="scheduleForm" (ngSubmit)="onSubmit()" class="space-y-6">
-         <div class="bg-white shadow-sm shadow-black border border-gray-800 rounded-lg p-6 space-y-6">
-
-          <mat-form-field appearance="outline" class="w-full">
-               <mat-label>Sucursal</mat-label>
-               <mat-select formControlName="branchId" required>
-                  @for (branch of branches$ | async; track branch.id) {
-                     <mat-option [value]="branch.id">{{ branch.name }}</mat-option>
-                  }
-               </mat-select>
-               @if (hasFieldError('branchId')) {
-                  <mat-error>{{ getFieldError('branchId') }}</mat-error>
-               }
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="w-full">
-               <mat-label>
-                  {{ isEditMode() ? 'Día de la semana' : 'Días de la semana (puedes seleccionar varios)' }}
-               </mat-label>
-               <mat-select formControlName="days" [multiple]="true" required>
-                  @for (day of days$ | async; track day.id) {
-                     <mat-option [value]="day.name">{{ day.name }}</mat-option>
-                  }
-               </mat-select>
-               <mat-hint>
-                  {{
-                     'selecciona los días que necesites'
-                  }}
-               </mat-hint>
-               @if (hasFieldError('days')) {
-                  <mat-error>{{ getFieldError('days') }}</mat-error>
-               }
-            </mat-form-field>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Hora de inicio</mat-label>
-                  <input matInput type="time" formControlName="startTime" required autocomplete="off" />
-                  @if (hasFieldError('startTime')) {
-                     <mat-error>{{ getFieldError('startTime') }}</mat-error>
-                  }
-               </mat-form-field>
-
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Hora de fin</mat-label>
-                  <input matInput type="time" formControlName="endTime" required autocomplete="off" />
-                  @if (hasFieldError('endTime')) {
-                     <mat-error>{{ getFieldError('endTime') }}</mat-error>
-                  }
-               </mat-form-field>
-            </div>
-
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-               <div class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                     <path
-                        fill-rule="evenodd"
-                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                        clip-rule="evenodd"
-                     />
-                  </svg>
-                  <p class="text-sm text-blue-800">
-                     <strong>Disciplina:</strong> Todos los horarios se crearán con disciplina <strong>MMA</strong>
-                  </p>
-               </div>
-            </div>
-
-            @if (instructors$) {
-               <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Instructor (Opcional)</mat-label>
-                  <mat-select formControlName="instructorId">
-                     <mat-option value="">Sin instructor asignado</mat-option>
-                     @for (instructor of instructors$ | async; track instructor.id) {
-                        <mat-option [value]="instructor.id">
-                           {{ getInstructorFullName(instructor) }}
-                        </mat-option>
-                     }
-                  </mat-select>
-                  <mat-hint>
-                     {{
-                        isEditMode()
-                           ? 'Cambia el instructor de este horario'
-                           : 'Se asignará a todos los días seleccionados'
-                     }}
-                  </mat-hint>
-               </mat-form-field>
+      <!-- Footer -->
+      <footer class="flex items-stretch gap-3 px-7 py-5 bg-bg-elevated border-t border-solid border-hairline border-border-default">
+         <button
+            type="button"
+            (click)="onCancel()"
+            [disabled]="isSubmitting()"
+            class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-transparent border border-solid border-standard border-border-strong text-ink text-body-sm font-bold cursor-pointer transition-colors duration-fast hover:bg-bg-inset disabled:opacity-50 disabled:cursor-not-allowed"
+         >
+            Cancelar
+         </button>
+         <button
+            type="submit"
+            [disabled]="!canSubmit()"
+            class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-brand-500 hover:bg-brand-600 text-on-brand text-body-sm font-extrabold border-0 shadow-brand cursor-pointer transition-colors duration-fast disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+         >
+            @if (isSubmitting()) {
+               <span class="w-4 h-4 rounded-full border-2 border-solid border-on-brand/30 border-t-on-brand animate-spin"></span>
+               Guardando…
+            } @else {
+               <span class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none">check</span>
+               {{ submitButtonText() }}
             }
-         </div>
-
-         @if (scheduleForm.hasError('invalidTimeRange') && scheduleForm.touched) {
-            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-               <div class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                     <path
-                        fill-rule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                        clip-rule="evenodd"
-                     />
-                  </svg>
-                  <p class="text-sm text-red-800">La hora de fin debe ser posterior a la hora de inicio</p>
-               </div>
-            </div>
-         }
-
-         @if (errorMessage()) {
-            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-               <div class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                     <path
-                        fill-rule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                        clip-rule="evenodd"
-                     />
-                  </svg>
-                  <p class="text-sm text-red-800">{{ errorMessage() }}</p>
-               </div>
-            </div>
-         }
-
-         <div class="flex gap-4">
-            <button
-               type="button"
-               (click)="onCancel()"
-               [disabled]="isSubmitting()"
-               class="flex-1 bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-               Cancelar
-            </button>
-
-            <button
-               type="submit"
-               [disabled]="!canSubmit()"
-               class="flex-1 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-               @if (isSubmitting()) {
-                  <span class="flex items-center justify-center gap-2">
-                     <svg
-                        class="animate-spin h-5 w-5"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                     >
-                        <circle
-                           class="opacity-25"
-                           cx="12"
-                           cy="12"
-                           r="10"
-                           stroke="currentColor"
-                           stroke-width="4"
-                        ></circle>
-                        <path
-                           class="opacity-75"
-                           fill="currentColor"
-                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                     </svg>
-                     Guardando...
-                  </span>
-               } @else {
-                  {{ submitButtonText() }}
-               }
-            </button>
-         </div>
-      </form>
-   </div>
+         </button>
+      </footer>
+   </form>
 </div>

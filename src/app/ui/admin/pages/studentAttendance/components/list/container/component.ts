@@ -12,6 +12,7 @@ import { MatSelectModule } from '@angular/material/select'
 import { MatDialogModule, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { Observable, BehaviorSubject, combineLatest } from 'rxjs'
 import { switchMap, map } from 'rxjs/operators'
+import { ConfirmDialogService } from '../../../../../../../../shared/services/confirm-dialog.service'
 import { BranchService } from '../../../../../../../services/branch/branch.service'
 import { InstructorAttendanceService } from '../../../../../../../services/instructorAttendance/instructor-attendance.service'
 import { InstructorAttendance, InstructorAttendanceStats } from '../../../../../../../models/instructorAttendance.model'
@@ -38,6 +39,7 @@ export default class InstructorAttendanceListComponent implements OnInit {
    private readonly attendanceService = inject(InstructorAttendanceService)
    private readonly branchService = inject(BranchService)
    private readonly dialog = inject(MatDialog)
+   private readonly confirmDialog = inject(ConfirmDialogService)
 
    backToMark = output<void>()
 
@@ -140,23 +142,35 @@ export default class InstructorAttendanceListComponent implements OnInit {
    }
 
    async markDeparture(attendance: InstructorAttendance): Promise<void> {
-      if (confirm('¿Marcar salida para este instructor?')) {
-         try {
-            await this.attendanceService.markDeparture(attendance.id)
-         } catch (error: any) {
-            alert('Error al marcar salida: ' + error.message)
-         }
-      }
+      this.confirmDialog
+         .confirm({
+            title: '¿Marcar salida?',
+            message: 'Se registrará la hora actual como salida para este instructor.',
+            confirmText: 'Marcar',
+            tone: 'info',
+            confirmIcon: 'logout',
+         })
+         .subscribe(async (confirmed) => {
+            if (!confirmed) return
+            try {
+               await this.attendanceService.markDeparture(attendance.id)
+            } catch (error: any) {
+               console.error('Error al marcar salida:', error)
+            }
+         })
    }
 
    async deleteAttendance(attendance: InstructorAttendance): Promise<void> {
-      if (confirm('¿Estás seguro de eliminar esta asistencia?')) {
-         try {
-            await this.attendanceService.deleteAttendance(attendance.id)
-         } catch (error: any) {
-            alert('Error al eliminar: ' + error.message)
-         }
-      }
+      this.confirmDialog
+         .confirmDelete(attendance.instructorName ?? 'asistencia', 'la asistencia')
+         .subscribe(async (confirmed) => {
+            if (!confirmed) return
+            try {
+               await this.attendanceService.deleteAttendance(attendance.id)
+            } catch (error: any) {
+               console.error('Error al eliminar:', error)
+            }
+         })
    }
 
    onBack(): void {

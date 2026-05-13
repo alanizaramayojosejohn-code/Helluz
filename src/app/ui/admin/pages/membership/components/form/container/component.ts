@@ -2,13 +2,6 @@
 import { Component, DestroyRef, effect, inject, input, OnInit, output, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
-import { MatFormFieldModule } from '@angular/material/form-field'
-import { MatInputModule } from '@angular/material/input'
-import { MatButtonModule } from '@angular/material/button'
-import { MatSelectModule } from '@angular/material/select'
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
-import { MatIconModule } from '@angular/material/icon'
-import { MatChipsModule } from '@angular/material/chips'
 import { MembershipService } from '../../../../../../../services/membership/membership.service'
 import { CreateMembershipDto, UpdateMembershipDto } from '../../../../../../../models/membership.model'
 
@@ -19,16 +12,7 @@ interface DayOption {
 
 @Component({
    selector: 'x-membership-form',
-   imports: [
-      ReactiveFormsModule,
-      MatFormFieldModule,
-      MatInputModule,
-      MatButtonModule,
-      MatSelectModule,
-      MatProgressSpinnerModule,
-      MatIconModule,
-      MatChipsModule,
-   ],
+   imports: [ReactiveFormsModule],
    templateUrl: './component.html',
 })
 export class MembershipForm implements OnInit {

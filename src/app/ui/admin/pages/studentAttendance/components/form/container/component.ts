@@ -1,14 +1,5 @@
 import { Component, inject, input, output, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
-import { MatInputModule } from '@angular/material/input';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
 import { EnrollmentService } from '../../../../../../../services/enrollment/enrollment.service';
 import { Enrollment } from '../../../../../../../models/enrollment.model';
 import { firstValueFrom } from 'rxjs';
@@ -16,18 +7,7 @@ import { firstValueFrom } from 'rxjs';
 @Component({
   selector: 'x-enrollment-edit',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    MatButtonModule,
-    MatInputModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-    MatDatepickerModule,
-    MatNativeDateModule
-  ],
+  imports: [ReactiveFormsModule],
   providers: [EnrollmentService],
   templateUrl: './component.html'
 })
@@ -137,18 +117,25 @@ export class EnrollmentFormComponent implements OnInit {
     return option?.label || status;
   }
 
-  getStatusClass(status: string): string {
-    const classes: Record<string, string> = {
-      'activa': 'bg-green-100 text-green-800',
-      'vencida': 'bg-red-100 text-red-800',
-      'cancelada': 'bg-gray-100 text-gray-800',
-      'completada': 'bg-blue-100 text-blue-800'
-    };
-    return classes[status] || 'bg-gray-100 text-gray-800';
+  getStatusTone(status: string): 'success' | 'error' | 'info' | 'muted' {
+    switch (status) {
+      case 'activa': return 'success';
+      case 'vencida': return 'error';
+      case 'completada': return 'info';
+      case 'cancelada': return 'muted';
+      default: return 'muted';
+    }
   }
 
   formatDate(timestamp: any): string {
-    return timestamp.toDate().toLocaleDateString('es-BO', {
+    if (!timestamp) return '—';
+    const date = typeof timestamp.toDate === 'function'
+      ? timestamp.toDate()
+      : (typeof timestamp.seconds === 'number'
+          ? new Date(timestamp.seconds * 1000)
+          : new Date(timestamp));
+    if (isNaN(date.getTime())) return '—';
+    return date.toLocaleDateString('es-BO', {
       day: '2-digit',
       month: 'long',
       year: 'numeric'

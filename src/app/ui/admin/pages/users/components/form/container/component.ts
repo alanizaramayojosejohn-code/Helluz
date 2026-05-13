@@ -2,16 +2,12 @@
 import { Component, DestroyRef, effect, inject, input, OnInit, output, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
-import { MatFormFieldModule } from '@angular/material/form-field'
-import { MatInputModule } from '@angular/material/input'
-import { MatSelectModule } from '@angular/material/select'
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { UserService } from '../../../../../../../services/user/user.service'
 import { AuthService } from '../../../../../../../services/auth/auth.service'
 
 @Component({
    selector: 'x-user-form',
-   imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatProgressSpinnerModule],
+   imports: [ReactiveFormsModule],
    templateUrl: './component.html',
 })
 export class UserForm implements OnInit {
