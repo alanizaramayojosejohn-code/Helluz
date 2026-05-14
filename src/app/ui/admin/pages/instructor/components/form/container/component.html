@@ -2,9 +2,9 @@
    <form
       [formGroup]="instructorForm"
       (ngSubmit)="onSubmit()"
-      class="max-w-[520px] mx-auto bg-bg-elevated border border-solid border-hairline border-border-default rounded-2xl shadow-lg flex flex-col overflow-hidden"
+      class="max-w-[520px] mx-auto bg-bg-elevated border border-solid border-hairline border-border-default rounded-2xl shadow-lg flex flex-col"
    >
-      <header class="flex items-start gap-4 px-7 py-6 border-b border-solid border-hairline border-border-default">
+      <header class="flex items-start gap-4 px-7 py-6 border-b border-solid border-hairline border-border-default rounded-tl-2xl rounded-tr-2xl">
          <div class="flex-1 flex flex-col gap-1.5">
             <span class="text-label font-extrabold tracking-[0.25em] text-text-brand uppercase">
                {{ isEditMode() ? 'EDITAR INSTRUCTOR' : 'NUEVO INSTRUCTOR' }}
@@ -38,30 +38,40 @@
                <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Sucursal</h2>
             </header>
 
-            <label class="flex flex-col gap-1.5">
+            <div class="relative flex flex-col gap-1.5">
                <span class="text-caption font-bold text-muted">Sucursal asignada</span>
-               <span
-                  class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
+               <button
+                  type="button"
+                  (click)="toggleBranchDropdown($event)"
+                  class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline text-left w-full transition-colors duration-fast cursor-pointer"
                   [class.border-border-strong]="!hasFieldError('branchId')"
                   [class.border-error]="hasFieldError('branchId')"
-                  [class.border-thick]="hasFieldError('branchId')"
                >
                   <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">storefront</span>
-                  <select
-                     formControlName="branchId"
-                     class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink min-w-0 cursor-pointer appearance-none"
-                  >
-                     <option value="">Seleccionar sucursal…</option>
+                  @if (selectedBranch; as branch) {
+                     <span class="flex-1 text-body-sm font-medium text-ink min-w-0 truncate">{{ branch.name }}</span>
+                  } @else {
+                     <span class="flex-1 text-body-sm font-medium text-faint">Seleccionar sucursal…</span>
+                  }
+                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0 transition-transform duration-fast" [class.rotate-180]="showBranchDropdown()">expand_more</span>
+               </button>
+               @if (showBranchDropdown()) {
+                  <div class="absolute left-0 right-0 top-[calc(100%+4px)] z-10 rounded-lg bg-bg-elevated border border-hairline border-border-strong shadow-lg overflow-hidden" (click)="$event.stopPropagation()">
                      @for (branch of branches(); track branch.id) {
-                        <option [value]="branch.id">{{ branch.name }}</option>
+                        <button type="button" (click)="selectBranch(branch, $event)" class="flex items-center gap-3 w-full px-4 py-3 text-left hover:bg-bg-inset transition-colors duration-fast border-none border-b border-hairline border-border-subtle last:border-b-0 bg-transparent cursor-pointer">
+                           <span class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none text-faint shrink-0">storefront</span>
+                           <span class="text-body-sm font-medium text-ink flex-1">{{ branch.name }}</span>
+                           @if (selectedBranch?.id === branch.id) {
+                              <span class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none text-text-brand">check</span>
+                           }
+                        </button>
                      }
-                  </select>
-                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">expand_more</span>
-               </span>
+                  </div>
+               }
                @if (hasFieldError('branchId')) {
                   <span class="text-caption font-medium text-error">{{ getFieldError('branchId') }}</span>
                }
-            </label>
+            </div>
          </section>
 
          <!-- Sec 2 · Identidad -->
@@ -210,20 +220,21 @@
                <h2 class="text-body font-extrabold tracking-[-0.01em] text-ink m-0">Estado</h2>
             </header>
 
-            <label class="flex flex-col gap-1.5">
+            <div class="flex flex-col gap-1.5">
                <span class="text-caption font-bold text-muted">Estado</span>
-               <span class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline border-border-strong transition-colors duration-fast">
-                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">flag</span>
-                  <select
-                     formControlName="status"
-                     class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink min-w-0 cursor-pointer appearance-none"
-                  >
-                     <option value="activo">Activo</option>
-                     <option value="inactivo">Inactivo</option>
-                  </select>
-                  <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">expand_more</span>
-               </span>
-            </label>
+               <div class="flex items-center gap-2">
+                  <button type="button" (click)="instructorForm.patchValue({ status: 'activo' })"
+                     class="flex-1 py-3 rounded-md text-body-sm font-extrabold border border-solid border-hairline cursor-pointer transition-colors duration-fast"
+                     [class]="instructorForm.get('status')?.value === 'activo' ? 'bg-bg-brand-soft text-text-brand border-border-brand' : 'bg-bg-elevated text-muted border-border-default hover:bg-bg-inset'">
+                     Activo
+                  </button>
+                  <button type="button" (click)="instructorForm.patchValue({ status: 'inactivo' })"
+                     class="flex-1 py-3 rounded-md text-body-sm font-extrabold border border-solid border-hairline cursor-pointer transition-colors duration-fast"
+                     [class]="instructorForm.get('status')?.value === 'inactivo' ? 'bg-bg-brand-soft text-text-brand border-border-brand' : 'bg-bg-elevated text-muted border-border-default hover:bg-bg-inset'">
+                     Inactivo
+                  </button>
+               </div>
+            </div>
          </section>
 
          @if (errorMessage()) {
@@ -234,7 +245,7 @@
          }
       </div>
 
-      <footer class="flex items-stretch gap-3 px-7 py-5 bg-bg-elevated border-t border-solid border-hairline border-border-default">
+      <footer class="flex items-stretch gap-3 px-7 py-5 bg-bg-elevated border-t border-solid border-hairline border-border-default rounded-bl-2xl rounded-br-2xl">
          <button
             type="button"
             (click)="onCancel()"

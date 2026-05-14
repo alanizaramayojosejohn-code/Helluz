@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, input, OnInit, output, signal } from '@angular/core'
+import { Component, computed, DestroyRef, HostListener, inject, input, OnInit, output, signal } from '@angular/core'
 import {
    FormBuilder,
    FormGroup,
@@ -36,6 +36,7 @@ export class InstructorForm implements OnInit {
    readonly currentInstructor = signal<Instructor | null>(null)
    readonly formValid = signal<boolean>(false)
    readonly branches = signal<any[]>([])
+   readonly showBranchDropdown = signal(false)
 
    readonly hasErrors = computed(() => !!this.errorMessage())
    readonly canSubmit = computed(() => this.formValid() && !this.isSubmitting())
@@ -211,6 +212,27 @@ export class InstructorForm implements OnInit {
               : 'Error desconocido al guardar el instructor'
 
       this.errorMessage.set(errorMsg)
+   }
+
+   @HostListener('document:click')
+   closeAllDropdowns(): void {
+      this.showBranchDropdown.set(false)
+   }
+
+   toggleBranchDropdown(event: Event): void {
+      event.stopPropagation()
+      this.showBranchDropdown.update(v => !v)
+   }
+
+   selectBranch(branch: any, event: Event): void {
+      event.stopPropagation()
+      this.instructorForm.patchValue({ branchId: branch.id })
+      this.showBranchDropdown.set(false)
+   }
+
+   get selectedBranch(): any {
+      const id = this.instructorForm.get('branchId')?.value
+      return this.branches().find(b => b.id === id) || null
    }
 
    onCancel(): void {

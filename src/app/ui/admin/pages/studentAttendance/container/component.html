@@ -6,6 +6,18 @@
       <span class="text-label font-extrabold uppercase tracking-[2.75px] text-text-brand">REPORTES</span>
       <h1 class="font-display text-h1 font-extrabold text-ink leading-none tracking-tightest">Asistencias Alumnos</h1>
     </div>
+    @if (filteredAttendances$ | async; as attendances) {
+      @if (attendances.length > 0) {
+        <button
+          type="button"
+          (click)="exportToExcel()"
+          class="flex items-center gap-2 px-4 py-2 rounded-full border border-hairline border-border-default bg-bg-elevated hover:bg-bg-surface text-ink text-caption font-extrabold transition-colors duration-fast cursor-pointer"
+        >
+          <mat-icon class="!text-[16px] !w-[16px] !h-[16px] leading-none text-success">download</mat-icon>
+          Exportar Excel
+        </button>
+      }
+    }
   </div>
 
   <!-- Filters -->

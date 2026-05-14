@@ -1,14 +1,14 @@
-<div class="p-8 flex flex-col gap-0">
+<div class="p-4 sm:p-8 flex flex-col gap-0">
 
   <!-- Page header -->
-  <div class="flex items-end justify-between pb-7 border-b border-hairline border-border-default">
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between pb-7 border-b border-hairline border-border-default">
     <div class="flex flex-col gap-1.5">
       <span class="text-label font-extrabold uppercase tracking-[2.75px] text-text-brand">GESTIÓN</span>
       <h1 class="font-display text-h1 font-extrabold text-ink leading-none tracking-tightest">Usuarios</h1>
     </div>
     <button
       (click)="onCreateUser()"
-      class="flex items-center gap-2 px-7 py-4 rounded-full bg-brand-500 text-on-brand text-body font-extrabold shadow-brand hover:bg-brand-600 transition-colors duration-fast cursor-pointer border-none"
+      class="flex items-center gap-2 px-7 py-4 rounded-full bg-brand-500 text-on-brand text-body font-extrabold shadow-brand hover:bg-brand-600 transition-colors duration-fast cursor-pointer border-none shrink-0"
     >
       <mat-icon class="!text-[18px] !w-[18px] !h-[18px] leading-none">add</mat-icon>
       Nuevo usuario
@@ -16,7 +16,7 @@
   </div>
 
   <!-- Filters -->
-  <div class="flex items-center gap-3 pt-6">
+  <div class="flex flex-wrap items-center gap-3 pt-6">
     <!-- Role tabs -->
     <div class="flex items-center rounded-full bg-bg-inset p-[3px]">
       <button
@@ -60,7 +60,8 @@
   <!-- Pendientes -->
   @if (usersPending$ | async; as usersPending) {
     @if (usersPending.length > 0) {
-      <div class="mt-6 rounded-lg overflow-hidden bg-bg-ink">
+      <div class="mt-6 rounded-lg overflow-x-auto bg-bg-ink">
+        <div class="min-w-[700px]">
         <div class="flex items-center gap-3 px-5 py-3">
           <span class="text-[10px] font-extrabold tracking-[1.5px] text-zinc-500 uppercase">PENDIENTES DE ACCESO</span>
           <span class="px-2 py-0.5 rounded-full bg-warning/20 text-warning text-[10px] font-extrabold">{{ usersPending.length }}</span>
@@ -86,17 +87,19 @@
             </div>
           </div>
         }
+        </div>
       </div>
     }
   }
 
   <!-- Usuarios activos -->
-  <div class="mt-6 rounded-lg border border-hairline border-border-default bg-bg-elevated overflow-hidden">
+  <div class="mt-6 rounded-lg border border-hairline border-border-default overflow-x-auto">
     @if (isLoading()) {
-      <div class="flex justify-center items-center py-12">
+      <div class="flex justify-center items-center py-12 bg-bg-elevated">
         <mat-spinner diameter="40"></mat-spinner>
       </div>
     } @else {
+      <div class="min-w-[800px] bg-bg-elevated">
 
       <!-- Col headers -->
       <div class="flex items-center gap-4 px-5 py-[10px] bg-bg-inset">
@@ -168,6 +171,7 @@
         <button class="w-8 h-8 rounded-md bg-bg-ink flex items-center justify-center cursor-pointer border-none">
           <mat-icon class="text-on-brand !text-[18px] !w-[18px] !h-[18px] leading-none">chevron_right</mat-icon>
         </button>
+      </div>
       </div>
     }
   </div>

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, output, signal } from '@angular/core'
+import { Component, DestroyRef, HostListener, inject, OnInit, output, signal } from '@angular/core'
 import { MatTableModule } from '@angular/material/table'
 import { MatButtonModule } from '@angular/material/button'
 import { MatIconModule } from '@angular/material/icon'
@@ -41,6 +41,7 @@ export class InstructorList implements OnInit {
    readonly instructors = signal<Instructor[]>([])
    readonly branches = signal<any[]>([])
    readonly selectedBranchId = signal<string>('all')
+   readonly showBranchDropdown = signal(false)
    readonly isLoading = signal(false)
    readonly errorMessage = signal<string | null>(null)
 
@@ -86,6 +87,27 @@ export class InstructorList implements OnInit {
       }
 
       return allInstructors.filter((instructor) => instructor.branchId === branchId)
+   }
+
+   @HostListener('document:click')
+   closeBranchDropdown(): void {
+      this.showBranchDropdown.set(false)
+   }
+
+   toggleBranchDropdown(event: Event): void {
+      event.stopPropagation()
+      this.showBranchDropdown.update(v => !v)
+   }
+
+   selectBranch(branchId: string, event: Event): void {
+      event.stopPropagation()
+      this.showBranchDropdown.set(false)
+      this.onBranchFilterChange(branchId)
+   }
+
+   get selectedBranchName(): string {
+      if (this.selectedBranchId() === 'all') return 'Todas las sucursales'
+      return this.branches().find(b => b.id === this.selectedBranchId())?.name || 'Todas las sucursales'
    }
 
    onBranchFilterChange(branchId: string): void {

@@ -10,8 +10,9 @@ import { MatInputModule } from '@angular/material/input'
 import { MatSelectModule } from '@angular/material/select'
 import { MatDialogModule, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { Observable, BehaviorSubject, combineLatest } from 'rxjs'
-import { switchMap, map } from 'rxjs/operators'
+import { switchMap, map, take } from 'rxjs/operators'
 import { ConfirmDialogService } from '../../../../../../shared/services/confirm-dialog.service'
+import { ExcelExportService } from '../../../../../../shared/services/excel-export.service'
 import { StudentAttendanceService } from '../../../../../services/studentAttendance/student-attendance.service'
 import { BranchService } from '../../../../../services/branch/branch.service'
 import { StudentAttendance, StudentAttendanceStats } from '../../../../../models/studentattendance.model'
@@ -57,6 +58,7 @@ export default class StudentAttendanceListComponent implements OnInit {
    private readonly branchService = inject(BranchService)
    private readonly dialog = inject(MatDialog)
    private readonly confirmDialog = inject(ConfirmDialogService)
+   private readonly excelExport = inject(ExcelExportService)
 
    backToMark = output<void>()
 
@@ -155,6 +157,12 @@ export default class StudentAttendanceListComponent implements OnInit {
                console.error('Error al eliminar:', error)
             }
          })
+   }
+
+   exportToExcel(): void {
+      this.filteredAttendances$.pipe(take(1)).subscribe((attendances) => {
+         this.excelExport.exportAsistenciaAlumnos(attendances, this.selectedDate$.value)
+      })
    }
 
    onBack(): void {
