@@ -11,10 +11,10 @@
          <form
             [formGroup]="enrollmentForm"
             (ngSubmit)="onSubmit()"
-            class="bg-bg-elevated border border-solid border-hairline border-border-default rounded-2xl shadow-lg flex flex-col overflow-hidden"
+            class="bg-bg-elevated border border-solid border-hairline border-border-default rounded-2xl shadow-lg flex flex-col"
          >
             <!-- ───── Header ───────────────────────────────────────────── -->
-            <header class="flex items-start gap-4 px-7 py-6 border-b border-solid border-hairline border-border-default">
+            <header class="flex items-start gap-4 px-7 py-6 border-b border-solid border-hairline border-border-default rounded-tl-2xl rounded-tr-2xl">
                <div class="flex-1 flex flex-col gap-1.5">
                   <span class="text-label font-extrabold tracking-[0.25em] text-text-brand uppercase">EDITAR INSCRIPCIÓN</span>
                   <h1 class="font-display text-[2rem] font-extrabold tracking-[-0.03em] text-ink leading-[1.05] m-0">
@@ -104,29 +104,26 @@
                   </header>
 
                   <!-- Estado -->
-                  <label class="flex flex-col gap-1.5">
+                  <div class="flex flex-col gap-1.5">
                      <span class="text-caption font-bold text-muted">Nuevo estado</span>
-                     <span
-                        class="flex items-center gap-2.5 px-4 py-3.5 rounded-md bg-bg-elevated border border-solid border-hairline transition-colors duration-fast"
-                        [class.border-border-strong]="!hasFieldError('status')"
-                        [class.border-error]="hasFieldError('status')"
-                        [class.border-thick]="hasFieldError('status')"
-                     >
-                        <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">flag</span>
-                        <select
-                           formControlName="status"
-                           class="bg-transparent border-0 outline-none flex-1 text-body-sm font-medium text-ink min-w-0 cursor-pointer appearance-none"
-                        >
-                           @for (option of statusOptions; track option.value) {
-                              <option [value]="option.value">{{ option.label }}</option>
-                           }
-                        </select>
-                        <span class="material-symbols-rounded !text-[18px] !w-[18px] !h-[18px] leading-none text-faint shrink-0">expand_more</span>
-                     </span>
+                     <div class="grid grid-cols-2 gap-1.5">
+                        @for (option of statusOptions; track option.value) {
+                           <button
+                              type="button"
+                              (click)="enrollmentForm.patchValue({ status: option.value })"
+                              class="py-3 rounded-md text-body-sm font-extrabold border border-solid border-hairline cursor-pointer transition-colors duration-fast"
+                              [class]="enrollmentForm.get('status')?.value === option.value
+                                 ? 'bg-bg-brand-soft text-text-brand border-border-brand'
+                                 : 'bg-bg-elevated text-muted border-border-default hover:bg-bg-inset'"
+                           >
+                              {{ option.label }}
+                           </button>
+                        }
+                     </div>
                      @if (hasFieldError('status')) {
                         <span class="text-caption font-medium text-error">{{ getFieldError('status') }}</span>
                      }
-                  </label>
+                  </div>
 
                   <!-- Notas -->
                   <label class="flex flex-col gap-1.5">
@@ -169,7 +166,7 @@
             </div>
 
             <!-- ───── Footer ────────────────────────────────────────────── -->
-            <footer class="flex items-stretch gap-3 px-7 py-5 bg-bg-elevated border-t border-solid border-hairline border-border-default">
+            <footer class="flex items-stretch gap-3 px-7 py-5 bg-bg-elevated border-t border-solid border-hairline border-border-default rounded-bl-2xl rounded-br-2xl">
                <button
                   type="button"
                   (click)="onCancel()"

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, output, signal } from '@angular/core'
+import { Component, DestroyRef, HostListener, inject, OnInit, output, signal } from '@angular/core'
 import { MatTableModule } from '@angular/material/table'
 import { MatButtonModule } from '@angular/material/button'
 import { MatIconModule } from '@angular/material/icon'
@@ -46,6 +46,9 @@ export class ScheduleList implements OnInit {
    branches$!: Observable<Branch[]>
 
    private selectedBranchId$ = new BehaviorSubject<string | null>(null)
+   readonly selectedBranchFilter = signal<string>('all')
+   readonly showBranchDropdown = signal(false)
+   private branchesCache: Branch[] = []
 
    readonly isLoading = signal(false)
    readonly errorMessage = signal<string | null>(null)
@@ -70,7 +73,9 @@ export class ScheduleList implements OnInit {
       this.isLoading.set(true)
       this.errorMessage.set(null)
 
-      this.branches$ = this.branchService.getActiveBranches()
+      this.branches$ = this.branchService.getActiveBranches().pipe(
+         map(branches => { this.branchesCache = branches; return branches; })
+      )
 
       this.schedules$ = this.selectedBranchId$.pipe(
          switchMap((branchId) => {
@@ -116,7 +121,29 @@ export class ScheduleList implements OnInit {
    //     return totalMinutesA - totalMinutesB
    //  }
 
+   @HostListener('document:click')
+   closeBranchDropdown(): void {
+      this.showBranchDropdown.set(false)
+   }
+
+   toggleBranchDropdown(event: Event): void {
+      event.stopPropagation()
+      this.showBranchDropdown.update(v => !v)
+   }
+
+   selectBranch(branchId: string, event: Event): void {
+      event.stopPropagation()
+      this.showBranchDropdown.set(false)
+      this.onBranchFilterChange(branchId)
+   }
+
+   get selectedBranchName(): string {
+      if (this.selectedBranchFilter() === 'all') return 'Todas las sucursales'
+      return this.branchesCache.find(b => b.id === this.selectedBranchFilter())?.name || 'Todas las sucursales'
+   }
+
    onBranchFilterChange(branchId: string): void {
+      this.selectedBranchFilter.set(branchId)
       this.selectedBranchId$.next(branchId === 'all' ? null : branchId)
    }
 

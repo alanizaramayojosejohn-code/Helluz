@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, output, signal } from '@angular/core'
+import { Component, DestroyRef, HostListener, inject, OnInit, output, signal } from '@angular/core'
 import { MatTableModule } from '@angular/material/table'
 import { MatButtonModule } from '@angular/material/button'
 import { MatIconModule } from '@angular/material/icon'
@@ -15,7 +15,7 @@ import { BranchService } from '../../../../../../../services/branch/branch.servi
 import { Enrollment } from '../../../../../../../models/enrollment.model'
 import { Branch } from '../../../../../../../models/branch.model'
 import { DocumentSnapshot } from '@angular/fire/firestore'
-import { Observable } from 'rxjs'
+import { Observable, tap } from 'rxjs'
 
 @Component({
    selector: 'x-enrollment-list',
@@ -53,8 +53,10 @@ export class EnrollmentList implements OnInit {
    private pageHistory: (DocumentSnapshot | null)[] = [null]
    private lastDoc: DocumentSnapshot | null = null
 
-   private selectedBranchId = signal<string | null>(null)
-   private selectedStatus = signal<string>('all')
+   readonly showBranchDropdown = signal(false)
+   readonly selectedBranchId = signal<string | null>(null)
+   readonly selectedStatus = signal<string>('all')
+   private branchesCache: Branch[] = []
 
    readonly isLoading = signal(false)
    readonly errorMessage = signal<string | null>(null)
@@ -65,7 +67,30 @@ export class EnrollmentList implements OnInit {
    }
 
    private loadBranches(): void {
-      this.branches$ = this.branchService.getActiveBranches()
+      this.branches$ = this.branchService.getActiveBranches().pipe(
+         tap(branches => this.branchesCache = branches)
+      )
+   }
+
+   @HostListener('document:click')
+   closeBranchDropdown(): void {
+      this.showBranchDropdown.set(false)
+   }
+
+   toggleBranchDropdown(event: Event): void {
+      event.stopPropagation()
+      this.showBranchDropdown.update(v => !v)
+   }
+
+   async selectBranch(branchId: string, event: Event): Promise<void> {
+      event.stopPropagation()
+      this.showBranchDropdown.set(false)
+      await this.onBranchFilterChange(branchId)
+   }
+
+   get selectedBranchName(): string {
+      if (!this.selectedBranchId()) return 'Todas las sucursales'
+      return this.branchesCache.find(b => b.id === this.selectedBranchId())?.name || 'Todas las sucursales'
    }
 
    private async loadPage(pageIndex: number): Promise<void> {

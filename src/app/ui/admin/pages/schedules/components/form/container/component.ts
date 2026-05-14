@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, input, OnInit, output, signal } from '@angular/core'
+import { Component, computed, DestroyRef, HostListener, inject, input, OnInit, output, signal } from '@angular/core'
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms'
 import { AsyncPipe, TitleCasePipe } from '@angular/common'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
@@ -36,6 +36,8 @@ export class ScheduleForm implements OnInit {
    readonly currentSchedule = signal<Schedule | null>(null)
    readonly formValid = signal<boolean>(false)
    readonly selectedDays = signal<string[]>([])
+   readonly showBranchDropdown = signal(false)
+   readonly showInstructorDropdown = signal(false)
 
    branches$!: Observable<Branch[]>
    days$!: Observable<Day[]>
@@ -242,6 +244,47 @@ export class ScheduleForm implements OnInit {
               ? error
               : 'Error desconocido al guardar el horario'
       this.errorMessage.set(errorMsg)
+   }
+
+   @HostListener('document:click')
+   closeAllDropdowns(): void {
+      this.showBranchDropdown.set(false)
+      this.showInstructorDropdown.set(false)
+   }
+
+   toggleBranchDropdown(event: Event): void {
+      event.stopPropagation()
+      this.showBranchDropdown.update(v => !v)
+      this.showInstructorDropdown.set(false)
+   }
+
+   selectBranch(branch: Branch, event: Event): void {
+      event.stopPropagation()
+      this.scheduleForm.patchValue({ branchId: branch.id })
+      this.showBranchDropdown.set(false)
+   }
+
+   toggleInstructorDropdown(event: Event): void {
+      event.stopPropagation()
+      this.showInstructorDropdown.update(v => !v)
+      this.showBranchDropdown.set(false)
+   }
+
+   selectInstructor(instructor: Instructor | null, event: Event): void {
+      event.stopPropagation()
+      this.scheduleForm.patchValue({ instructorId: instructor?.id || '' })
+      this.showInstructorDropdown.set(false)
+   }
+
+   get selectedBranch(): Branch | null {
+      const id = this.scheduleForm.get('branchId')?.value
+      return this.branchesCache.find(b => b.id === id) || null
+   }
+
+   get selectedInstructor(): Instructor | null {
+      const id = this.scheduleForm.get('instructorId')?.value
+      if (!id) return null
+      return this.instructorsCache.find(i => i.id === id) || null
    }
 
    onCancel(): void {

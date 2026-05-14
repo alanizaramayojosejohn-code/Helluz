@@ -1,7 +1,7 @@
-import { Component, computed, DestroyRef, inject, input, OnInit, output, signal } from '@angular/core'
+import { Component, computed, DestroyRef, HostListener, inject, input, OnInit, output, signal } from '@angular/core'
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms'
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop'
-import { Observable, combineLatest, map, tap } from 'rxjs'
+import { Observable, combineLatest, map, take, tap } from 'rxjs'
 import { AsyncPipe } from '@angular/common'
 import { EnrollmentService } from '../../../../../../../services/enrollment/enrollment.service'
 import { BranchService } from '../../../../../../../services/branch/branch.service'
@@ -43,6 +43,11 @@ export class EnrollmentForm implements OnInit {
    readonly formValid = signal<boolean>(false)
 
    readonly searchText = signal<string>('')
+   readonly showStudentDropdown = signal(false)
+   readonly selectedStudent = signal<Student | null>(null)
+   readonly showBranchDropdown = signal(false)
+   readonly showScheduleDropdown = signal(false)
+   readonly showMembershipDropdown = signal(false)
 
    readonly students$: Observable<Student[]> = combineLatest([
       this.studentService.getActiveStudents(),
@@ -228,6 +233,16 @@ export class EnrollmentForm implements OnInit {
                      paymentMethod: enrollment.paymentMethod,
                      status: enrollment.status,
                   })
+
+                  const cached = this.studentsCache.find(s => s.id === enrollment.studentId)
+                  if (cached) {
+                     this.selectedStudent.set(cached)
+                  } else {
+                     this.students$.pipe(take(1)).subscribe(students => {
+                        const s = students.find(st => st.id === enrollment.studentId)
+                        if (s) this.selectedStudent.set(s)
+                     })
+                  }
                }
             },
             error: () => this.errorMessage.set('Error al cargar inscripción'),
@@ -363,10 +378,93 @@ export class EnrollmentForm implements OnInit {
       this.errorMessage.set(errorMsg)
    }
 
-   onSearchInputChange(event: Event): void {
-      const input = event.target as HTMLInputElement;
-      this.searchText.set(input.value);
-    }
+   @HostListener('document:click')
+   closeAllDropdowns(): void {
+      this.showStudentDropdown.set(false)
+      this.showBranchDropdown.set(false)
+      this.showScheduleDropdown.set(false)
+      this.showMembershipDropdown.set(false)
+   }
+
+   onComboInput(event: Event): void {
+      const input = event.target as HTMLInputElement
+      this.searchText.set(input.value)
+      this.showStudentDropdown.set(true)
+   }
+
+   onComboFocus(event: Event): void {
+      event.stopPropagation()
+      this.showStudentDropdown.set(true)
+   }
+
+   selectStudent(student: Student, event: Event): void {
+      event.stopPropagation()
+      this.selectedStudent.set(student)
+      this.enrollmentForm.patchValue({ studentId: student.id })
+      this.searchText.set('')
+      this.showStudentDropdown.set(false)
+   }
+
+   clearStudent(event: Event): void {
+      event.stopPropagation()
+      this.selectedStudent.set(null)
+      this.enrollmentForm.patchValue({ studentId: '' })
+      this.searchText.set('')
+   }
+
+   toggleStudentDropdown(event: Event): void {
+      event.stopPropagation()
+      this.showStudentDropdown.update(v => !v)
+   }
+
+   selectBranch(branch: Branch, event: Event): void {
+      event.stopPropagation()
+      this.enrollmentForm.patchValue({ branchId: branch.id })
+      this.showBranchDropdown.set(false)
+   }
+
+   toggleBranchDropdown(event: Event): void {
+      event.stopPropagation()
+      this.showBranchDropdown.update(v => !v)
+      this.showScheduleDropdown.set(false)
+      this.showMembershipDropdown.set(false)
+   }
+
+   selectSchedule(schedule: Schedule, event: Event): void {
+      event.stopPropagation()
+      this.enrollmentForm.patchValue({ scheduleId: schedule.id })
+      this.showScheduleDropdown.set(false)
+   }
+
+   toggleScheduleDropdown(event: Event): void {
+      event.stopPropagation()
+      this.showScheduleDropdown.update(v => !v)
+      this.showBranchDropdown.set(false)
+      this.showMembershipDropdown.set(false)
+   }
+
+   selectMembership(membership: Membership, event: Event): void {
+      event.stopPropagation()
+      this.enrollmentForm.patchValue({ membershipId: membership.id })
+      this.showMembershipDropdown.set(false)
+   }
+
+   toggleMembershipDropdown(event: Event): void {
+      event.stopPropagation()
+      this.showMembershipDropdown.update(v => !v)
+      this.showBranchDropdown.set(false)
+      this.showScheduleDropdown.set(false)
+   }
+
+   get selectedBranch(): Branch | null {
+      const id = this.enrollmentForm.get('branchId')?.value
+      return this.branchesCache.find(b => b.id === id) || null
+   }
+
+   get selectedScheduleItem(): Schedule | null {
+      const id = this.enrollmentForm.get('scheduleId')?.value
+      return this.scheduleCache.find(s => s.id === id) || null
+   }
 
    onCancel(): void {
       this.cancel.emit()

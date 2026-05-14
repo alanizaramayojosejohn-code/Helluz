@@ -6,6 +6,7 @@ import { MatSelectModule } from '@angular/material/select'
 import { MatButtonModule } from '@angular/material/button'
 import { MatDatepickerModule } from '@angular/material/datepicker'
 import { MatNativeDateModule } from '@angular/material/core'
+import { MatIconModule } from '@angular/material/icon'
 import { AsyncPipe, CurrencyPipe } from '@angular/common'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { Observable } from 'rxjs'
@@ -15,6 +16,7 @@ import { EnrollmentService } from '../../../../../services/enrollment/enrollment
 import { Branch } from '../../../../../models/branch.model'
 import { QueryService } from '../../../../../services/branch/query.service'
 import { EnrollmentQueryService } from '../../../../../services/enrollment/enrollment-query.service'
+import { ExcelExportService } from '../../../../../../shared/services/excel-export.service'
 
 export interface ScheduleGroup {
    scheduleId: string
@@ -33,6 +35,7 @@ export interface ScheduleGroup {
       MatInputModule,
       MatSelectModule,
       MatButtonModule,
+      MatIconModule,
       MatDatepickerModule,
       MatNativeDateModule,
       AsyncPipe,
@@ -46,6 +49,7 @@ export default class FinanceListComponent implements OnInit {
    private readonly branchService = inject(BranchService)
    private readonly enrollmentService = inject(EnrollmentService)
    private readonly destroyRef = inject(DestroyRef)
+   private readonly excelExport = inject(ExcelExportService)
 
    branches$!: Observable<Branch[]>
 
@@ -125,6 +129,18 @@ export default class FinanceListComponent implements OnInit {
       this.scheduleGroups.set([])
       this.hasSearched.set(false)
       this.errorMessage.set(null)
+   }
+
+   exportToExcel(): void {
+      this.excelExport.exportFinanzas(
+         this.scheduleGroups(),
+         this.totalRecaudado(),
+         this.totalInscripciones(),
+         {
+            start: this.filterForm.value.startDate,
+            end: this.filterForm.value.endDate,
+         },
+      )
    }
 
    // ── Agrupación ────────────────────────────────────────────────────────────

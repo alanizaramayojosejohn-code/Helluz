@@ -1,14 +1,14 @@
-<div class="p-8 flex flex-col gap-0">
+<div class="p-4 sm:p-8 flex flex-col gap-0">
 
   <!-- Page header -->
-  <div class="flex items-end justify-between pb-7 border-b border-hairline border-border-default">
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between pb-7 border-b border-hairline border-border-default">
     <div class="flex flex-col gap-1.5">
       <span class="text-label font-extrabold uppercase tracking-[2.75px] text-text-brand">GESTIÓN</span>
       <h1 class="font-display text-h1 font-extrabold text-ink leading-none tracking-tightest">Instructores</h1>
     </div>
     <button
       (click)="onCreateInstructor()"
-      class="flex items-center gap-2 px-7 py-4 rounded-full bg-brand-500 text-on-brand text-body font-extrabold shadow-brand hover:bg-brand-600 transition-colors duration-fast cursor-pointer border-none"
+      class="flex items-center gap-2 px-7 py-4 rounded-full bg-brand-500 text-on-brand text-body font-extrabold shadow-brand hover:bg-brand-600 transition-colors duration-fast cursor-pointer border-none shrink-0"
     >
       <mat-icon class="!text-[18px] !w-[18px] !h-[18px] leading-none">add</mat-icon>
       Nuevo instructor
@@ -16,7 +16,7 @@
   </div>
 
   <!-- Filters -->
-  <div class="flex items-center gap-3 pt-6">
+  <div class="flex flex-wrap items-center gap-3 pt-6">
     <!-- Status tabs -->
     <div class="flex items-center rounded-full bg-bg-inset p-[3px]">
       <button class="flex items-center gap-2 px-4 py-2 rounded-full bg-bg-elevated text-caption font-extrabold text-ink shadow-sm cursor-pointer border-none">
@@ -30,17 +30,38 @@
       </button>
     </div>
     <!-- Branch filter -->
-    <div class="flex items-center gap-2 px-4 py-[10px] rounded-full bg-bg-elevated border border-hairline border-border-strong">
-      <mat-icon class="text-muted !text-base !w-4 !h-4 leading-none shrink-0">storefront</mat-icon>
-      <select
-        (change)="onBranchFilterChange($any($event.target).value)"
-        class="text-caption font-extrabold text-ink bg-transparent border-none outline-none cursor-pointer"
+    <div class="relative">
+      <button
+        (click)="toggleBranchDropdown($event)"
+        class="flex items-center gap-2 px-4 py-[10px] rounded-full bg-bg-elevated border border-hairline border-border-strong cursor-pointer"
       >
-        <option value="all">Todas las sucursales</option>
-        @for (branch of branches(); track branch.id) {
-          <option [value]="branch.id">{{ branch.name }}</option>
-        }
-      </select>
+        <mat-icon class="text-muted !text-base !w-4 !h-4 leading-none shrink-0">storefront</mat-icon>
+        <span class="text-caption font-extrabold text-ink">{{ selectedBranchName }}</span>
+        <mat-icon class="text-faint !text-[14px] !w-[14px] !h-[14px] leading-none transition-transform duration-fast" [class.rotate-180]="showBranchDropdown()">expand_more</mat-icon>
+      </button>
+      @if (showBranchDropdown()) {
+        <div
+          class="absolute left-0 top-[calc(100%+4px)] z-10 min-w-[200px] rounded-lg bg-bg-elevated border border-hairline border-border-strong shadow-lg overflow-hidden"
+          (click)="$event.stopPropagation()"
+        >
+          <button (click)="selectBranch('all', $event)" class="flex items-center gap-3 w-full px-4 py-3 text-left hover:bg-bg-inset transition-colors duration-fast border-none border-b border-hairline border-border-subtle bg-transparent cursor-pointer">
+            <mat-icon class="text-faint !text-base !w-4 !h-4 leading-none shrink-0">storefront</mat-icon>
+            <span class="text-body-sm font-medium text-ink flex-1">Todas las sucursales</span>
+            @if (selectedBranchId() === 'all') {
+              <mat-icon class="text-text-brand !text-base !w-4 !h-4 leading-none">check</mat-icon>
+            }
+          </button>
+          @for (branch of branches(); track branch.id) {
+            <button (click)="selectBranch(branch.id, $event)" class="flex items-center gap-3 w-full px-4 py-3 text-left hover:bg-bg-inset transition-colors duration-fast border-none border-b border-hairline border-border-subtle last:border-b-0 bg-transparent cursor-pointer">
+              <mat-icon class="text-faint !text-base !w-4 !h-4 leading-none shrink-0">storefront</mat-icon>
+              <span class="text-body-sm font-medium text-ink flex-1">{{ branch.name }}</span>
+              @if (selectedBranchId() === branch.id) {
+                <mat-icon class="text-text-brand !text-base !w-4 !h-4 leading-none">check</mat-icon>
+              }
+            </button>
+          }
+        </div>
+      }
     </div>
     <!-- Search -->
     <div class="flex-1 flex items-center gap-2 px-4 py-[10px] rounded-full bg-bg-elevated border border-hairline border-border-strong">
@@ -56,12 +77,13 @@
   }
 
   <!-- Table -->
-  <div class="mt-6 rounded-lg border border-hairline border-border-default bg-bg-elevated overflow-hidden">
+  <div class="mt-6 rounded-lg border border-hairline border-border-default overflow-x-auto">
     @if (isLoading()) {
-      <div class="flex justify-center items-center py-12">
+      <div class="flex justify-center items-center py-12 bg-bg-elevated">
         <mat-spinner diameter="40"></mat-spinner>
       </div>
     } @else {
+      <div class="min-w-[1000px] bg-bg-elevated">
 
       <!-- Col headers -->
       <div class="flex items-center gap-4 px-5 py-[10px] bg-bg-inset">
@@ -127,6 +149,7 @@
         <button class="w-8 h-8 rounded-md bg-bg-ink flex items-center justify-center cursor-pointer border-none">
           <mat-icon class="text-on-brand !text-[18px] !w-[18px] !h-[18px] leading-none">chevron_right</mat-icon>
         </button>
+      </div>
       </div>
     }
   </div>
