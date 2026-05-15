@@ -58,9 +58,8 @@ export default class LogInComponent {
 
          try {
             await this.authService.loginWithEmail(email, password)
-            this.router.navigate(['/admin/home'])
          } catch (error: any) {
-            this.errorMessage.set(error)
+            this.errorMessage.set(error.message ?? String(error))
          } finally {
             this.loading.set(false)
          }
@@ -75,9 +74,8 @@ export default class LogInComponent {
 
       try {
          await this.authService.loginWithGoogle()
-         this.router.navigate(['/admin/home'])
       } catch (error: any) {
-         this.errorMessage.set(error)
+         this.errorMessage.set(error.message ?? String(error))
       } finally {
          this.loading.set(false)
       }

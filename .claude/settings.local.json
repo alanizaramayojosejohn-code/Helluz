@@ -14,7 +14,8 @@
       "mcp__playwright__browser_fill_form",
       "mcp__playwright__browser_wait_for",
       "mcp__playwright__browser_resize",
-      "Bash(bun add *)"
+      "Bash(bun add *)",
+      "Bash(Find \"C:\\\\Users\\\\Jose\\\\Desktop\\\\Helluz\\\\Helluz\\\\src\" -name \"*auth*\" -o -name \"*login*\")"
     ]
   },
   "enableAllProjectMcpServers": true,
