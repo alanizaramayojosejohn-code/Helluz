@@ -20,7 +20,7 @@ import {
   deleteDoc,
 } from '@angular/fire/firestore'
 import { Router } from '@angular/router'
-import { Observable, from, of, switchMap, map, catchError } from 'rxjs'
+import { Observable, of, switchMap, map, catchError } from 'rxjs'
 import { AuthUser, User } from '../../models/user.model'
 import { UserPending } from '../../models/userPending'
 
@@ -87,6 +87,7 @@ export class AuthService {
 
       this.redirectByRole(userData.role)
     } catch (error: any) {
+      if (error.code === 'auth/invalid-credential') throw new Error('Email o contraseña incorrectos')
       if (error.code === 'auth/user-not-found') throw new Error('Usuario no encontrado')
       if (error.code === 'auth/wrong-password') throw new Error('Contraseña incorrecta')
       if (error.code === 'auth/invalid-email') throw new Error('Email inválido')
@@ -100,11 +101,43 @@ export class AuthService {
     try {
       const provider = new GoogleAuthProvider()
       const credential = await signInWithPopup(this.auth, provider)
-      const userData = await this.getUserDataPromise(credential.user.uid)
+      const firebaseUser = credential.user
 
+      let userData = await this.getUserDataPromise(firebaseUser.uid)
+
+      // Si no existe en users, verificar si está pre-registrado por el admin
       if (!userData) {
-        await this.logout()
-        throw new Error('Tu cuenta de Google no está autorizada. Contacta al administrador')
+        const email = firebaseUser.email ?? ''
+        const pendiente = await this.readUsuarioPendiente(email)
+
+        if (!pendiente) {
+          await this.logout()
+          throw new Error('Tu cuenta de Google no está autorizada. Contacta al administrador')
+        }
+
+        // Crear el doc en users a partir del pre-registro
+        const userRef = doc(this.firestore, 'users', firebaseUser.uid)
+        await setDoc(userRef, {
+          email: email.toLowerCase(),
+          name: pendiente.name,
+          lastname: pendiente.lastname,
+          role: pendiente.role,
+          status: pendiente.status,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          createdBy: pendiente.createdBy ?? '',
+        })
+
+        // Eliminar el pre-registro
+        await this.deletePendienteDoc(email)
+
+        if (pendiente.status !== 'activo') {
+          await this.logout()
+          throw new Error('Usuario inactivo. Contacta al administrador')
+        }
+
+        this.redirectByRole(pendiente.role)
+        return
       }
 
       if (userData.status !== 'activo') {
@@ -215,19 +248,10 @@ export class AuthService {
   }
 
   private async getUserDataPromise(uid: string): Promise<User | null> {
-    const userDoc = doc(this.firestore, `users/${uid}`)
-    return new Promise((resolve) => {
-      const subscription = docData(userDoc).subscribe({
-        next: (data) => {
-          subscription.unsubscribe()
-          resolve(data ? (data as User) : null)
-        },
-        error: () => {
-          subscription.unsubscribe()
-          resolve(null)
-        },
-      })
-    })
+    const userRef = doc(this.firestore, `users/${uid}`)
+    const snap = await getDoc(userRef)
+    if (!snap.exists()) return null
+    return snap.data() as User
   }
 
   private redirectByRole(role: string): void {

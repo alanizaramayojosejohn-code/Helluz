@@ -1,11 +1,13 @@
-<div class="app-container">
-   <i-header></i-header>
+<div class="min-h-screen bg-bg-base font-body">
    <i-sidebar></i-sidebar>
-   <main
-      [class.content-expanded]="!sidebarService.isOpen()"
-      [class.content-collapsed]="sidebarService.isOpen()"
-      class="main-content pt-16"
+   <div
+      class="flex flex-col min-h-screen transition-all duration-normal ease-standard"
+      [class.lg:ml-60]="sidebarService.isOpen()"
+      [class.lg:ml-16]="!sidebarService.isOpen()"
    >
-      <router-outlet></router-outlet>
-   </main>
+      <i-header></i-header>
+      <main class="flex-1">
+         <router-outlet></router-outlet>
+      </main>
+   </div>
 </div>
