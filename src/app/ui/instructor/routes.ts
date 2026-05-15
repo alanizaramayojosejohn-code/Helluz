@@ -5,6 +5,7 @@ export const InstructorRoutes: Routes = [
    {
       path: 'home',
       loadComponent: async () => await import('./pages/home/home.component'),
+      data: { breadcrumb: 'Dashboard' },
    },
    //  {
    //     path: 'alumnos',
@@ -18,6 +19,7 @@ export const InstructorRoutes: Routes = [
    {
       path: 'asistenciainstructores',
       loadComponent: async () => await import('./../public/pages/markInstructorAttendance/container/component'),
+      data: { breadcrumb: 'Marcar asistencia' },
    },
    {
       path: '',

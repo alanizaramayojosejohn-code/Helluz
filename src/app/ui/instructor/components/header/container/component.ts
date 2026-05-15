@@ -1,72 +1,83 @@
-// components/header/component.ts
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatMenuModule } from '@angular/material/menu';
-import { AuthService } from '../../../../../services/auth/auth.service';
-import { SidebarService } from '../../../../../services/sidebar/sidebar.service';
-import { AuthUser } from '../../../../../models/user.model';
+import { Component, OnInit, inject, signal } from '@angular/core'
+import { CommonModule } from '@angular/common'
+import { ActivatedRoute, NavigationEnd, Router, RouterLink } from '@angular/router'
+import { filter } from 'rxjs/operators'
+import { MatIconModule } from '@angular/material/icon'
+import { MatButtonModule } from '@angular/material/button'
+import { MatTooltipModule } from '@angular/material/tooltip'
+import { MatMenuModule } from '@angular/material/menu'
+import { AuthService } from '../../../../../services/auth/auth.service'
+import { SidebarService } from '../../../../../services/sidebar/sidebar.service'
+import { AuthUser } from '../../../../../models/user.model'
 
 @Component({
-  selector: 'i-header',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatIconModule,
-    MatButtonModule,
-    MatTooltipModule,
-    MatMenuModule,
-  ],
-  templateUrl: './component.html',
-  styleUrls: ['./component.css'],
+   selector: 'i-header',
+   standalone: true,
+   imports: [CommonModule, RouterLink, MatIconModule, MatButtonModule, MatTooltipModule, MatMenuModule],
+   templateUrl: './component.html',
 })
 export class InstructorHeaderComponent implements OnInit {
-  private readonly authService = inject(AuthService);
-  readonly sidebarService = inject(SidebarService);
+   private readonly authService = inject(AuthService)
+   private readonly router = inject(Router)
+   private readonly route = inject(ActivatedRoute)
+   readonly sidebarService = inject(SidebarService)
 
-  user = signal<AuthUser | null>(null);
+   user = signal<AuthUser | null>(null)
+   currentPageLabel = signal<string>('')
 
-  ngOnInit(): void {
-    this.authService.currentUser$.subscribe((user) => {
-      this.user.set(user);
-    });
-  }
+   ngOnInit(): void {
+      this.authService.currentUser$.subscribe((user) => {
+         this.user.set(user)
+      })
 
-  toggleSidebar(): void {
-    this.sidebarService.toggle();
-  }
+      this.updateBreadcrumb()
+      this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe(() => {
+         this.updateBreadcrumb()
+      })
+   }
 
-  async logout(): Promise<void> {
-    await this.authService.logout();
-  }
+   private updateBreadcrumb(): void {
+      let active = this.route.root
+      while (active.firstChild) {
+         active = active.firstChild
+      }
+      const data = active.snapshot.data
+      this.currentPageLabel.set(data?.['breadcrumb'] || '')
+   }
 
-  getUserDisplayName(): string {
-    const currentUser = this.user();
-    if (currentUser?.name) {
-      return `${currentUser.name} ${currentUser.lastname}`;
-    }
-    if (currentUser?.email) {
-      return currentUser.email.split('@')[0];
-    }
-    return 'Usuario';
-  }
+   toggleSidebar(): void {
+      this.sidebarService.toggle()
+   }
 
-  getUserEmail(): string {
-    return this.user()?.email || 'Sin email';
-  }
+   async logout(): Promise<void> {
+      await this.authService.logout()
+   }
 
-  getUserInitials(): string {
-    const currentUser = this.user();
-    if (currentUser?.name && currentUser?.lastname) {
-      return `${currentUser.name[0]}${currentUser.lastname[0]}`.toUpperCase();
-    }
-    return 'U';
-  }
+   getUserDisplayName(): string {
+      const u = this.user()
+      if (u?.name) {
+         const last = u.lastname ? ` ${u.lastname}` : ''
+         return `${u.name}${last}`
+      }
+      if (u?.email) return u.email.split('@')[0]
+      return 'Usuario'
+   }
 
-  getUserRole(): string {
-    const currentUser = this.user();
-    return currentUser?.role === 'admin' ? 'Administrador' : 'Instructor';
-  }
+   getUserEmail(): string {
+      return this.user()?.email || 'Sin email'
+   }
+
+   getUserInitials(): string {
+      const u = this.user()
+      if (u?.name && u?.lastname) {
+         return `${u.name[0]}${u.lastname[0]}`.toUpperCase()
+      }
+      if (u?.name) return u.name[0].toUpperCase()
+      if (u?.email) return u.email[0].toUpperCase()
+      return 'U'
+   }
+
+   getUserRole(): string {
+      return this.user()?.role === 'admin' ? 'Administrador' : 'Instructor'
+   }
 }
