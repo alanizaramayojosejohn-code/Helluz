@@ -20,6 +20,7 @@
 
   <!-- Filters -->
   <form [formGroup]="filterForm" (ngSubmit)="onSearch()" class="flex items-end gap-3 pt-6 flex-wrap">
+    @if (!isBranchAdmin()) {
     <mat-form-field appearance="outline" class="w-44">
       <mat-label>Sucursal</mat-label>
       <mat-select formControlName="branchId" required>
@@ -31,6 +32,7 @@
         <mat-error>{{ getFieldError('branchId') }}</mat-error>
       }
     </mat-form-field>
+    }
 
     <mat-form-field appearance="outline" class="w-40">
       <mat-label>Desde</mat-label>

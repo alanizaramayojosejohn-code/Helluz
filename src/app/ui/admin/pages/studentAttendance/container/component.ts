@@ -24,6 +24,7 @@ import { ScheduleQueryService } from '../../../../../services/schedule/schedule-
 import { ScheduleService } from '../../../../../services/schedule/schedule.service'
 import { StudentQueryService } from '../../../../../services/student/student-query.service'
 import { StudentService } from '../../../../../services/student/student.service'
+import { AuthService } from '../../../../../services/auth/auth.service'
 
 @Component({
    selector: 'x-student-attendance-list',
@@ -56,10 +57,12 @@ import { StudentService } from '../../../../../services/student/student.service'
 export default class StudentAttendanceListComponent implements OnInit {
    private readonly attendanceService = inject(StudentAttendanceService)
    private readonly branchService = inject(BranchService)
+   private readonly authService = inject(AuthService)
    private readonly dialog = inject(MatDialog)
    private readonly confirmDialog = inject(ConfirmDialogService)
    private readonly excelExport = inject(ExcelExportService)
 
+   readonly isBranchAdmin = signal(false)
    backToMark = output<void>()
 
    private selectedBranchId$ = new BehaviorSubject<string>('')
@@ -95,9 +98,16 @@ export default class StudentAttendanceListComponent implements OnInit {
    }
 
    ngOnInit(): void {
-      this.branches$.subscribe((branches) => {
-         if (branches.length > 0 && !this.selectedBranchId$.value) {
-            this.selectedBranchId$.next(branches[0].id!)
+      this.authService.currentUser$.pipe(take(1)).subscribe(user => {
+         if ((user?.role === 'admin' || user?.role === 'instructor') && user.branchId) {
+            this.isBranchAdmin.set(true)
+            this.selectedBranchId$.next(user.branchId)
+         } else {
+            this.branches$.subscribe((branches) => {
+               if (branches.length > 0 && !this.selectedBranchId$.value) {
+                  this.selectedBranchId$.next(branches[0].id!)
+               }
+            })
          }
       })
    }

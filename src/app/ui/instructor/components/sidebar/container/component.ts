@@ -18,7 +18,7 @@ export class InstructorSidebarComponent implements OnInit {
    readonly sidebarService = inject(SidebarService)
    private readonly authService = inject(AuthService)
 
-   userRole = signal<'admin' | 'instructor' | null>(null)
+   userRole = signal<'superAdmin' | 'admin' | 'instructor' | null>(null)
    userName = signal('Usuario')
    userInitials = signal('U')
 

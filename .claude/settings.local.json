@@ -15,7 +15,11 @@
       "mcp__playwright__browser_wait_for",
       "mcp__playwright__browser_resize",
       "Bash(bun add *)",
-      "Bash(Find \"C:\\\\Users\\\\Jose\\\\Desktop\\\\Helluz\\\\Helluz\\\\src\" -name \"*auth*\" -o -name \"*login*\")"
+      "Bash(Find \"C:\\\\Users\\\\Jose\\\\Desktop\\\\Helluz\\\\Helluz\\\\src\" -name \"*auth*\" -o -name \"*login*\")",
+      "Bash(node_modules\\\\.bin\\\\tsc --noEmit)",
+      "Bash(./node_modules/.bin/tsc --noEmit)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Jose\\\\Desktop\\\\Helluz\\\\Helluz\\\\src\\\\app\\\\ui\\\\admin\\\\pages\" -Directory)",
+      "Bash(Select-Object Name)"
     ]
   },
   "enableAllProjectMcpServers": true,

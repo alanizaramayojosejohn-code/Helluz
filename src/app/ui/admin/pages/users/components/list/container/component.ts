@@ -31,7 +31,7 @@ export class UserList implements OnInit {
    usersPending$!: Observable<UserPending[]>
    readonly isLoading = signal(false)
    readonly errorMessage = signal<string | null>(null)
-   readonly roleFilter = signal<'all' | 'admin' | 'instructor'>('all')
+   readonly roleFilter = signal<'all' | 'superAdmin' | 'admin' | 'instructor'>('all')
 
    ngOnInit(): void {
       this.loadData()
@@ -115,7 +115,7 @@ export class UserList implements OnInit {
          })
    }
 
-   onRoleFilterChange(role: 'all' | 'admin' | 'instructor'): void {
+   onRoleFilterChange(role: 'all' | 'superAdmin' | 'admin' | 'instructor'): void {
       this.roleFilter.set(role)
    }
 
@@ -130,7 +130,10 @@ export class UserList implements OnInit {
    }
 
    getRoleBadgeClass(role: string): string {
-      return role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+      const base = 'px-[10px] py-1 rounded-full text-caption font-extrabold'
+      if (role === 'superAdmin') return `${base} bg-amber-500/20 text-amber-700`
+      if (role === 'admin') return `${base} bg-purple-500/20 text-purple-700`
+      return `${base} bg-info/20 text-info`
    }
 
    async deleteUser(user: User): Promise<void> {

@@ -1,5 +1,6 @@
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core'
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms'
+import { take } from 'rxjs'
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatInputModule } from '@angular/material/input'
 import { MatSelectModule } from '@angular/material/select'
@@ -17,6 +18,7 @@ import { Branch } from '../../../../../models/branch.model'
 import { QueryService } from '../../../../../services/branch/query.service'
 import { EnrollmentQueryService } from '../../../../../services/enrollment/enrollment-query.service'
 import { ExcelExportService } from '../../../../../../shared/services/excel-export.service'
+import { AuthService } from '../../../../../services/auth/auth.service'
 
 export interface ScheduleGroup {
    scheduleId: string
@@ -48,9 +50,11 @@ export default class FinanceListComponent implements OnInit {
    private readonly fb = inject(FormBuilder)
    private readonly branchService = inject(BranchService)
    private readonly enrollmentService = inject(EnrollmentService)
+   private readonly authService = inject(AuthService)
    private readonly destroyRef = inject(DestroyRef)
    private readonly excelExport = inject(ExcelExportService)
 
+   readonly isBranchAdmin = signal(false)
    branches$!: Observable<Branch[]>
 
    readonly isLoading = signal<boolean>(false)
@@ -73,6 +77,14 @@ export default class FinanceListComponent implements OnInit {
    ngOnInit(): void {
       this.initForm()
       this.branches$ = this.branchService.getActiveBranches()
+
+      this.authService.currentUser$.pipe(take(1)).subscribe(user => {
+         if (user?.role === 'admin' && user.branchId) {
+            this.isBranchAdmin.set(true)
+            this.filterForm.patchValue({ branchId: user.branchId })
+            this.filterForm.get('branchId')!.disable()
+         }
+      })
    }
 
    private initForm(): void {
@@ -102,7 +114,7 @@ export default class FinanceListComponent implements OnInit {
          return
       }
 
-      const { branchId } = this.filterForm.value
+      const { branchId } = this.filterForm.getRawValue()
 
       this.isLoading.set(true)
       this.errorMessage.set(null)
@@ -125,7 +137,10 @@ export default class FinanceListComponent implements OnInit {
    }
 
    onClear(): void {
+      const branchId = this.isBranchAdmin() ? this.filterForm.getRawValue().branchId : ''
       this.filterForm.reset()
+      this.filterForm.patchValue({ branchId })
+      if (this.isBranchAdmin()) this.filterForm.get('branchId')!.disable()
       this.scheduleGroups.set([])
       this.hasSearched.set(false)
       this.errorMessage.set(null)

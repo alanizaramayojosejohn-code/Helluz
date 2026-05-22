@@ -1,6 +1,6 @@
 import { Timestamp } from '@angular/fire/firestore'
 
-export type UserRole = 'admin' | 'instructor'
+export type UserRole = 'superAdmin' | 'admin' | 'instructor'
 
 export interface User {
    id?: string
@@ -8,6 +8,7 @@ export interface User {
    name: string
    lastname: string
    role: UserRole
+   branchId?: string
    status: 'activo' | 'inactivo'
    createdAt?: Timestamp
    updatedAt?: Timestamp
@@ -24,6 +25,7 @@ export interface AuthUser {
    uid: string
    email: string
    role: UserRole
+   branchId?: string
    name: string
    lastname: string
    status: 'activo' | 'inactivo'

@@ -58,6 +58,7 @@ export class AuthService {
           uid: uid,
           email: user.email,
           role: user.role,
+          branchId: user.branchId,
           name: user.name,
           lastname: user.lastname,
           status: user.status,
@@ -122,6 +123,7 @@ export class AuthService {
           name: pendiente.name,
           lastname: pendiente.lastname,
           role: pendiente.role,
+          ...(pendiente.branchId ? { branchId: pendiente.branchId } : {}),
           status: pendiente.status,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
@@ -180,6 +182,7 @@ export class AuthService {
         name,
         lastname,
         role,
+        ...(pendiente?.branchId ? { branchId: pendiente.branchId } : {}),
         status,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
@@ -255,7 +258,7 @@ export class AuthService {
   }
 
   private redirectByRole(role: string): void {
-    if (role === 'admin') {
+    if (role === 'superAdmin' || role === 'admin') {
       this.router.navigateByUrl('/admin/home')
     } else if (role === 'instructor') {
       this.router.navigateByUrl('/instructor/home')
@@ -267,7 +270,7 @@ export class AuthService {
   async isAdmin(): Promise<boolean> {
     return new Promise((resolve) => {
       this.currentUser$.subscribe((user) => {
-        resolve(user?.role === 'admin' && user?.status === 'activo')
+        resolve((user?.role === 'superAdmin' || user?.role === 'admin') && user?.status === 'activo')
       })
     })
   }

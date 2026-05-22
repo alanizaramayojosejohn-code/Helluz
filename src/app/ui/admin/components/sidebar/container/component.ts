@@ -19,35 +19,36 @@ export class SidebarComponent implements OnInit {
    readonly sidebarService = inject(SidebarService)
    private readonly authService = inject(AuthService)
 
-   userRole = signal<'admin' | 'instructor' | null>(null)
+   userRole = signal<'superAdmin' | 'admin' | 'instructor' | null>(null)
    userName = signal('Usuario')
    userInitials = signal('U')
    userEmail = signal('')
 
    roleLabel = computed(() => {
       const role = this.userRole()
+      if (role === 'superAdmin') return 'Super Administrador'
       if (role === 'admin') return 'Administrador'
       if (role === 'instructor') return 'Instructor'
       return ''
    })
 
    menuItems: MenuItem[] = [
-      { label: 'Dashboard', icon: 'dashboard', route: '/admin/home', roles: ['admin', 'instructor'] },
-      { label: 'Alumnos', icon: 'school', route: '/admin/alumnos', roles: ['admin', 'instructor'] },
-      { label: 'Inscripciones', icon: 'assignment', route: '/admin/inscripciones', roles: ['admin', 'instructor'] },
-      { label: 'Horarios', icon: 'schedule', route: '/admin/horarios', roles: ['admin', 'instructor'] },
-      { label: 'Membresías', icon: 'card_membership', route: '/admin/membresias', roles: ['admin'] },
-      { label: 'Instructores', icon: 'fitness_center', route: '/admin/instructores', roles: ['admin'] },
-      { label: 'Usuarios', icon: 'groups', route: '/admin/usuarios', roles: ['admin'] },
-      { label: 'Sucursales', icon: 'storefront', route: '/admin/sucursales', roles: ['admin'] },
-      { label: 'Asistencias alumnos', icon: 'list_alt', route: '/admin/asistenciasa', roles: ['admin'] },
-      { label: 'Asistencias instructor', icon: 'task_alt', route: '/admin/asistenciasi', roles: ['admin'] },
-      { label: 'Finanzas', icon: 'account_balance', route: '/admin/finanzas', roles: ['admin'] },
+      { label: 'Dashboard', icon: 'dashboard', route: '/admin/home', roles: ['superAdmin', 'admin', 'instructor'] },
+      { label: 'Alumnos', icon: 'school', route: '/admin/alumnos', roles: ['superAdmin', 'admin', 'instructor'] },
+      { label: 'Inscripciones', icon: 'assignment', route: '/admin/inscripciones', roles: ['superAdmin', 'admin', 'instructor'] },
+      { label: 'Horarios', icon: 'schedule', route: '/admin/horarios', roles: ['superAdmin', 'admin', 'instructor'] },
+      { label: 'Membresías', icon: 'card_membership', route: '/admin/membresias', roles: ['superAdmin', 'admin'] },
+      { label: 'Instructores', icon: 'fitness_center', route: '/admin/instructores', roles: ['superAdmin', 'admin'] },
+      { label: 'Usuarios', icon: 'groups', route: '/admin/usuarios', roles: ['superAdmin'] },
+      { label: 'Sucursales', icon: 'storefront', route: '/admin/sucursales', roles: ['superAdmin'] },
+      { label: 'Asistencias alumnos', icon: 'list_alt', route: '/admin/asistenciasa', roles: ['superAdmin', 'admin'] },
+      { label: 'Asistencias instructor', icon: 'task_alt', route: '/admin/asistenciasi', roles: ['superAdmin', 'admin'] },
+      { label: 'Finanzas', icon: 'account_balance', route: '/admin/finanzas', roles: ['superAdmin', 'admin'] },
       {
          label: 'Marcar asistencia',
          icon: 'qr_code_scanner',
          route: '/admin/asistenciainstructores',
-         roles: ['admin', 'instructor'],
+         roles: ['superAdmin', 'admin', 'instructor'],
       },
    ]
 

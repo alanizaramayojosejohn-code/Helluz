@@ -4,6 +4,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
 import { UserService } from '../../../../../../../services/user/user.service'
 import { AuthService } from '../../../../../../../services/auth/auth.service'
+import { BranchService } from '../../../../../../../services/branch/branch.service'
+import { Branch } from '../../../../../../../models/branch.model'
 
 @Component({
    selector: 'x-user-form',
@@ -14,6 +16,7 @@ export class UserForm implements OnInit {
    private readonly fb = inject(FormBuilder)
    private readonly userService = inject(UserService)
    private readonly authService = inject(AuthService)
+   private readonly branchService = inject(BranchService)
    private readonly destroyRef = inject(DestroyRef)
 
    readonly userId = input<string | null>(null)
@@ -28,6 +31,7 @@ export class UserForm implements OnInit {
    readonly isLoading = signal(false)
    readonly errorMessage = signal<string | null>(null)
    readonly currentUserId = signal<string | null>(null)
+   readonly branches = signal<Branch[]>([])
 
    constructor() {
       effect(() => {
@@ -41,6 +45,8 @@ export class UserForm implements OnInit {
    ngOnInit(): void {
       this.initForm()
       this.loadCurrentUser()
+      this.loadBranches()
+      this.watchRoleChanges()
    }
 
    private initForm(): void {
@@ -49,8 +55,41 @@ export class UserForm implements OnInit {
          name: ['', [Validators.required, Validators.minLength(2)]],
          lastname: ['', [Validators.required, Validators.minLength(2)]],
          role: ['instructor', Validators.required],
+         branchId: [''],
          status: ['activo', Validators.required],
       })
+   }
+
+   private loadBranches(): void {
+      this.branchService.getActiveBranches()
+         .pipe(takeUntilDestroyed(this.destroyRef))
+         .subscribe((branches) => this.branches.set(branches))
+   }
+
+   private watchRoleChanges(): void {
+      this.userForm.get('role')!.valueChanges
+         .pipe(takeUntilDestroyed(this.destroyRef))
+         .subscribe((role) => {
+            const branchControl = this.userForm.get('branchId')!
+            if (role === 'admin') {
+               branchControl.setValidators(Validators.required)
+            } else if (role === 'instructor') {
+               branchControl.clearValidators()
+            } else {
+               branchControl.clearValidators()
+               branchControl.setValue('')
+            }
+            branchControl.updateValueAndValidity()
+         })
+   }
+
+   get isAdminRole(): boolean {
+      return this.userForm.get('role')?.value === 'admin'
+   }
+
+   get showBranchSelector(): boolean {
+      const role = this.userForm.get('role')?.value
+      return role === 'admin' || role === 'instructor'
    }
 
    private loadCurrentUser(): void {
@@ -76,6 +115,7 @@ export class UserForm implements OnInit {
                      name: user.name,
                      lastname: user.lastname,
                      role: user.role,
+                     branchId: user.branchId ?? '',
                      status: user.status,
                   })
                }
@@ -123,6 +163,7 @@ export class UserForm implements OnInit {
             name: formValue.name,
             lastname: formValue.lastname,
             role: formValue.role,
+            ...(formValue.branchId ? { branchId: formValue.branchId } : {}),
             status: formValue.status,
          })
       } else {
@@ -136,6 +177,7 @@ export class UserForm implements OnInit {
                name: formValue.name,
                lastname: formValue.lastname,
                role: formValue.role,
+               ...(formValue.branchId ? { branchId: formValue.branchId } : {}),
                status: formValue.status,
                createdBy: currentUserId,
             },
