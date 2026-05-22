@@ -5,13 +5,15 @@ import { UserForm } from '../components/form/container/component';
 import { UserDetail } from '../components/detail/container/component';
 import { UserService } from '../../../../../services/user/user.service';
 import { UserQueryService } from '../../../../../services/user/user-query.service';
+import { BranchService } from '../../../../../services/branch/branch.service';
+import { QueryService as BranchQueryService } from '../../../../../services/branch/query.service';
 
 type View = 'list' | 'form' | 'detail';
 
 @Component({
   selector: 'x-users-container',
   imports: [UserList, UserForm, UserDetail],
-  providers: [UserService, UserQueryService],
+  providers: [UserService, UserQueryService, BranchService, BranchQueryService],
   templateUrl: './component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

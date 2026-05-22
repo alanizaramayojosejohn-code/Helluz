@@ -18,6 +18,7 @@
   <!-- Filters -->
   <div class="flex flex-wrap items-center gap-3 pt-6">
     <!-- Branch filter -->
+    @if (!isBranchAdmin()) {
     <div class="relative">
       <button
         (click)="toggleBranchDropdown($event)"
@@ -51,6 +52,7 @@
         </div>
       }
     </div>
+    } <!-- end @if (!isBranchAdmin()) -->
     <!-- Search -->
     <div class="flex-1 flex items-center gap-2 px-4 py-[10px] rounded-full bg-bg-elevated border border-hairline border-border-strong">
       <mat-icon class="text-faint !text-base !w-4 !h-4 leading-none shrink-0">search</mat-icon>

@@ -1,4 +1,4 @@
-import { Component, inject, output, OnInit } from '@angular/core'
+import { Component, inject, output, OnInit, signal } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
 import { MatButtonModule } from '@angular/material/button'
@@ -22,6 +22,7 @@ import { ScheduleService } from '../../../../../services/schedule/schedule.servi
 import { InstructorAttendanceQueryService } from '../../../../../services/instructorAttendance/instructor-attendance-query.service'
 import { InstructorService } from '../../../../../services/instructor/instructor.service'
 import { InstructorQueryService } from '../../../../../services/instructor/instructor-query.service'
+import { AuthService } from '../../../../../services/auth/auth.service'
 
 @Component({
    selector: 'x-instructor-attendance-list',
@@ -52,10 +53,12 @@ import { InstructorQueryService } from '../../../../../services/instructor/instr
 export default class InstructorAttendanceListComponent implements OnInit {
    private readonly attendanceService = inject(InstructorAttendanceService)
    private readonly branchService = inject(BranchService)
+   private readonly authService = inject(AuthService)
    private readonly dialog = inject(MatDialog)
    private readonly confirmDialog = inject(ConfirmDialogService)
    private readonly excelExport = inject(ExcelExportService)
 
+   readonly isBranchAdmin = signal(false)
    backToMark = output<void>()
 
    private selectedBranchId$ = new BehaviorSubject<string>('')
@@ -101,9 +104,16 @@ export default class InstructorAttendanceListComponent implements OnInit {
    }
 
    ngOnInit(): void {
-      this.branches$.subscribe((branches) => {
-         if (branches.length > 0 && !this.selectedBranchId$.value) {
-            this.selectedBranchId$.next(branches[0].id!)
+      this.authService.currentUser$.pipe(take(1)).subscribe(user => {
+         if (user?.role === 'admin' && user.branchId) {
+            this.isBranchAdmin.set(true)
+            this.selectedBranchId$.next(user.branchId)
+         } else {
+            this.branches$.subscribe((branches) => {
+               if (branches.length > 0 && !this.selectedBranchId$.value) {
+                  this.selectedBranchId$.next(branches[0].id!)
+               }
+            })
          }
       })
    }

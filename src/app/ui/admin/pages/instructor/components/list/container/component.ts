@@ -9,8 +9,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { MatTooltipModule } from '@angular/material/tooltip'
 import { FormsModule } from '@angular/forms'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
+import { take } from 'rxjs'
 import { InstructorService } from '../../../../../../../services/instructor/instructor.service'
 import { BranchService } from '../../../../../../../services/branch/branch.service'
+import { AuthService } from '../../../../../../../services/auth/auth.service'
 import { Instructor } from '../../../../../../../models/instructor.model'
 import { ConfirmDialogService } from '../../../../../../../../shared/services/confirm-dialog.service'
 
@@ -32,6 +34,7 @@ import { ConfirmDialogService } from '../../../../../../../../shared/services/co
 export class InstructorList implements OnInit {
    private readonly instructorService = inject(InstructorService)
    private readonly branchService = inject(BranchService)
+   private readonly authService = inject(AuthService)
    private readonly destroyRef = inject(DestroyRef)
 
    readonly createInstructor = output<void>()
@@ -44,27 +47,41 @@ export class InstructorList implements OnInit {
    readonly showBranchDropdown = signal(false)
    readonly isLoading = signal(false)
    readonly errorMessage = signal<string | null>(null)
+   readonly isBranchAdmin = signal(false)
+   private fixedBranchId: string | null = null
 
    readonly displayedColumns = ['name', 'ci', 'cellphone', 'email', 'branch', 'status', 'actions']
 
    ngOnInit(): void {
-      this.loadData()
+      this.authService.currentUser$.pipe(take(1)).subscribe(user => {
+         if (user?.role === 'admin' && user.branchId) {
+            this.isBranchAdmin.set(true)
+            this.fixedBranchId = user.branchId
+            this.selectedBranchId.set(user.branchId)
+         }
+         this.loadData()
+      })
    }
 
    private loadData(): void {
       this.isLoading.set(true)
       this.errorMessage.set(null)
 
-      this.branchService
-         .getActiveBranches()
-         .pipe(takeUntilDestroyed(this.destroyRef))
-         .subscribe({
-            next: (branches) => this.branches.set(branches),
-            error: () => this.errorMessage.set('Error al cargar sucursales'),
-         })
+      if (!this.isBranchAdmin()) {
+         this.branchService
+            .getActiveBranches()
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+               next: (branches) => this.branches.set(branches),
+               error: () => this.errorMessage.set('Error al cargar sucursales'),
+            })
+      }
 
-      this.instructorService
-         .getInstructors()
+      const instructors$ = this.fixedBranchId
+         ? this.instructorService.getInstructorsByBranch(this.fixedBranchId)
+         : this.instructorService.getInstructors()
+
+      instructors$
          .pipe(takeUntilDestroyed(this.destroyRef))
          .subscribe({
             next: (instructors) => {

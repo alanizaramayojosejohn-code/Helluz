@@ -34,5 +34,5 @@ export interface MenuItem {
   label: string;
   icon: string;
   route: string;
-  roles?: ('admin' | 'instructor')[];
+  roles?: ('superAdmin' | 'admin' | 'instructor')[];
 }

@@ -6,6 +6,7 @@ export interface UserPending {
   name: string
   lastname: string
   role: UserRole
+  branchId?: string
   status: 'activo' | 'inactivo'
   createdBy: string
   createdAt?: Timestamp

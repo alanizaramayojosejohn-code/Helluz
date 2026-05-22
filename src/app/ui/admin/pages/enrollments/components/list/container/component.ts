@@ -12,10 +12,11 @@ import { AsyncPipe, DatePipe } from '@angular/common'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { EnrollmentService } from '../../../../../../../services/enrollment/enrollment.service'
 import { BranchService } from '../../../../../../../services/branch/branch.service'
+import { AuthService } from '../../../../../../../services/auth/auth.service'
 import { Enrollment } from '../../../../../../../models/enrollment.model'
 import { Branch } from '../../../../../../../models/branch.model'
 import { DocumentSnapshot } from '@angular/fire/firestore'
-import { Observable, tap } from 'rxjs'
+import { Observable, tap, take } from 'rxjs'
 
 @Component({
    selector: 'x-enrollment-list',
@@ -37,6 +38,7 @@ import { Observable, tap } from 'rxjs'
 export class EnrollmentList implements OnInit {
    private readonly enrollmentService = inject(EnrollmentService)
    private readonly branchService = inject(BranchService)
+   private readonly authService = inject(AuthService)
    private readonly destroyRef = inject(DestroyRef)
 
    readonly createEnrollment = output<void>()
@@ -56,14 +58,21 @@ export class EnrollmentList implements OnInit {
    readonly showBranchDropdown = signal(false)
    readonly selectedBranchId = signal<string | null>(null)
    readonly selectedStatus = signal<string>('all')
+   readonly isBranchAdmin = signal(false)
    private branchesCache: Branch[] = []
 
    readonly isLoading = signal(false)
    readonly errorMessage = signal<string | null>(null)
 
    ngOnInit(): void {
-      this.loadBranches()
-      this.loadPage(0)
+      this.authService.currentUser$.pipe(take(1)).subscribe(user => {
+         if ((user?.role === 'admin' || user?.role === 'instructor') && user.branchId) {
+            this.isBranchAdmin.set(true)
+            this.selectedBranchId.set(user.branchId)
+         }
+         this.loadBranches()
+         this.loadPage(0)
+      })
    }
 
    private loadBranches(): void {

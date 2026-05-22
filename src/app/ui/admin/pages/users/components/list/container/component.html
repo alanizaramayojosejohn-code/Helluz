@@ -28,6 +28,14 @@
         Todos
       </button>
       <button
+        (click)="onRoleFilterChange('superAdmin')"
+        [class]="roleFilter() === 'superAdmin'
+          ? 'flex items-center gap-2 px-4 py-2 rounded-full bg-bg-elevated text-caption font-extrabold text-ink shadow-sm cursor-pointer border-none'
+          : 'px-4 py-2 rounded-full text-caption font-extrabold text-muted bg-transparent cursor-pointer border-none'"
+      >
+        Super Admins
+      </button>
+      <button
         (click)="onRoleFilterChange('admin')"
         [class]="roleFilter() === 'admin'
           ? 'flex items-center gap-2 px-4 py-2 rounded-full bg-bg-elevated text-caption font-extrabold text-ink shadow-sm cursor-pointer border-none'
@@ -124,10 +132,8 @@
             <span class="text-body-sm font-semibold text-ink w-[200px] shrink-0 truncate">{{ user.email }}</span>
             <!-- Rol -->
             <div class="w-[120px] shrink-0">
-              <span [class]="user.role === 'admin'
-                ? 'px-[10px] py-1 rounded-full bg-purple-500/20 text-purple-700 text-caption font-extrabold'
-                : 'px-[10px] py-1 rounded-full bg-info/20 text-info text-caption font-extrabold'">
-                {{ user.role === 'admin' ? 'Administrador' : 'Instructor' }}
+              <span [class]="getRoleBadgeClass(user.role)">
+                {{ user.role === 'superAdmin' ? 'Super Admin' : user.role === 'admin' ? 'Administrador' : 'Instructor' }}
               </span>
             </div>
             <!-- Estado -->

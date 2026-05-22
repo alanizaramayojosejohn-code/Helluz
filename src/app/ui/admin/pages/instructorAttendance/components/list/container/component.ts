@@ -1,4 +1,4 @@
-import { Component, inject, output, OnInit } from '@angular/core'
+import { Component, inject, output, OnInit, signal } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
 import { MatTableModule } from '@angular/material/table'
@@ -10,9 +10,10 @@ import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatInputModule } from '@angular/material/input'
 import { MatSelectModule } from '@angular/material/select'
 import { MatDialogModule, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
-import { Observable, BehaviorSubject, combineLatest } from 'rxjs'
+import { Observable, BehaviorSubject, combineLatest, take } from 'rxjs'
 import { switchMap, map } from 'rxjs/operators'
 import { BranchService } from '../../../../../../../services/branch/branch.service'
+import { AuthService } from '../../../../../../../services/auth/auth.service'
 import { InstructorAttendanceService } from '../../../../../../../services/instructorAttendance/instructor-attendance.service'
 import { InstructorAttendance, InstructorAttendanceStats } from '../../../../../../../models/instructorAttendance.model'
 import { ConfirmDialogService } from '../../../../../../../../shared/services/confirm-dialog.service'
@@ -38,8 +39,10 @@ import { ConfirmDialogService } from '../../../../../../../../shared/services/co
 export default class InstructorAttendanceListComponent implements OnInit {
    private readonly attendanceService = inject(InstructorAttendanceService)
    private readonly branchService = inject(BranchService)
+   private readonly authService = inject(AuthService)
    private readonly dialog = inject(MatDialog)
 
+   readonly isBranchAdmin = signal(false)
    backToMark = output<void>()
 
    displayedColumns: string[] = ['createdAt', 'instructorName', 'schedule', 'punctuality', 'hours', 'status']
@@ -87,9 +90,16 @@ export default class InstructorAttendanceListComponent implements OnInit {
    }
 
    ngOnInit(): void {
-      this.branches$.subscribe((branches) => {
-         if (branches.length > 0 && !this.selectedBranchId$.value) {
-            this.selectedBranchId$.next(branches[0].id!)
+      this.authService.currentUser$.pipe(take(1)).subscribe(user => {
+         if (user?.role === 'admin' && user.branchId) {
+            this.isBranchAdmin.set(true)
+            this.selectedBranchId$.next(user.branchId)
+         } else {
+            this.branches$.subscribe((branches) => {
+               if (branches.length > 0 && !this.selectedBranchId$.value) {
+                  this.selectedBranchId$.next(branches[0].id!)
+               }
+            })
          }
       })
    }

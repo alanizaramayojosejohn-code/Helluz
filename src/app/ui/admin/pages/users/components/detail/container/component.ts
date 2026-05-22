@@ -128,15 +128,17 @@ export class UserDetail implements OnInit {
   }
 
   getRoleBadgeClass(): string {
-    const user = this.user();
-    return user?.role === 'admin'
-      ? 'bg-purple-500 text-white'
-      : 'bg-blue-500 text-white';
+    const role = this.user()?.role
+    if (role === 'superAdmin') return 'bg-amber-500 text-white'
+    if (role === 'admin') return 'bg-purple-500 text-white'
+    return 'bg-blue-500 text-white'
   }
 
   getRoleLabel(): string {
-    const user = this.user();
-    return user?.role === 'admin' ? 'Administrador' : 'Instructor';
+    const role = this.user()?.role
+    if (role === 'superAdmin') return 'Super Administrador'
+    if (role === 'admin') return 'Administrador'
+    return 'Instructor'
   }
 
   getInitials(): string {

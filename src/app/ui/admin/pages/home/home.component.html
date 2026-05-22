@@ -21,6 +21,7 @@
             </div>
 
             <div class="flex items-center gap-2 flex-wrap">
+               @if (!isBranchAdmin()) {
                <label
                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-bg-elevated border border-hairline border-border-strong text-caption font-extrabold tracking-wide hover:bg-bg-inset transition-colors duration-fast cursor-pointer">
                   <span class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none">storefront</span>
@@ -37,6 +38,13 @@
                   <span
                      class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none text-faint">keyboard_arrow_down</span>
                </label>
+               } @else {
+               <div
+                  class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-bg-elevated border border-hairline border-border-strong text-caption font-extrabold tracking-wide">
+                  <span class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none">storefront</span>
+                  <span>{{ selectedBranchName() | titlecase }}</span>
+               </div>
+               }
                <a routerLink="/admin/usuarios"
                   class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-brand-500 hover:bg-brand-600 text-on-brand text-caption font-extrabold tracking-wide shadow-brand transition-colors duration-fast no-underline">
                   <span class="material-symbols-rounded !text-[16px] !w-[16px] !h-[16px] leading-none">add</span>
@@ -274,7 +282,7 @@
                   <p class="text-caption text-[#78350f]/80 leading-snug m-0">
                      Esta semana. Notificar a los alumnos para renovar.
                   </p>
-                  <a routerLink="/admin/finanzas"
+                  <a routerLink="/admin/inscripciones"
                      class="inline-flex items-center gap-1 text-[10px] font-extrabold tracking-[0.15em] text-[#78350f] mt-1 cursor-pointer no-underline">
                      VER LISTA
                      <span

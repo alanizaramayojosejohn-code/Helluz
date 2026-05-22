@@ -9,14 +9,16 @@
 
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <mat-form-field appearance="outline" class="w-full">
-               <mat-label>Sucursal</mat-label>
-               <mat-select (selectionChange)="onBranchChange($event.value)">
-                  @for (branch of branches$ | async; track branch.id) {
-                     <mat-option [value]="branch.id">{{ branch.name }}</mat-option>
-                  }
-               </mat-select>
-            </mat-form-field>
+            @if (!isBranchAdmin()) {
+               <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Sucursal</mat-label>
+                  <mat-select (selectionChange)="onBranchChange($event.value)">
+                     @for (branch of branches$ | async; track branch.id) {
+                        <mat-option [value]="branch.id">{{ branch.name }}</mat-option>
+                     }
+                  </mat-select>
+               </mat-form-field>
+            }
 
             <mat-form-field appearance="outline" class="w-full">
                <mat-label>Fecha</mat-label>

@@ -67,7 +67,12 @@ export default class Home {
       initialValue: [] as Branch[],
    })
 
+   readonly isBranchAdmin = signal(false)
    readonly selectedBranchId = signal<string>('')
+
+   readonly selectedBranchName = computed(
+      () => this.branches().find((b) => b.id === this.selectedBranchId())?.name ?? ''
+   )
 
    private readonly branchId$ = toObservable(this.selectedBranchId)
 
@@ -287,9 +292,19 @@ export default class Home {
 
    constructor() {
       effect(() => {
-         const list = this.branches()
-         if (list.length && !this.selectedBranchId()) {
-            this.selectedBranchId.set(list[0].id)
+         const u = this.user()
+         if (!u) return
+
+         if (u.role === 'admin' && u.branchId) {
+            this.isBranchAdmin.set(true)
+            if (!this.selectedBranchId()) {
+               this.selectedBranchId.set(u.branchId)
+            }
+         } else {
+            const list = this.branches()
+            if (list.length && !this.selectedBranchId()) {
+               this.selectedBranchId.set(list[0].id)
+            }
          }
       })
    }

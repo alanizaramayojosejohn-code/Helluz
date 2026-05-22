@@ -9,9 +9,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { MatTooltipModule } from '@angular/material/tooltip'
 import { AsyncPipe } from '@angular/common'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
-import { Observable, BehaviorSubject, switchMap, map } from 'rxjs'
+import { Observable, BehaviorSubject, switchMap, map, take } from 'rxjs'
 import { ScheduleService } from '../../../../../../../services/schedule/schedule.service'
 import { BranchService } from '../../../../../../../services/branch/branch.service'
+import { AuthService } from '../../../../../../../services/auth/auth.service'
 import { SeedService } from '../../../../../../../services/seed/seed.service'
 import { Schedule } from '../../../../../../../models/schedule.model'
 import { Branch } from '../../../../../../../models/branch.model'
@@ -35,6 +36,7 @@ import { ConfirmDialogService } from '../../../../../../../../shared/services/co
 export class ScheduleList implements OnInit {
    private readonly scheduleService = inject(ScheduleService)
    private readonly branchService = inject(BranchService)
+   private readonly authService = inject(AuthService)
    private readonly seedService = inject(SeedService)
    private readonly destroyRef = inject(DestroyRef)
 
@@ -48,6 +50,7 @@ export class ScheduleList implements OnInit {
    private selectedBranchId$ = new BehaviorSubject<string | null>(null)
    readonly selectedBranchFilter = signal<string>('all')
    readonly showBranchDropdown = signal(false)
+   readonly isBranchAdmin = signal(false)
    private branchesCache: Branch[] = []
 
    readonly isLoading = signal(false)
@@ -66,7 +69,14 @@ export class ScheduleList implements OnInit {
    //  }
 
    ngOnInit(): void {
-      this.loadData()
+      this.authService.currentUser$.pipe(take(1)).subscribe(user => {
+         if (user?.role === 'admin' && user.branchId) {
+            this.isBranchAdmin.set(true)
+            this.selectedBranchFilter.set(user.branchId)
+            this.selectedBranchId$.next(user.branchId)
+         }
+         this.loadData()
+      })
    }
 
    private loadData(): void {

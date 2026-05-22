@@ -1,6 +1,5 @@
-import { Component, computed, effect, inject, signal } from '@angular/core'
+import { Component, computed, inject } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { FormsModule } from '@angular/forms'
 import { RouterLink } from '@angular/router'
 import { switchMap, of } from 'rxjs'
 import { toObservable, toSignal } from '@angular/core/rxjs-interop'
@@ -38,7 +37,7 @@ interface RecentRow extends StudentAttendance {
 @Component({
    selector: 'app-home',
    standalone: true,
-   imports: [CommonModule, FormsModule, RouterLink],
+   imports: [CommonModule, RouterLink],
    providers: [
       StudentService,
       StudentQueryService,
@@ -67,9 +66,14 @@ export default class Home {
       initialValue: [] as Branch[],
    })
 
-   readonly selectedBranchId = signal<string>('')
+   readonly branchId = computed(() => this.user()?.branchId ?? '')
 
-   private readonly branchId$ = toObservable(this.selectedBranchId)
+   readonly branchName = computed(() => {
+      const id = this.branchId()
+      return this.branches().find((b) => b.id === id)?.name ?? ''
+   })
+
+   private readonly branchId$ = toObservable(this.branchId)
 
    readonly activeStudents = toSignal(this.studentService.getActiveStudents(), {
       initialValue: [] as Student[],
@@ -104,7 +108,7 @@ export default class Home {
    )
 
    readonly branchEnrollments = computed<Enrollment[]>(() => {
-      const id = this.selectedBranchId()
+      const id = this.branchId()
       if (!id) return []
       return this.allEnrollments().filter((e) => e.branchId === id)
    })
@@ -178,7 +182,7 @@ export default class Home {
       const dayName = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'][
          new Date().getDay()
       ]
-      const branchId = this.selectedBranchId()
+      const branchId = this.branchId()
       return this.schedulesActive()
          .filter((s) => !branchId || s.branchId === branchId)
          .filter((s) => (s.days || []).map((d) => d.toLowerCase()).includes(dayName))
@@ -200,19 +204,6 @@ export default class Home {
                : '--:--',
          }))
    })
-
-   constructor() {
-      effect(() => {
-         const list = this.branches()
-         if (list.length && !this.selectedBranchId()) {
-            this.selectedBranchId.set(list[0].id)
-         }
-      })
-   }
-
-   onBranchChange(value: string) {
-      this.selectedBranchId.set(value)
-   }
 
    getUserDisplayName(): string {
       const currentUser = this.user()

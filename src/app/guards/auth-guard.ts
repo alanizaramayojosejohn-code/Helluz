@@ -33,7 +33,7 @@ export const noAuthGuard: CanActivateFn = (route, state) => {
          if (!user) {
             return true
          } else {
-            if (user.role === 'admin') {
+            if (user.role === 'superAdmin' || user.role === 'admin') {
                router.navigate(['/admin/home'])
             } else {
                router.navigate(['/instructor/home'])
@@ -44,6 +44,7 @@ export const noAuthGuard: CanActivateFn = (route, state) => {
    )
 }
 
+/** Permite acceso a cualquier usuario con rol de administración (superAdmin o admin de sucursal) */
 export const adminGuard: CanActivateFn = (route, state) => {
    const authService = inject(AuthService)
    const router = inject(Router)
@@ -51,10 +52,28 @@ export const adminGuard: CanActivateFn = (route, state) => {
    return authService.currentUser$.pipe(
       take(1),
       map((user: AuthUser | null) => {
-         if (user && user.status === 'activo' && user.role === 'admin') {
+         if (user && user.status === 'activo' && (user.role === 'superAdmin' || user.role === 'admin')) {
             return true
          } else {
             router.navigate(['/log-in'])
+            return false
+         }
+      })
+   )
+}
+
+/** Permite acceso solo a superAdmin (gestión global: usuarios, sucursales) */
+export const superAdminGuard: CanActivateFn = (route, state) => {
+   const authService = inject(AuthService)
+   const router = inject(Router)
+
+   return authService.currentUser$.pipe(
+      take(1),
+      map((user: AuthUser | null) => {
+         if (user && user.status === 'activo' && user.role === 'superAdmin') {
+            return true
+         } else {
+            router.navigate(['/admin/home'])
             return false
          }
       })
@@ -65,11 +84,9 @@ export const instructorGuard: CanActivateFn = (route, state) => {
    const authService = inject(AuthService)
    const router = inject(Router)
 
-
    return authService.currentUser$.pipe(
       take(1),
       map((user: AuthUser | null) => {
-
          if (user && user.status === 'activo' && user.role === 'instructor') {
             return true
          } else {
@@ -79,6 +96,7 @@ export const instructorGuard: CanActivateFn = (route, state) => {
       })
    )
 }
+
 export const adminOrInstructorGuard: CanActivateFn = (route, state) => {
    const authService = inject(AuthService)
    const router = inject(Router)
@@ -86,7 +104,7 @@ export const adminOrInstructorGuard: CanActivateFn = (route, state) => {
    return authService.currentUser$.pipe(
       take(1),
       map((user: AuthUser | null) => {
-         if (user && user.status === 'activo' && (user.role === 'admin' || user.role === 'instructor')) {
+         if (user && user.status === 'activo' && (user.role === 'superAdmin' || user.role === 'admin' || user.role === 'instructor')) {
             return true
          } else {
             router.navigate(['/log-in'])

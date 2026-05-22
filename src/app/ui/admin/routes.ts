@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router'
-import { authGuard } from '../../guards/auth-guard'
+import { superAdminGuard } from '../../guards/auth-guard'
 import { SharedRoutes } from '../../routes/shared.routes'
 
 export const AdminRoutes: Routes = [
@@ -10,11 +10,13 @@ export const AdminRoutes: Routes = [
    },
    {
       path: 'usuarios',
+      canActivate: [superAdminGuard],
       data: { breadcrumb: 'Usuarios' },
       loadComponent: async () => await import('./pages/users/container/component'),
    },
    {
       path: 'sucursales',
+      canActivate: [superAdminGuard],
       data: { breadcrumb: 'Sucursales' },
       loadComponent: async () => await import('./pages/branches/container/component'),
    },

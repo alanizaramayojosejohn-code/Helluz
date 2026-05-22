@@ -58,7 +58,9 @@ export class Home implements OnInit {
    }
 
    getUserRole(): string {
-      const currentUser = this.user()
-      return currentUser?.role === 'admin' ? 'Administrador' : 'Instructor'
+      const role = this.user()?.role
+      if (role === 'superAdmin') return 'Super Administrador'
+      if (role === 'admin') return 'Administrador'
+      return 'Instructor'
    }
 }

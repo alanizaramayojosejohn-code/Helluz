@@ -70,6 +70,7 @@ export class UserService {
          name: userData.name.trim(),
          lastname: userData.lastname.trim(),
          role: userData.role,
+         ...(userData.branchId ? { branchId: userData.branchId } : {}),
          status: userData.status,
          createdBy: currentUserId,
          createdAt: serverTimestamp(),
@@ -149,7 +150,7 @@ export class UserService {
          throw new Error('Email inválido')
       }
 
-      if (!['admin', 'instructor'].includes(userData.role)) {
+      if (!['superAdmin', 'admin', 'instructor'].includes(userData.role)) {
          throw new Error('Rol inválido')
       }
    }
