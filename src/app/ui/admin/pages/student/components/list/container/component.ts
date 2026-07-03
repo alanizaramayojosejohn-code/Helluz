@@ -2,6 +2,7 @@
 import { Component, DestroyRef, inject, OnInit, output, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AsyncPipe } from '@angular/common'
+import { FormsModule } from '@angular/forms'
 import { Observable } from 'rxjs'
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatSelectModule } from '@angular/material/select'
@@ -14,7 +15,7 @@ import { MatIcon } from '@angular/material/icon'
 
 @Component({
    selector: 'x-student-list',
-   imports: [MatFormFieldModule, MatSelectModule, MatProgressSpinnerModule, MatTooltipModule, AsyncPipe, MatIcon],
+   imports: [MatFormFieldModule, MatSelectModule, MatProgressSpinnerModule, MatTooltipModule, AsyncPipe, MatIcon, FormsModule],
    templateUrl: './component.html',
 })
 export class StudentList implements OnInit {
@@ -30,6 +31,7 @@ export class StudentList implements OnInit {
    readonly isLoading = signal(false)
    readonly errorMessage = signal<string | null>(null)
    readonly statusFilter = signal<'all' | 'activo' | 'inactivo'>('all')
+   readonly searchTerm = signal<string>('')
 
    ngOnInit(): void {
       this.loadData()
@@ -82,8 +84,19 @@ export class StudentList implements OnInit {
 
    filterStudents(students: Student[]): Student[] {
       const filter = this.statusFilter()
-      if (filter === 'all') return students
-      return students.filter((s) => s.status === filter)
+      const search = this.searchTerm().trim().toLowerCase()
+      let result = filter === 'all' ? students : students.filter((s) => s.status === filter)
+      if (search) {
+         result = result.filter(
+            (s) =>
+               s.name.toLowerCase().includes(search) ||
+               s.lastname.toLowerCase().includes(search) ||
+               s.ci.toLowerCase().includes(search) ||
+               s.cellphone.toLowerCase().includes(search) ||
+               (s.email && s.email.toLowerCase().includes(search))
+         )
+      }
+      return result
    }
 
    getFullName(student: Student): string {

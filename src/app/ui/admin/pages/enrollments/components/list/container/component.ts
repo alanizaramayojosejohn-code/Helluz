@@ -9,6 +9,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { MatTooltipModule } from '@angular/material/tooltip'
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator'
 import { AsyncPipe, DatePipe } from '@angular/common'
+import { FormsModule } from '@angular/forms'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { EnrollmentService } from '../../../../../../../services/enrollment/enrollment.service'
 import { BranchService } from '../../../../../../../services/branch/branch.service'
@@ -32,6 +33,7 @@ import { Observable, tap, take } from 'rxjs'
       MatPaginatorModule,
       DatePipe,
       AsyncPipe,
+      FormsModule,
    ],
    templateUrl: './component.html',
 })
@@ -63,6 +65,18 @@ export class EnrollmentList implements OnInit {
 
    readonly isLoading = signal(false)
    readonly errorMessage = signal<string | null>(null)
+   readonly searchTerm = signal<string>('')
+
+   filterEnrollments(enrollments: Enrollment[]): Enrollment[] {
+      const search = this.searchTerm().trim().toLowerCase()
+      if (!search) return enrollments
+      return enrollments.filter(
+         (e) =>
+            e.studentName.toLowerCase().includes(search) ||
+            (e.membershipName && e.membershipName.toLowerCase().includes(search)) ||
+            (e.branchName && e.branchName.toLowerCase().includes(search))
+      )
+   }
 
    ngOnInit(): void {
       this.authService.currentUser$.pipe(take(1)).subscribe(user => {

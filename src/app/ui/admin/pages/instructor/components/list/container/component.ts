@@ -48,6 +48,8 @@ export class InstructorList implements OnInit {
    readonly isLoading = signal(false)
    readonly errorMessage = signal<string | null>(null)
    readonly isBranchAdmin = signal(false)
+   readonly searchTerm = signal<string>('')
+   readonly statusFilter = signal<'all' | 'activo' | 'inactivo'>('all')
    private fixedBranchId: string | null = null
 
    readonly displayedColumns = ['name', 'ci', 'cellphone', 'email', 'branch', 'status', 'actions']
@@ -97,13 +99,30 @@ export class InstructorList implements OnInit {
 
    get filteredInstructors(): Instructor[] {
       const branchId = this.selectedBranchId()
-      const allInstructors = this.instructors()
+      const status = this.statusFilter()
+      const search = this.searchTerm().trim().toLowerCase()
+      let result = this.instructors()
 
-      if (branchId === 'all') {
-         return allInstructors
+      if (branchId !== 'all') {
+         result = result.filter((instructor) => instructor.branchId === branchId)
       }
 
-      return allInstructors.filter((instructor) => instructor.branchId === branchId)
+      if (status !== 'all') {
+         result = result.filter((instructor) => instructor.status === status)
+      }
+
+      if (search) {
+         result = result.filter(
+            (i) =>
+               i.name.toLowerCase().includes(search) ||
+               i.lastname.toLowerCase().includes(search) ||
+               i.ci.toLowerCase().includes(search) ||
+               i.cellphone.toLowerCase().includes(search) ||
+               (i.email && i.email.toLowerCase().includes(search))
+         )
+      }
+
+      return result
    }
 
    @HostListener('document:click')

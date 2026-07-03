@@ -2,6 +2,7 @@
 import { Component, DestroyRef, inject, OnInit, output, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AsyncPipe } from '@angular/common'
+import { FormsModule } from '@angular/forms'
 import { Observable } from 'rxjs'
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatSelectModule } from '@angular/material/select'
@@ -15,7 +16,7 @@ import { UserPending } from '../../../../../../../models/userPending'
 
 @Component({
    selector: 'x-user-list',
-   imports: [MatFormFieldModule, MatSelectModule, MatProgressSpinnerModule, MatTooltipModule, AsyncPipe, MatIcon],
+   imports: [MatFormFieldModule, MatSelectModule, MatProgressSpinnerModule, MatTooltipModule, AsyncPipe, MatIcon, FormsModule],
    templateUrl: './component.html',
 })
 export class UserList implements OnInit {
@@ -32,6 +33,7 @@ export class UserList implements OnInit {
    readonly isLoading = signal(false)
    readonly errorMessage = signal<string | null>(null)
    readonly roleFilter = signal<'all' | 'superAdmin' | 'admin' | 'instructor'>('all')
+   readonly searchTerm = signal<string>('')
 
    ngOnInit(): void {
       this.loadData()
@@ -121,8 +123,17 @@ export class UserList implements OnInit {
 
    filterUsers(users: User[]): User[] {
       const filter = this.roleFilter()
-      if (filter === 'all') return users
-      return users.filter((u) => u.role === filter)
+      const search = this.searchTerm().trim().toLowerCase()
+      let result = filter === 'all' ? users : users.filter((u) => u.role === filter)
+      if (search) {
+         result = result.filter(
+            (u) =>
+               u.name.toLowerCase().includes(search) ||
+               u.lastname.toLowerCase().includes(search) ||
+               u.email.toLowerCase().includes(search)
+         )
+      }
+      return result
    }
 
    getFullName(user: User): string {
