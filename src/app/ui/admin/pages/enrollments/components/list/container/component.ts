@@ -87,7 +87,7 @@ export class EnrollmentList implements OnInit {
 
    onSearchInput(value: string): void {
       this.searchTerm.set(value)
-      this.searchInput$.next(value.trim().toLowerCase())
+      this.searchInput$.next(value.trim())
    }
 
    clearSearch(): void {

@@ -245,6 +245,30 @@ export class EnrollmentQueryService {
       return results.sort((a, b) => a.studentName.localeCompare(b.studentName))
    }
 
+   async searchByStudentNamePrefix(
+      term: string,
+      branchId?: string,
+      status?: string,
+      maxResults: number = 100
+   ): Promise<Enrollment[]> {
+      const col = collection(this.firestore, this.collectionName)
+      const constraints: QueryConstraint[] = [
+         where('studentName', '>=', term),
+         where('studentName', '<', term + '\uf8ff'),
+         orderBy('studentName'),
+         limit(maxResults),
+      ]
+
+      const q = query(col, ...constraints)
+      const snapshot = await getDocs(q)
+      let results = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Enrollment)
+
+      if (branchId) results = results.filter((e) => e.branchId === branchId)
+      if (status && status !== 'all') results = results.filter((e) => e.status === status)
+
+      return results
+   }
+
    async searchBySearchablePrefix(
       term: string,
       branchId?: string,
