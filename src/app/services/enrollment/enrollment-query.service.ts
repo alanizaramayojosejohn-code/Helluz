@@ -245,7 +245,7 @@ export class EnrollmentQueryService {
       return results.sort((a, b) => a.studentName.localeCompare(b.studentName))
    }
 
-   async searchByStudentNamePrefix(
+   async searchBySearchablePrefix(
       term: string,
       branchId?: string,
       status?: string,
@@ -253,9 +253,9 @@ export class EnrollmentQueryService {
    ): Promise<Enrollment[]> {
       const col = collection(this.firestore, this.collectionName)
       const constraints: QueryConstraint[] = [
-         where('studentName', '>=', term),
-         where('studentName', '<', term + '\uf8ff'),
-         orderBy('studentName'),
+         where('searchable', '>=', term),
+         where('searchable', '<', term + '\uf8ff'),
+         orderBy('searchable'),
          limit(maxResults),
       ]
 

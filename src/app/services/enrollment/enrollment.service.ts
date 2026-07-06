@@ -55,7 +55,7 @@ export class EnrollmentService {
             throw new Error('El alumno ya tiene una inscripción activa en esta sucursal')
          }
 
-         const searchKeywords = this.generateSearchKeywords(
+         const keywords = this.generateSearchKeywords(
             enrollment.studentName,
             enrollment.membershipName,
             enrollment.branchName
@@ -64,7 +64,8 @@ export class EnrollmentService {
          await this.query.create(id, {
             ...enrollment,
             id,
-            searchKeywords,
+            searchable: keywords.join(' '),
+            searchKeywords: keywords,
             createdBy: currentUserId,
             createdByName: currentUserName,
          })
@@ -87,11 +88,13 @@ export class EnrollmentService {
 
          if (enrollment.studentName || enrollment.membershipName || enrollment.branchName) {
             const existing = await firstValueFrom(this.query.getById(id))
-            data.searchKeywords = this.generateSearchKeywords(
+            const keywords = this.generateSearchKeywords(
                enrollment.studentName ?? existing?.studentName ?? '',
                enrollment.membershipName ?? existing?.membershipName ?? '',
                enrollment.branchName ?? existing?.branchName ?? ''
             )
+            data.searchable = keywords.join(' ')
+            data.searchKeywords = keywords
          }
 
          await this.query.update(id, data)
@@ -244,22 +247,17 @@ export class EnrollmentService {
       branchId?: string,
       status?: string
    ): Promise<Enrollment[]> {
-      try {
-         const [keywordMatches, prefixMatches] = await Promise.all([
-            this.query.searchByKeywords(term, branchId, status),
-            this.query.searchByStudentNamePrefix(term, branchId, status),
-         ])
+      const [keywordMatches, prefixMatches] = await Promise.all([
+         this.query.searchByKeywords(term, branchId, status).catch(() => [] as Enrollment[]),
+         this.query.searchBySearchablePrefix(term, branchId, status).catch(() => [] as Enrollment[]),
+      ])
 
-         const seen = new Set<string>()
-         return [...keywordMatches, ...prefixMatches].filter((e) => {
-            if (seen.has(e.id)) return false
-            seen.add(e.id)
-            return true
-         })
-      } catch (error) {
-         console.error('Error al buscar inscripciones:', error)
-         return []
-      }
+      const seen = new Set<string>()
+      return [...keywordMatches, ...prefixMatches].filter((e) => {
+         if (seen.has(e.id)) return false
+         seen.add(e.id)
+         return true
+      })
    }
 
 
