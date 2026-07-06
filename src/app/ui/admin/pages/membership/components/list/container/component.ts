@@ -1,6 +1,7 @@
 import { Component, DestroyRef, inject, OnInit, output, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AsyncPipe } from '@angular/common'
+import { FormsModule } from '@angular/forms'
 import { Observable } from 'rxjs'
 import { MatTableModule } from '@angular/material/table'
 import { MatButtonModule } from '@angular/material/button'
@@ -22,6 +23,7 @@ import { ConfirmDialogService } from '../../../../../../../../shared/services/co
       MatProgressSpinnerModule,
       MatTooltipModule,
       AsyncPipe,
+      FormsModule,
    ],
    templateUrl: './component.html',
 })
@@ -40,6 +42,8 @@ export class MembershipList implements OnInit {
    readonly errorMessage = signal<string | null>(null)
 
    readonly displayedColumns = ['name', 'duration', 'sessions', 'cost', 'status', 'actions']
+   readonly statusFilter = signal<'all' | 'activo' | 'inactivo'>('all')
+   readonly searchTerm = signal<string>('')
 
    ngOnInit(): void {
       this.loadData()
@@ -84,6 +88,20 @@ export class MembershipList implements OnInit {
       } catch (error) {
          this.errorMessage.set('Error al cambiar el estado')
       }
+   }
+
+   onStatusFilterChange(status: 'all' | 'activo' | 'inactivo'): void {
+      this.statusFilter.set(status)
+   }
+
+   filterMemberships(memberships: Membership[]): Membership[] {
+      const filter = this.statusFilter()
+      const search = this.searchTerm().trim().toLowerCase()
+      let result = filter === 'all' ? memberships : memberships.filter((m) => m.status === filter)
+      if (search) {
+         result = result.filter((m) => m.name.toLowerCase().includes(search))
+      }
+      return result
    }
 
    getDaysLabel(days: number[]): string {

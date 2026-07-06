@@ -54,10 +54,25 @@
     </div>
     } <!-- end @if (!isBranchAdmin()) -->
     <!-- Search -->
-    <div class="flex-1 flex items-center gap-2 px-4 py-[10px] rounded-full bg-bg-elevated border border-hairline border-border-strong">
+    <label class="flex-1 flex items-center gap-2 px-4 py-[10px] rounded-full bg-bg-elevated border border-hairline border-border-strong cursor-text">
       <mat-icon class="text-faint !text-base !w-4 !h-4 leading-none shrink-0">search</mat-icon>
-      <span class="text-caption text-faint font-medium">Buscar horario…</span>
-    </div>
+      <input
+        type="text"
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+        placeholder="Buscar día, disciplina o instructor…"
+        class="bg-transparent border-none outline-none flex-1 text-caption font-medium text-ink placeholder:text-faint min-w-0"
+      />
+      @if (searchTerm()) {
+        <button
+          type="button"
+          (click)="searchTerm.set('')"
+          class="bg-transparent border-none cursor-pointer text-faint hover:text-ink p-0 leading-none transition-colors duration-fast shrink-0"
+        >
+          <mat-icon class="!text-[16px] !w-[16px] !h-[16px] leading-none">close</mat-icon>
+        </button>
+      }
+    </label>
   </div>
 
   @if (errorMessage()) {
@@ -86,7 +101,7 @@
       </div>
 
       @if (schedules$ | async; as schedules) {
-        @for (schedule of schedules; track schedule.id) {
+        @for (schedule of filterSchedules(schedules); track schedule.id) {
           <div class="flex items-center gap-4 px-5 py-[14px] border-b border-hairline border-border-subtle hover:bg-bg-surface transition-colors duration-fast last:border-b-0">
             <!-- Día -->
             <span class="text-body-sm font-extrabold text-ink flex-1 min-w-0 truncate">{{ getDaysLabel(schedule.days) }}</span>

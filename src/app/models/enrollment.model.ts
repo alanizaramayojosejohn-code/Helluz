@@ -33,6 +33,7 @@ export interface Enrollment {
    createdByName?:  string
    updatedBy?:      string
    updatedByName?:  string
+   searchKeywords?: string[]
 }
 
 export type CreateEnrollmentDto = Omit<Enrollment, 'id' | 'createdAt' | 'updatedAt'>

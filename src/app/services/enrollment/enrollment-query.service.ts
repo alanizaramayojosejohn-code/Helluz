@@ -222,4 +222,50 @@ export class EnrollmentQueryService {
       )
       return collectionData(q, { idField: 'id' }) as Observable<Enrollment[]>
    }
+
+   async searchByKeywords(
+      term: string,
+      branchId?: string,
+      status?: string,
+      maxResults: number = 200
+   ): Promise<Enrollment[]> {
+      const col = collection(this.firestore, this.collectionName)
+      const constraints: QueryConstraint[] = [
+         where('searchKeywords', 'array-contains', term),
+         limit(maxResults),
+      ]
+
+      const q = query(col, ...constraints)
+      const snapshot = await getDocs(q)
+      let results = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Enrollment)
+
+      if (branchId) results = results.filter((e) => e.branchId === branchId)
+      if (status && status !== 'all') results = results.filter((e) => e.status === status)
+
+      return results.sort((a, b) => a.studentName.localeCompare(b.studentName))
+   }
+
+   async searchByStudentNamePrefix(
+      term: string,
+      branchId?: string,
+      status?: string,
+      maxResults: number = 100
+   ): Promise<Enrollment[]> {
+      const col = collection(this.firestore, this.collectionName)
+      const constraints: QueryConstraint[] = [
+         where('studentName', '>=', term),
+         where('studentName', '<', term + '\uf8ff'),
+         orderBy('studentName'),
+         limit(maxResults),
+      ]
+
+      const q = query(col, ...constraints)
+      const snapshot = await getDocs(q)
+      let results = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Enrollment)
+
+      if (branchId) results = results.filter((e) => e.branchId === branchId)
+      if (status && status !== 'all') results = results.filter((e) => e.status === status)
+
+      return results
+   }
 }

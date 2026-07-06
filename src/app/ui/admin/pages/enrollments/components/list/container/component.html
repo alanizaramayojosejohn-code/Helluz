@@ -79,10 +79,25 @@
     </div>
     } <!-- end @if (!isBranchAdmin()) -->
     <!-- Search -->
-    <div class="flex-1 min-w-[200px] flex items-center gap-2 px-4 py-[10px] rounded-full bg-bg-elevated border border-hairline border-border-strong">
+    <label class="flex-1 min-w-[200px] flex items-center gap-2 px-4 py-[10px] rounded-full bg-bg-elevated border border-hairline border-border-strong cursor-text">
       <mat-icon class="text-faint !text-base !w-4 !h-4 leading-none shrink-0">search</mat-icon>
-      <span class="text-caption text-faint font-medium">Buscar alumno o membresía…</span>
-    </div>
+      <input
+        type="text"
+        [ngModel]="searchTerm()"
+        (ngModelChange)="onSearchInput($event)"
+        placeholder="Buscar alumno o membresía…"
+        class="bg-transparent border-none outline-none flex-1 text-caption font-medium text-ink placeholder:text-faint min-w-0"
+      />
+      @if (searchTerm()) {
+        <button
+          type="button"
+          (click)="clearSearch()"
+          class="bg-transparent border-none cursor-pointer text-faint hover:text-ink p-0 leading-none transition-colors duration-fast shrink-0"
+        >
+          <mat-icon class="!text-[16px] !w-[16px] !h-[16px] leading-none">close</mat-icon>
+        </button>
+      }
+    </label>
   </div>
 
   @if (errorMessage()) {
@@ -113,8 +128,8 @@
         <span class="w-[60px] shrink-0"></span>
       </div>
 
-      @if (enrollments$ | async; as enrollments) {
-        @for (enrollment of enrollments; track enrollment.id) {
+      @if (!isSearching() || searchTerm().length >= 2) {
+        @for (enrollment of enrollments(); track enrollment.id) {
           <div class="flex items-center gap-4 px-5 py-[14px] border-b border-hairline border-border-subtle hover:bg-bg-surface transition-colors duration-fast last:border-b-0">
             <!-- Alumno -->
             <div class="flex items-center gap-2.5 flex-1 min-w-0">
@@ -169,33 +184,45 @@
             </div>
           </div>
         } @empty {
-          <div class="px-5 py-12 text-center text-faint text-body-sm">No hay inscripciones registradas</div>
+          <div class="px-5 py-12 text-center text-faint text-body-sm">
+            @if (isSearching()) {
+              No se encontraron resultados para "{{ searchTerm() }}"
+            } @else {
+              No hay inscripciones registradas
+            }
+          </div>
         }
       }
 
       <!-- Footer / Paginación -->
       <div class="flex items-center gap-3 px-5 py-[14px] border-t border-hairline border-border-default">
         <span class="text-caption font-semibold text-muted flex-1">
-          Página {{ currentPage() + 1 }}
-          @if ((enrollments$ | async)?.length) {
-            · {{ (enrollments$ | async)?.length }} registros
+          @if (isSearching()) {
+            {{ searchResultsCount() }} resultado{{ searchResultsCount() !== 1 ? 's' : '' }}
+          } @else {
+            Página {{ currentPage() + 1 }}
+            @if (enrollments().length) {
+              · {{ enrollments().length }} registros
+            }
           }
         </span>
-        <button
-          [disabled]="currentPage() === 0 || isLoading()"
-          (click)="onPageChange({ pageIndex: currentPage() - 1, pageSize: pageSize, length: 0 })"
-          class="w-8 h-8 rounded-md bg-bg-inset flex items-center justify-center cursor-pointer border-none disabled:opacity-disabled"
-        >
-          <mat-icon class="text-faint !text-[18px] !w-[18px] !h-[18px] leading-none">chevron_left</mat-icon>
-        </button>
-        <span class="text-caption font-extrabold font-mono text-ink">{{ currentPage() + 1 }}</span>
-        <button
-          [disabled]="!hasMore() || isLoading()"
-          (click)="onPageChange({ pageIndex: currentPage() + 1, pageSize: pageSize, length: 0 })"
-          class="w-8 h-8 rounded-md bg-bg-ink flex items-center justify-center cursor-pointer border-none disabled:opacity-disabled"
-        >
-          <mat-icon class="text-on-brand !text-[18px] !w-[18px] !h-[18px] leading-none">chevron_right</mat-icon>
-        </button>
+        @if (!isSearching()) {
+          <button
+            [disabled]="currentPage() === 0 || isLoading()"
+            (click)="onPageChange({ pageIndex: currentPage() - 1, pageSize: pageSize, length: 0 })"
+            class="w-8 h-8 rounded-md bg-bg-inset flex items-center justify-center cursor-pointer border-none disabled:opacity-disabled"
+          >
+            <mat-icon class="text-faint !text-[18px] !w-[18px] !h-[18px] leading-none">chevron_left</mat-icon>
+          </button>
+          <span class="text-caption font-extrabold font-mono text-ink">{{ currentPage() + 1 }}</span>
+          <button
+            [disabled]="!hasMore() || isLoading()"
+            (click)="onPageChange({ pageIndex: currentPage() + 1, pageSize: pageSize, length: 0 })"
+            class="w-8 h-8 rounded-md bg-bg-ink flex items-center justify-center cursor-pointer border-none disabled:opacity-disabled"
+          >
+            <mat-icon class="text-on-brand !text-[18px] !w-[18px] !h-[18px] leading-none">chevron_right</mat-icon>
+          </button>
+        }
       </div>
       </div>
     }

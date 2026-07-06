@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { MatTooltipModule } from '@angular/material/tooltip'
 import { AsyncPipe } from '@angular/common'
+import { FormsModule } from '@angular/forms'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { Observable, BehaviorSubject, switchMap, map, take } from 'rxjs'
 import { ScheduleService } from '../../../../../../../services/schedule/schedule.service'
@@ -30,6 +31,7 @@ import { ConfirmDialogService } from '../../../../../../../../shared/services/co
       MatProgressSpinnerModule,
       MatTooltipModule,
       AsyncPipe,
+      FormsModule,
    ],
    templateUrl: './component.html',
 })
@@ -55,6 +57,19 @@ export class ScheduleList implements OnInit {
 
    readonly isLoading = signal(false)
    readonly errorMessage = signal<string | null>(null)
+   readonly searchTerm = signal<string>('')
+
+   filterSchedules(schedules: Schedule[]): Schedule[] {
+      const search = this.searchTerm().trim().toLowerCase()
+      if (!search) return schedules
+      return schedules.filter(
+         (s) =>
+            s.days.some((d) => d.toLowerCase().includes(search)) ||
+            s.discipline.toLowerCase().includes(search) ||
+            (s.instructorName && s.instructorName.toLowerCase().includes(search)) ||
+            (s.branchName && s.branchName.toLowerCase().includes(search))
+      )
+   }
 
    readonly displayedColumns = ['days', 'time', 'discipline', 'instructor', 'branch', 'actions']
 
