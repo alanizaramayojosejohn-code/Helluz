@@ -17,7 +17,7 @@ import { AuthService } from '../../../../../../../services/auth/auth.service'
 import { Enrollment } from '../../../../../../../models/enrollment.model'
 import { Branch } from '../../../../../../../models/branch.model'
 import { DocumentSnapshot } from '@angular/fire/firestore'
-import { Observable, tap, take } from 'rxjs'
+import { Observable, tap, take, Subject, debounceTime, distinctUntilChanged } from 'rxjs'
 
 @Component({
    selector: 'x-enrollment-list',
@@ -47,7 +47,7 @@ export class EnrollmentList implements OnInit {
    readonly editEnrollment = output<string>()
    readonly viewDetail = output<string>()
 
-   enrollments$!: Observable<Enrollment[]>
+   readonly enrollments = signal<Enrollment[]>([])
    branches$!: Observable<Branch[]>
 
    readonly pageSize = 20
@@ -66,19 +66,15 @@ export class EnrollmentList implements OnInit {
    readonly isLoading = signal(false)
    readonly errorMessage = signal<string | null>(null)
    readonly searchTerm = signal<string>('')
-
-   filterEnrollments(enrollments: Enrollment[]): Enrollment[] {
-      const search = this.searchTerm().trim().toLowerCase()
-      if (!search) return enrollments
-      return enrollments.filter(
-         (e) =>
-            e.studentName.toLowerCase().includes(search) ||
-            (e.membershipName && e.membershipName.toLowerCase().includes(search)) ||
-            (e.branchName && e.branchName.toLowerCase().includes(search))
-      )
-   }
+   readonly isSearching = signal(false)
+   readonly searchResultsCount = signal(0)
+   private readonly searchInput$ = new Subject<string>()
 
    ngOnInit(): void {
+      this.searchInput$
+         .pipe(debounceTime(2000), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+         .subscribe((term) => this.handleSearch(term))
+
       this.authService.currentUser$.pipe(take(1)).subscribe(user => {
          if ((user?.role === 'admin' || user?.role === 'instructor') && user.branchId) {
             this.isBranchAdmin.set(true)
@@ -87,6 +83,35 @@ export class EnrollmentList implements OnInit {
          this.loadBranches()
          this.loadPage(0)
       })
+   }
+
+   onSearchInput(value: string): void {
+      this.searchTerm.set(value)
+      this.searchInput$.next(value.trim().toLowerCase())
+   }
+
+   clearSearch(): void {
+      this.searchTerm.set('')
+      this.searchInput$.next('')
+   }
+
+   private async handleSearch(term: string): Promise<void> {
+      if (term.length >= 2) {
+         this.isSearching.set(true)
+         this.isLoading.set(true)
+         const results = await this.enrollmentService.searchEnrollments(
+            term,
+            this.selectedBranchId() || undefined,
+            this.selectedStatus()
+         )
+         this.enrollments.set(results)
+         this.searchResultsCount.set(results.length)
+         this.isLoading.set(false)
+      } else if (this.isSearching()) {
+         this.isSearching.set(false)
+         this.searchResultsCount.set(0)
+         await this.loadPage(this.currentPage())
+      }
    }
 
    private loadBranches(): void {
@@ -130,10 +155,7 @@ export class EnrollmentList implements OnInit {
             this.selectedBranchId() || undefined,
             this.selectedStatus()
          )
-         this.enrollments$ = new Observable<Enrollment[]>((observer) => {
-            observer.next(result.enrollments)
-            observer.complete()
-         })
+         this.enrollments.set(result.enrollments)
 
          this.lastDoc = result.lastDoc
          this.hasMore.set(result.hasMore)
@@ -156,14 +178,24 @@ export class EnrollmentList implements OnInit {
 
    async onBranchFilterChange(branchId: string): Promise<void> {
       this.selectedBranchId.set(branchId === 'all' ? null : branchId)
-      this.resetPagination()
-      await this.loadPage(0)
+      if (this.isSearching()) {
+         const term = this.searchTerm().trim().toLowerCase()
+         if (term.length >= 2) await this.handleSearch(term)
+      } else {
+         this.resetPagination()
+         await this.loadPage(0)
+      }
    }
 
    async onStatusFilterChange(status: string): Promise<void> {
       this.selectedStatus.set(status)
-      this.resetPagination()
-      await this.loadPage(0)
+      if (this.isSearching()) {
+         const term = this.searchTerm().trim().toLowerCase()
+         if (term.length >= 2) await this.handleSearch(term)
+      } else {
+         this.resetPagination()
+         await this.loadPage(0)
+      }
    }
 
    private resetPagination(): void {

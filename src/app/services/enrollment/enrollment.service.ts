@@ -55,9 +55,16 @@ export class EnrollmentService {
             throw new Error('El alumno ya tiene una inscripción activa en esta sucursal')
          }
 
+         const searchKeywords = this.generateSearchKeywords(
+            enrollment.studentName,
+            enrollment.membershipName,
+            enrollment.branchName
+         )
+
          await this.query.create(id, {
             ...enrollment,
             id,
+            searchKeywords,
             createdBy: currentUserId,
             createdByName: currentUserName,
          })
@@ -76,11 +83,18 @@ export class EnrollmentService {
       currentUserName: string
    ): Promise<void> {
       try {
-         await this.query.update(id, {
-            ...enrollment,
-            updatedBy: currentUserId,
-            updatedByName: currentUserName,
-         })
+         const data: Partial<Enrollment> = { ...enrollment, updatedBy: currentUserId, updatedByName: currentUserName }
+
+         if (enrollment.studentName || enrollment.membershipName || enrollment.branchName) {
+            const existing = await firstValueFrom(this.query.getById(id))
+            data.searchKeywords = this.generateSearchKeywords(
+               enrollment.studentName ?? existing?.studentName ?? '',
+               enrollment.membershipName ?? existing?.membershipName ?? '',
+               enrollment.branchName ?? existing?.branchName ?? ''
+            )
+         }
+
+         await this.query.update(id, data)
       } catch (error) {
          console.error('Error al actualizar la inscripción', error)
          throw error
@@ -151,6 +165,17 @@ export class EnrollmentService {
       })
    }
 
+   private generateSearchKeywords(
+      studentName: string,
+      membershipName: string,
+      branchName: string
+   ): string[] {
+      const words = new Set<string>()
+      const all = `${studentName} ${membershipName} ${branchName}`.toLowerCase()
+      all.split(/\s+/).filter(Boolean).forEach((w) => words.add(w))
+      return Array.from(words)
+   }
+
    async decrementUsedSessions(enrollmentId: string): Promise<void> {
       try {
          const enrollment = await firstValueFrom(this.getEnrollmentById(enrollmentId))
@@ -211,6 +236,29 @@ export class EnrollmentService {
       } catch (error) {
          console.error('Error al contar inscripciones:', error)
          return 0
+      }
+   }
+
+   async searchEnrollments(
+      term: string,
+      branchId?: string,
+      status?: string
+   ): Promise<Enrollment[]> {
+      try {
+         const [keywordMatches, prefixMatches] = await Promise.all([
+            this.query.searchByKeywords(term, branchId, status),
+            this.query.searchByStudentNamePrefix(term, branchId, status),
+         ])
+
+         const seen = new Set<string>()
+         return [...keywordMatches, ...prefixMatches].filter((e) => {
+            if (seen.has(e.id)) return false
+            seen.add(e.id)
+            return true
+         })
+      } catch (error) {
+         console.error('Error al buscar inscripciones:', error)
+         return []
       }
    }
 
