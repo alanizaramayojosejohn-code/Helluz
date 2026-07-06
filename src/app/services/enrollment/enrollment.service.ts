@@ -247,13 +247,22 @@ export class EnrollmentService {
       branchId?: string,
       status?: string
    ): Promise<Enrollment[]> {
-      const [keywordMatches, prefixMatches] = await Promise.all([
-         this.query.searchByKeywords(term, branchId, status).catch(() => [] as Enrollment[]),
-         this.query.searchBySearchablePrefix(term, branchId, status).catch(() => [] as Enrollment[]),
-      ])
+      const lowerTerm = term.toLowerCase()
+      const capitalized = term.charAt(0).toUpperCase() + term.slice(1).toLowerCase()
+      const upperTerm = term.toUpperCase()
+
+      const [keywordMatches, lowerMatches, originalMatches, capitalizedMatches, upperMatches, searchableMatches] =
+         await Promise.all([
+            this.query.searchByKeywords(lowerTerm, branchId, status).catch(() => [] as Enrollment[]),
+            this.query.searchByStudentNamePrefix(lowerTerm, branchId, status).catch(() => [] as Enrollment[]),
+            this.query.searchByStudentNamePrefix(term, branchId, status).catch(() => [] as Enrollment[]),
+            this.query.searchByStudentNamePrefix(capitalized, branchId, status).catch(() => [] as Enrollment[]),
+            this.query.searchByStudentNamePrefix(upperTerm, branchId, status).catch(() => [] as Enrollment[]),
+            this.query.searchBySearchablePrefix(lowerTerm, branchId, status).catch(() => [] as Enrollment[]),
+         ])
 
       const seen = new Set<string>()
-      return [...keywordMatches, ...prefixMatches].filter((e) => {
+      return [...keywordMatches, ...lowerMatches, ...originalMatches, ...capitalizedMatches, ...upperMatches, ...searchableMatches].filter((e) => {
          if (seen.has(e.id)) return false
          seen.add(e.id)
          return true
