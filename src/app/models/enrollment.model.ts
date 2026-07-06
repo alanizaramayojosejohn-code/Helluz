@@ -33,6 +33,7 @@ export interface Enrollment {
    createdByName?:  string
    updatedBy?:      string
    updatedByName?:  string
+   searchable?: string
    searchKeywords?: string[]
 }
 
